@@ -1,0 +1,17 @@
+# Ignore virtual environment folders
+env/
+venv/
+cuda_venv/
+
+# Ignore faces folder for face recognition
+Website/Dashboard/Artificial_Intelligence/faces/
+
+# Ignore csv
+Website/Dashboard/static/*.xlsx
+
+# Ignore Personnel Pics
+/Website/Dashboard/static/img/personnel_pics/*/*.jpg
+/Website/Dashboard/static/img/personnel_pics/*/*.jpeg
+
+# Ignore Python cache folders
+__pycache__/

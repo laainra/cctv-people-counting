@@ -1,0 +1,73 @@
+[
+  {
+    "model": "auth.user",
+    "pk": 1,
+    "fields": {
+      "password": "pbkdf2_sha256$720000$llDjffaNL7S5Yi0QEVVsEF$rNxZUpOmxTX0k9YwYmL5IF59PH7XzR44DCJQp+hNI9w=",
+      "last_login": null, 
+      "is_superuser": true,
+      "username": "admin123",
+      "first_name": "",
+      "last_name": "",
+      "email": "",
+      "is_staff": true,
+      "is_active": true,
+      "date_joined": "2024-04-15T20:14:36.428Z",
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "Dashboard.personnels",
+    "pk": 1,
+    "fields": {
+      "name": "Unknown",
+      "gender": "Unknown"
+    }
+  },
+  {
+    "model": "django_celery_beat.crontabschedule",
+    "pk": 2,
+    "fields": {
+      "minute": "0",
+      "hour": "0",
+      "day_of_month": "*",
+      "month_of_year": "*",
+      "day_of_week": "*",
+      "timezone": "Asia/Jakarta"
+    }
+  },
+  {
+    "model": "django_celery_beat.periodictasks",
+    "pk": 1,
+    "fields": { "last_update": "2024-05-12T23:09:13.344Z" }
+  },
+  {
+    "model": "django_celery_beat.periodictask",
+    "pk": 2,
+    "fields": {
+      "name": "scheduled_unknown_delete",
+      "task": "Dashboard.tasks.deleteUnknownEveryDay",
+      "interval": null,
+      "crontab": 2,
+      "solar": null,
+      "clocked": null,
+      "args": "[]",
+      "kwargs": "{}",
+      "queue": null,
+      "exchange": null,
+      "routing_key": null,
+      "headers": "{}",
+      "priority": null,
+      "expires": null,
+      "expire_seconds": null,
+      "one_off": false,
+      "start_time": null,
+      "enabled": true,
+      "last_run_at": null,
+      "total_run_count": 0,
+      "date_changed": "2024-05-12T23:09:13.340Z",
+      "description": ""
+    }
+  }
+]

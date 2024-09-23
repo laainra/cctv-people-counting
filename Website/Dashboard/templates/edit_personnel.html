@@ -1,0 +1,15 @@
+{% extends 'base.html' %} {% block content %}
+<!-- insert content -->
+<form action="#" method="POST">
+  <div class="form-group">
+    {% csrf_token %} {{ form.as_p }}
+    <button type="submit" class="btn btn-primary btn-user btn-block">
+      Submit
+    </button>
+    <a class="btn btn-danger" href="{% url 'delete_personnel' p_id %}">
+      Delete Personnel
+    </a>
+  </div>
+</form>
+<!-- end logged cases -->
+{% endblock %}

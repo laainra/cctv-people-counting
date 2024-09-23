@@ -1,0 +1,740 @@
+{% extends 'base.html' %} {%block javascript_custom %}
+
+<style type="text/css" media="screen">
+  .handle {
+    position: absolute;
+    border: 0.1em solid;
+    width: 1em;
+    height: 1em;
+    border-radius: 100%;
+  }
+</style>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.min.js"></script>
+
+<script type="text/javascript">
+  function adjustPolyPoints(){
+    var width = parseFloat(document.getElementById("stream").offsetWidth)
+    var fx = width / parseFloat('{{Frame_X}}');
+    var poly = document.getElementById("poly");
+    var greenLines = document.getElementById("x");
+    var redLines = document.getElementById("y");
+
+    for(var i = 0; i < poly.points.numberOfItems; i++){
+      poly.points[i].x = parseFloat(poly.points[i].x * fx)
+      poly.points[i].y = parseFloat(poly.points[i].y * fx)
+
+      if(i < 4){
+        greenLines.points.getItem(i).x = parseFloat(greenLines.points.getItem(i).x * fx)
+        greenLines.points.getItem(i).y = parseFloat(greenLines.points.getItem(i).y * fx)
+      }else{
+        redLines.points.getItem(i-4).x = parseFloat(redLines.points.getItem(i-4).x * fx)
+        redLines.points.getItem(i-4).y = parseFloat(redLines.points.getItem(i-4).y * fx)
+      }
+    }
+  }
+
+  function adjustSVG(){
+    var width = parseFloat(document.getElementById("stream").offsetWidth)
+    document.getElementById("theSVG").setAttribute("width", width)
+    var height = parseFloat(parseFloat("{{Frame_Y}}") * (width / parseFloat("{{Frame_X}}")))
+    document.getElementById("theSVG").setAttribute("height", height)
+  }
+
+  function draggablePolyline(polygon, greenLines, redLines) {
+    var points = polygon.points;
+    var greenPoints = greenLines.points;
+    var redPoints = redLines.points;
+    var svgRoot = $(polygon).closest("svg");
+    var container = document.getElementById('stream');
+    var imgStream = document.getElementById('img_stream')
+
+    width = (parseInt(container.clientWidth) - parseInt(imgStream.clientWidth))
+    height = (parseInt(container.clientHeight) - parseInt(imgStream.clientHeight))
+
+    for (var i = 0; i < points.numberOfItems; i++) {
+      (function (i) {
+        // close over variables for drag call back
+        var point = points.getItem(i);
+        
+        var handle = document.createElement("div");
+        handle.className = "handle";
+        document.body.appendChild(handle);
+        svg = document.getElementById('theSVG')
+        // container.appendChild(handle);
+
+        var base = svgRoot.position();
+        // center handles over polygon
+        var cs = window.getComputedStyle(handle, null);
+        
+        base.left -= (parseFloat(cs.width)/2) - parseFloat(window.getComputedStyle(svg).marginLeft)
+
+        base.top -= (parseFloat(cs.height)/2) - parseFloat(window.getComputedStyle(svg).marginTop)
+
+        handle.style.left = base.left + point.x + "px";
+        handle.style.top = base.top + point.y + "px";
+
+        $(handle).draggable({
+          containment: container,
+          drag: function (event) {
+            setTimeout(function () {
+              // jQuery apparently calls this *before* setting position, so defer
+              point.x = parseInt(handle.style.left) - base.left;
+              point.y = parseInt(handle.style.top) - base.top;
+
+              if (i < 4){
+                greenPoints.getItem(i).x = point.x
+                greenPoints.getItem(i).y = point.y
+              }else{
+                redPoints.getItem(i-4).x = point.x
+                redPoints.getItem(i-4).y = point.y
+              }
+
+            }, 0);
+          },
+        });
+      })(i);
+    }
+  }
+</script>
+{%endblock%} {% block content %} {% csrf_token %}
+
+<script>
+  if (localStorage.getItem('darkMode') == 'enabled') {
+      document.body.classList.add("dark-mode")
+      document.getElementById("accordionSidebar").classList.add("dark-mode")
+      document.getElementById("toggler-button").classList.add("dark-mode")
+  }else {
+      document.body.classList.add("light-mode")
+      document.getElementById("accordionSidebar").classList.add("light-mode")
+      document.getElementById("toggler-button").classList.add("light-mode")
+  }
+</script>
+
+<h1 id="header" class="effected" style="padding-left: 50px; font-size: 30px; margin-bottom: 20px;">
+  Camera
+</h1>
+
+<section class="my-modal camera hidden">
+  <div class="card align-items-center effected pl-5 pr-5 pt-4 pb-4 align-self-center" style="border-radius: 25px; width: fit-content;">
+    <span id="form-title" class="mb-4 effected" style="font-weight: 600; font-size: 30px;">Camera Settings</span>
+    <form id="camera-form" method="POST" class="d-flex flex-column justify-content-center align-items-center mb-3" style="width: fit-content;">
+      {% csrf_token %}
+      <p class="mb-3" style="display: flex; flex-direction: column; justify-content: center; align-items: start; width: 100%;">
+        <label for="cam_name" class="mb-1 effected">Camera Name:</label>
+        <input name="cam_name" type="text" class="effected edit-text" style="width:320px;" maxlength="21" placeholder="Insert Camera Name" required> 
+      </p>
+      <p class="mb-3" style="display: flex; flex-direction: column; justify-content: center; align-items: start; width: 100%;">
+        <label for="feed_src" class="mb-1 effected">RTSP Link:</label>
+        <input name="feed_src" type="text" class="effected edit-text" style="width:320px;" placeholder="Insert RTSP Link" required>
+      </p>
+      <div class="d-flex justify-content-between align-items-end mb-3" style="width: 320px;">
+        <div class="d-flex flex-column align-items-start justify-content-center">
+          <label for="cam_start" class="mb-1 effected">AI Start At:</label>
+          <input id="start-time" title="Camera Start Time" name="cam_start" type="time" step="300" class="effected time-input"value="08:00:00" onchange="checkValidTimeRange()" style="cursor: pointer;" required>
+        </div>
+        <span class="d-flex align-items-center effected" style="margin-bottom: 5px;">to</span>
+        <div class="d-flex flex-column align-items-start justify-content-center">
+          <label for="cam_stop" class="mb-1 effected">AI Stop At:</label>
+          <input id="end-time" title="Camera Stop Time" name="cam_stop" type="time" step="300" class="effected time-input" value="17:00:00" onchange="checkValidTimeRange()" style="cursor: pointer;" required>
+        </div>
+      </div>
+      <div class="d-flex flex-column justify-content-between align-items-start" style="width: 320px;">
+        <label class="d-flex align-items-center effected mb-1">Additional AI Detection:</label>
+        <div class="d-flex flex-row align-items-start justify-content-start checkbox-container mb-2 effected">
+          <input name='gender_detection' type="checkbox" class="ml-1 effected" style="margin-top:4px;" checked> 
+          <div class="d-flex flex-column justify-content-center ml-2 mb-1 align-items-start" style="text-decoration: none;">
+            <span class="effected" style="font-size: 14px; font-weight: 600;">Gender Detection</span>
+            <span class="effected" style="font-size: 14px; text-align: justify; font-weight: 300;">Enable gender detection to detect the gender of the person that enters the area</span>
+          </div>
+        </div>
+
+        <div class="d-flex flex-row align-items-start justify-content-start checkbox-container effected">
+          <input name="face_detection" type="checkbox" class="ml-1 effected" style="margin-top:4px;" checked>
+          <div class="d-flex flex-column justify-content-center ml-2 mb-1 align-items-start" style="text-decoration: none;">
+            <span class="effected" style="font-size: 14px; font-weight: 600;">Face Recognition</span>
+            <span class="effected" style="font-size: 13px; text-align: justify; font-weight: 300;">Enable face recognition to recognize registered personnel when entering the area</span>
+          </div>
+        </div>
+      </div>
+      <div class="d-flex mt-4 justify-content-between align-items-center btn-container gap-2" style="width: 320px;">
+        <button 
+          type="button" 
+          class="btn btn-danger btn-user btn-block m-0" 
+          style="border-radius: 8px; padding-left: 2%; padding-right: 2%;"
+          onclick="closeModal()">
+          Cancel
+        </button>
+        <button 
+          class="btn btn-primary btn-user btn-block m-0" 
+          type="submit"
+          style="border-radius: 8px; padding-left: 2%; padding-right: 2%;">
+          Add Camera
+        </button>
+        <button 
+          type="submit" 
+          class="btn btn-success btn-user btn-block m-0" 
+          style="border-radius: 8px; padding-left: 2%; padding-right: 2%;">
+          Save
+        </button>
+      </div>
+    </form>
+    
+    <button
+      class="btn btn-danger btn-block align-self-center text-center delete-button effected">
+      Delete Camera
+    </button>
+
+  </div>
+</section>
+
+<div id="camera-scroll-container" class="card p-3 mb-4 text-center effected closable responsive-card">
+  <div class="d-flex p-0 mb-2 align-items-center justify-content-between">
+    <a class="d-inline-flex nav-link align-items-center gap-1 p-0 mt-2 ml-3 effected">
+        <i class="d-flex fa-solid fa-camera text-center effected" style="font-size: 20px"></i>
+        <span id="camera-list-title" class="ml-1">Camera List</span>
+    </a>
+    
+    <div class="d-inline-flex nav-link align-items-center gap-3 p-0 mt-2 mr-3 effected">
+      <i title="Add Camera" id="add-camera" class="d-flex fa-solid fa-plus text-center effected" style="font-size: 20px; cursor: pointer;" onclick="addCamera(); openModal()"></i>
+      <!-- <a class="effected" href="{% url 'add_camera' %}" style="text-decoration: none;">
+      </a> -->
+    </div>
+  </div>
+  
+  <div id="camera-list" class="scrollmenu horizontal-scroll effected" style="align-self: center;">
+    {% for cam in Cams %}
+      <a 
+      {% if Active_Cam.id == cam.id %}
+      class="card mb-1 text-center effected camera-item m-0 active"   
+      {% else %}
+      class="card mb-1 text-center camera-item m-0 effected"   
+      {% endif %}
+      onclick="selectCamera('{{cam.id}}', this)">
+        {% load static %}
+        {% if Active_Cam.id == cam.id %}
+          <div class="camera-marker effected" style="padding: 0; border-radius: 0px 0px 8px 8px; position: absolute; height: 6px; width: 100px; top: 0; margin-left: auto; margin-right: auto; left: 0; right: 0;"></div>
+        {% endif %}
+
+        <div class="container d-flex flex-column justify-content-between align-items-center text-center">
+          <i title="Open Camera Settings" class="d-flex fa-solid fa-gear text-center effected" onclick=" editCamera('{{cam.id}}')"></i>
+          <div class="d-flex align-items-center justify-content-center mb-2 apply-shadow" style="border-radius: 50%; width: 105px; height: 105px; background-color: #ffffff;">
+            {% if cam.cam_is_active == False %}
+            <i class="d-flex fa-solid fa-video-slash text-center effected" style="font-size: 40px; cursor: pointer; color: #B80F0A;"></i>
+            {% else %}
+            <i class="d-flex fa-solid fa-video text-center effected" style="font-size: 40px; cursor: pointer; color: #0A5C36;"></i>
+            {% endif %}    
+          </div>
+          <p class="mb-0">{{cam.cam_name}}</p>
+          {% if cam.cam_is_active == False %}
+          <p class="m-0" style="font-size: 12px;">Inactive</p>
+          {% else %}
+          <p class="m-0" style="font-size: 12px;">Active</p>
+          {% endif %}
+        </div> 
+      </a>
+    {% endfor %}
+  </div>
+
+
+  {% if Active_Cam != None %}
+  <div class="w-100 mt-1">
+      <a class="d-flex nav-link align-items-center justify-content-center gap-1 p-0 effected">
+          <i class="d-flex fa-solid fa-chevron-up text-center effected" style="font-size: 20px; cursor: pointer;" onclick="toggleCollapsed()"></i>
+      </a>
+  </div>
+  {% endif %}
+</div>
+
+<div id="camera-stream-container" class="card p-3 pb-0 text-center effected mb-5 responsive-card">
+  <div class="d-flex p-0 mb-2 align-items-center justify-content-between responsive">
+    <a id="camera-stream-info" class="d-inline-flex nav-link align-items-center gap-1 p-0 mt-2 ml-3 effected">
+        <i class="d-flex fa-solid fa-video text-center effected" style="font-size: 20px"></i>
+        <span id="camera-list-title" class="ml-1">Camera Stream</span>
+    </a>
+    
+    <a class="d-inline-flex nav-link align-items-center gap-3 p-0 mt-2 mr-3 effected responsive">
+      {% if Active_Cam.cam_is_active == True %}
+        {% if Toggle_Settings == True %}
+          <button
+            class="btn btn-info d-flex justify-content-center align-items-center gap-2" 
+            style="text-decoration: none; color: white; font-size: medium; min-height: 38px;" 
+            onclick="window.location.reload()">
+            Reset
+            <i title="Reset" class="d-flex fa-solid fa-refresh text-center effected" style="font-size: 12px; color: white; cursor: pointer;"></i>
+          </button>
+          <button
+            class="btn btn-danger d-flex justify-content-center align-items-center gap-2" 
+            style="text-decoration: none; color: white; font-size: medium; min-height: 38px;" 
+            onclick="changeSettings('close_settings')">
+            Cancel
+            <i title="Cancel" class="d-flex fa-solid fa-xmark text-center effected" style="font-size: 12px; color: white; cursor: pointer;"></i>
+          </button>
+          <button
+            class="btn btn-success d-flex justify-content-center align-items-center gap-2" 
+            style="text-decoration: none; color: white; font-size: medium; min-height: 38px;" 
+            onclick="sendPolylineCoordinates()">
+            Confirm
+            <i title="Confirm" class="d-flex fa-solid fa-check text-center effected" style="font-size: 12px; color: white; cursor: pointer;"></i>
+          </button>
+        {% else %}
+          <button 
+            class="btn btn-success d-flex justify-content-center align-items-center gap-2"
+            style="text-decoration: none; color: white; font-size: medium; min-height: 38px;"
+            onclick="expandStream(this)">
+            Expand Stream
+            <i class="d-flex fa-solid fa-expand text-center text-white" style="font-size: 15px; cursor: pointer;"></i>    
+          </button>
+          <button
+            class="btn btn-info d-flex justify-content-center align-items-center gap-2" 
+            style="text-decoration: none; color: white; font-size: medium; min-height: 38px;" 
+            onclick="changeSettings('open_settings')">
+            Edit Polygon
+            <i title="Edit Polygon" class="d-flex fa-solid fa-draw-polygon text-center text-white" style="font-size: 15px; cursor: pointer;"></i>
+          </button>
+          <form action="{% url 'stop_stream' %}">
+            <button 
+              class="btn btn-danger d-flex justify-content-center align-items-center gap-2"
+              style="text-decoration: none; color: white; font-size: medium; min-height: 38px;">
+              Stop Stream
+              <i class="d-flex fa-solid fa-stop text-center text-white" style="font-size: 15px; cursor: pointer;"></i>    
+            </button>
+          </form>
+          <!-- <a class="effected" href="{% url 'stop_stream' %}" style="text-decoration: none;">
+            <i title="Stop Stream" class="d-flex fa-solid fa-pause text-center effected" style="font-size: 20px; cursor: pointer;"></i>
+          </a> -->
+        {% endif %}
+      {% else %}
+        {% if Active_Cam != None %}
+            <form action="{% url 'start_stream' %}">
+              <button 
+                id="start-stream"
+                class="btn btn-success d-flex justify-content-center align-items-center gap-2"
+                style="text-decoration: none; color: white; font-size: medium; min-height: 38px;"
+                onclick="showLoader()">
+                Start Stream
+                <i class="d-flex fa-solid fa-play text-center text-white" style="font-size: 15px; cursor: pointer;"></i>    
+              </button>
+            </form>
+          <!-- <a class="effected" href="{% url 'start_stream' %}" style="text-decoration: none;">
+            <i title="Start Stream" class="d-flex fa-solid fa-play text-center effected" style="font-size: 20px; cursor: pointer;"></i>
+          </a> -->
+        {% endif %}   
+      {% endif %}
+    </a>
+  </div>
+
+  <!-- Start Stop Stream -->
+  {% if Active_Cam == None %}
+    <p class="mt-3 effected">Plese Add Camera !</p>
+  {% elif Active_Cam.cam_is_active == True %}
+  <!-- Camera Stream -->
+  <div class="container text-center mb-3">
+    <div id="stream" class="mt-2" style="width: 100%; height: 100%;">
+        {% if Toggle_Settings == True %}
+          <svg
+          id="theSVG"
+          width="{{Frame_X}}"
+          height="{{Frame_Y}}"
+          style="position: absolute; border: 2px;">
+          <polyline
+            id="x"
+            points="{{Active_Cam.x1}},{{Active_Cam.y1}} {{Active_Cam.x2}},{{Active_Cam.y2}} {{Active_Cam.x3}},{{Active_Cam.y3}} {{Active_Cam.x4}},{{Active_Cam.y4}}"
+            stroke="green"
+            style="fill: none; fill-opacity: 0.5; stroke-width: 5px;"
+          />
+          <polyline
+            id="y"
+            points="{{Active_Cam.x8}},{{Active_Cam.y8}} {{Active_Cam.x7}},{{Active_Cam.y7}} {{Active_Cam.x6}},{{Active_Cam.y6}} {{Active_Cam.x5}},{{Active_Cam.y5}}"
+            stroke="red"
+            style="fill: none; fill-opacity: 0.5; stroke-width: 5px;"
+          />
+          <polygon
+            id="poly"
+            points="{{Active_Cam.x1}},{{Active_Cam.y1}} {{Active_Cam.x2}},{{Active_Cam.y2}} {{Active_Cam.x3}},{{Active_Cam.y3}} {{Active_Cam.x4}},{{Active_Cam.y4}} {{Active_Cam.x8}},{{Active_Cam.y8}} {{Active_Cam.x7}},{{Active_Cam.y7}} {{Active_Cam.x6}},{{Active_Cam.y6}} {{Active_Cam.x5}},{{Active_Cam.y5}}"
+            style="fill: grey; fill-opacity: 0.5; stroke-width: 5px"
+          />
+          </svg>
+        {% endif %}
+        <img id="img_stream" src="{% url 'video_feed' %}" style="width: 100%; border-radius: 10px;" onclick="expandStream(this)"/>
+    </div>
+  </div>
+  {% else %}
+  <div id="camera-stream-loader" class="loader" style="width: 50px; height: 50px; margin: -30px 0 0 -25px;"></div>
+  <span id="unactive-warning" class="effected" style="padding: 20px; font-size: small;">{{Active_Cam.cam_name}} Is Not Active !</span>
+  {% endif %}
+  
+</div>
+
+<script>
+  elements = document.getElementsByClassName("effected")
+
+  for (var i = 0; i<elements.length; i++){
+    if (localStorage.getItem('darkMode') == 'enabled') {
+        elements[i].classList.add("dark-mode")
+    }else {
+        elements[i].classList.add("light-mode")
+    }
+  }
+</script>
+
+<script type="text/javascript">
+  if ("{{Toggle_Settings}}" == "True"){
+    adjustPolyPoints()
+    adjustSVG()
+    draggablePolyline(document.getElementById("poly"), document.getElementById("x"), document.getElementById("y"));
+    
+    window.onresize = resize;
+    function resize() {
+      window.location.reload();
+    }
+  }
+  
+  function sendPolylineCoordinates() {
+    var width = parseInt(document.getElementById("stream").offsetWidth)
+    var fx = width / '{{Frame_X}}';
+
+    var greenLines = document.getElementById("x");
+    var redLines = document.getElementById("y");
+    var csrftoken = document.querySelector("[name=csrfmiddlewaretoken]").value;
+    var xhttp = new XMLHttpRequest();
+    var data =
+      "id=" +
+      "{{Active_Cam.id}}" +
+      "&x1=" +
+      parseInt(greenLines.points[0].x / fx) +
+      "&y1=" +
+      parseInt(greenLines.points[0].y / fx) +
+      "&x2=" +
+      parseInt(greenLines.points[1].x / fx) +
+      "&y2=" +
+      parseInt(greenLines.points[1].y / fx) +
+      "&x3=" +
+      parseInt(greenLines.points[2].x / fx) +
+      "&y3=" +
+      parseInt(greenLines.points[2].y / fx) +
+      "&x4=" +
+      parseInt(greenLines.points[3].x / fx) +
+      "&y4=" +
+      parseInt(greenLines.points[3].y / fx) +
+      "&x8=" +
+      parseInt(redLines.points[0].x / fx) +
+      "&y8=" +
+      parseInt(redLines.points[0].y / fx) +
+      "&x7=" +
+      parseInt(redLines.points[1].x / fx) +
+      "&y7=" +
+      parseInt(redLines.points[1].y / fx) +
+      "&x6=" +
+      parseInt(redLines.points[2].x / fx) +
+      "&y6=" +
+      parseInt(redLines.points[2].y / fx) +
+      "&x5=" +
+      parseInt(redLines.points[3].x / fx) +
+      "&y5=" +
+      parseInt(redLines.points[3].y / fx);
+    xhttp.open("POST", "save_coordinates");
+    xhttp.setRequestHeader("X-CSRFToken", csrftoken);
+    xhttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+    xhttp.send(data);
+    
+    changeSettings('close_settings');
+  }
+
+  function changeSettings(command){
+    var csrftoken = document.querySelector("[name=csrfmiddlewaretoken]").value;
+    var xhttp = new XMLHttpRequest();
+    var data = "command=" + command;
+
+    xhttp.open("POST", "camera");
+    xhttp.setRequestHeader("X-CSRFToken", csrftoken);
+    xhttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+    xhttp.onload = function(){
+      window.location.reload();
+    };
+    xhttp.send(data);
+  }
+
+  function setCameraContainer(){
+    if (parseInt(window.innerWidth) < 992){
+      width = 0
+    }else{
+      width = parseInt(document.getElementById('accordionSidebar').offsetWidth)
+    }
+    width2 = parseInt(document.body.clientWidth)
+    computedStyle = getComputedStyle(document.querySelector('.responsive-card'))
+    cardMarginRight = parseInt(computedStyle.marginRight)
+    cardMarginLeft = parseInt(computedStyle.marginLeft)
+
+    width3 = (width2 - width - 50 - cardMarginLeft - cardMarginRight).toString();
+
+    document.getElementById("camera-list").style.width = width3 + "px";
+  }
+
+  function selectCamera(id, element){
+    var csrftoken = document.querySelector("[name=csrfmiddlewaretoken]").value;
+    var xhttp = new XMLHttpRequest();
+    var data = "command=" + 'select_camera' + "&id=" + id;
+
+    xhttp.open("POST", "camera");
+    xhttp.setRequestHeader("X-CSRFToken", csrftoken);
+    xhttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+    xhttp.onload = function(){
+      window.location.reload();
+    };
+    xhttp.send(data);
+  }
+
+  function toggleCollapsed(){
+      document.getElementById("camera-scroll-container").classList.toggle("closed")
+
+      if (document.getElementById("camera-scroll-container").classList.contains("closed")){
+          if ("{{Active_Cam.cam_is_active}}" == "False"){
+              document.getElementById("camera-list-title").textContent = "{{Active_Cam.cam_name}}" + " - Inactive"
+          } else{
+              document.getElementById("camera-list-title").textContent = "{{Active_Cam.cam_name}}" + " - Active"
+          }
+      }else{
+          document.getElementById("camera-list-title").textContent = "Camera List"
+      }
+  }
+
+  function showLoader(){
+    var navItems = document.getElementsByClassName('nav-item')
+    var cameraItems = document.getElementsByClassName('camera-item')
+
+    for (var i = 0; i < navItems.length; i++){
+      navItems[i].classList.add('disabled')
+    }
+
+    for (var i = 0; i < cameraItems.length; i++){
+      cameraItems[i].classList.add('disabled')
+    }
+
+    document.getElementById('add-camera').classList.add('disabled')
+    document.getElementById('start-stream').classList.add('disabled')
+    document.querySelector('.sidebar-brand').classList.add('disabled')
+
+    document.getElementById('camera-stream-loader').style.display = 'block'
+    document.getElementById('unactive-warning').style.padding = '0px'
+    document.getElementById('unactive-warning').textContent = 'Starting Stream'
+    if (parseInt(window.innerWidth) < 922){
+      document.getElementById('unactive-warning').style.paddingTop = '65px'
+    } else{
+      document.getElementById('unactive-warning').style.paddingTop = '30px'
+    }
+    document.getElementById('unactive-warning').style.paddingBottom = '10px'
+  }
+
+  var modal = document.querySelector(".my-modal");
+  var overlay = document.querySelector(".overlay");
+
+  var cameraName = document.querySelector("input[name='cam_name']")
+  var feedSrc = document.querySelector("input[name='feed_src']")
+  var timeStart = document.querySelector("input[name='cam_start']")
+  var timeStop = document.querySelector("input[name='cam_stop']")
+  var genderCheckbox = document.querySelector("input[name='gender_detection']")
+  var faceCheckbox = document.querySelector("input[name='face_detection']")
+
+  var addCameraBtn = document.querySelector('.btn-container .btn-primary')
+  var saveBtn = document.querySelector('.btn-container .btn-success')
+  var deleteCameraBtn = document.querySelector('.delete-button') 
+
+  var formTitle = document.getElementById('form-title')
+
+  var cameraForm = document.getElementById('camera-form')
+
+  function addCamera(){
+    cameraForm.action = "{% url 'add_camera' %}"
+    cameraName.value = ''
+    feedSrc.value = ''
+    timeStart.value = '08:00:00'
+    timeStop.value = '17:00:00'
+    genderCheckbox.checked = true
+    faceCheckbox.checked = true
+    addCameraBtn.style.display = 'block'
+    saveBtn.style.display = 'none'
+    deleteCameraBtn.style.display = 'none'
+    formTitle.textContent = 'Insert Camera'
+  }
+
+  function editCamera(id){
+    event.stopPropagation()
+    
+    var csrftoken = document.querySelector("[name=csrfmiddlewaretoken]").value;
+    var xhttp = new XMLHttpRequest();
+    var data = "command=" + 'get_camera' + "&id=" + id;
+
+    xhttp.open("POST", "camera");
+    xhttp.setRequestHeader("X-CSRFToken", csrftoken);
+    xhttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+    xhttp.onload = function(){
+      json = JSON.parse(xhttp.responseText)
+
+      var edit_url = "{% url 'edit_camera' id=123 %}";
+      edit_url = edit_url.replace("123", id);
+      cameraForm.action = edit_url
+
+      cameraName.value = json['cam_name']
+      feedSrc.value = json['feed_src']
+      timeStart.value = json['cam_start']
+      timeStop.value = json['cam_stop']
+      genderCheckbox.checked = Boolean(json['gender_detection'])
+      faceCheckbox.checked = Boolean(json['face_detection'])
+      addCameraBtn.style.display = 'none'
+      saveBtn.style.display = 'block'
+      deleteCameraBtn.style.display = 'block'
+      formTitle.textContent = 'Camera Settings'
+
+      deleteCameraBtn.onclick= function(event) {
+        Swal.fire({
+          title: "Are you sure?",
+          text: "All camera data will be deleted!",
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonColor: "#3085d6",
+          cancelButtonColor: "#d33",
+          confirmButtonText: "Yes, delete it!"
+        }).then((result) => {
+          if (result.isConfirmed) {
+            var delete_url = "{% url 'delete_camera' id=123 %}";
+            delete_url = delete_url.replace("123", id);
+            window.location.href = delete_url 
+            
+            // Swal.fire({
+            //   title: "Deleted!",
+            //   text: "Camera has been deleted.",
+            //   icon: "success",
+            // }).then((result) => {
+            //   if (result.isConfirmed) {
+            //   }
+            // });
+            
+          }
+        });
+      }
+
+      openModal();
+    };
+    xhttp.send(data);
+
+  }
+
+  var currentStartTime = document.getElementById('start-time').value
+  var currentEndTime = document.getElementById('end-time').value
+
+  function checkValidTimeRange(){
+    var inputStart = document.getElementById('start-time')
+    var inputEnd = document.getElementById('end-time')
+
+    var startHour = inputStart.value.split(':')[0]
+    var startMinute = inputStart.value.split(':')[1]
+    var endHour = inputEnd.value.split(':')[0]
+    var endMinute = inputEnd.value.split(':')[1]
+
+    var startTime = parseInt(startHour + startMinute)
+    var endTime = parseInt(endHour + endMinute)
+
+    if (startTime > endTime){
+      inputStart.value = currentStartTime
+      inputEnd.value = currentEndTime
+
+      Swal.fire({
+          title: "Invalid Time Range!",
+          icon: "error"
+      });
+    }else{
+      currentStartTime = document.getElementById('start-time').value
+      currentEndTime = document.getElementById('end-time').value
+    }
+    
+  }
+
+
+  function closeModal(){
+    modal.classList.add('hidden')
+    overlay.classList.add('hidden')
+  }
+
+  function openModal(){
+    modal.classList.remove('hidden')
+    overlay.classList.remove('hidden')
+  }
+
+  function expandStream(element){
+    if (element == document.getElementById('img_stream')){
+      if (document.getElementById('img_stream').classList.contains('expand-vertical') || 
+          document.getElementById('img_stream').classList.contains('expand-horizontal')){
+        document.getElementById('img_stream').classList.remove('expand-horizontal')
+        document.getElementById('img_stream').classList.remove('expand-vertical')
+        document.querySelector('.overlay').classList.add('hidden')
+      }
+    } else {
+      if (parseInt(window.innerWidth) > parseInt(window.innerHeight)){
+        document.getElementById('img_stream').classList.toggle('expand-vertical')
+        document.getElementById('img_stream').classList.remove('expand-horizontal')
+      } else {
+        document.getElementById('img_stream').classList.remove('expand-vertical')
+        document.getElementById('img_stream').classList.toggle('expand-horizontal')
+      }
+      document.querySelector('.overlay').classList.toggle('hidden')
+    }
+  }
+
+  setCameraContainer()
+
+  if ("{{Active_Cam.cam_is_active}}" == "False" || "{{Active_Cam}}" == "None"){
+    localStorage.setItem("isExpanded", "False")
+  }
+
+  window.addEventListener("resize", setCameraContainer, false);
+
+  if ('{{request.session.status}}' == 'stream_error'){
+    Swal.fire({
+      title: "Stream Error!",
+      text: "There's a problem with the feed source.",
+      icon: "error"
+    });
+  } else if ('{{request.session.status}}' == 'adding_error') {
+    Swal.fire({
+      title: "Failed!",
+      text: "Camera can't be added.",
+      icon: "error"
+    });
+  } else if ('{{request.session.status}}' == 'adding_success') {
+    Swal.fire({
+      title: "Success!",
+      text: "Camera has been added.",
+      icon: "success"
+    });
+  } else if ('{{request.session.status}}' == 'edit_error') {
+    Swal.fire({
+      title: "Saving Failed!",
+      text: "Camera setting can't be saved.",
+      icon: "error"
+    });
+  } else if ('{{request.session.status}}' == 'edit_success') {
+    Swal.fire({
+      title: "Change Saved!",
+      text: "Camera setting has been saved.",
+      icon: "success"
+    });
+  } else if ('{{request.session.status}}' == 'camera_deleted') {
+    Swal.fire({
+      title: "Deleted!",
+      text: "Camera has been deleted.",
+      icon: "success"
+    });
+  }
+    
+  var csrftoken = document.querySelector("[name=csrfmiddlewaretoken]").value;
+  var xhttp = new XMLHttpRequest();
+  var data = "command=" + 'reset_status';
+
+  xhttp.open("POST", "camera");
+  xhttp.setRequestHeader("X-CSRFToken", csrftoken);
+  xhttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+  xhttp.send(data);
+</script>
+
+{% endblock %}

@@ -1,0 +1,156 @@
+{% extends 'base.html' %} {% block content %}
+<!-- insert content -->
+<div class="card ml-5 mr-5 align-items-center effected p-5 align-self-center" style="border-radius: 25px; width: fit-content;">
+  {% if Active_Cam == None %}
+  <span class="mb-4 effected" style="font-weight: 600; font-size: 30px;">Add Camera</span>
+  {% else %}
+  <span class="mb-4 effected" style="font-weight: 600; font-size: 30px;">Camera Settings</span>
+  {% endif %}
+  <form id="camera_form" action="#" method="POST" class="d-flex flex-column justify-content-center align-items-center mb-3" style="width: fit-content;">
+    {% csrf_token %}
+    <p style="align-items: start; width: fit-content;">
+      <span class="effected">Camera Name:</span>
+      <br>
+      <input name="cam_name" type="text" class="effected edit-text" style="width:320px;" maxlength="21" value="{{Active_Cam.cam_name}}" placeholder="Insert Camera Name" required> 
+    </p>
+    <p style="align-items: start; width: fit-content;">
+      <span class="effected">RTSP Link:</span>
+      <br>
+      <input name="feed_src" type="text" class="effected edit-text" style="width:320px;" value="{{Active_Cam.feed_src}}" placeholder="Insert RTSP Link" required>
+    </p>
+    <div class="d-flex justify-content-between mb-3" style="width: 320px;">
+      <a>
+        <span class="effected">AI Start At:</span>
+        <br>
+        <input id="start-time" title="Camera Start Time" name="cam_start" type="time" step="300" class="effected time-input" {% if Active_Cam != None %} value="{{Active_Cam.cam_start}}" {% else %} value="08:00:00" {% endif %} onchange="checkValidTimeRange()" style="cursor: pointer;" required>
+      </a>
+      <span class="d-flex align-items-center effected">to</span>
+      <a>
+        <span class="effected">AI Stop At:</span>
+        <br>
+        <input id="end-time" title="Camera Stop Time" name="cam_stop" type="time" step="300" class="effected time-input" {% if Active_Cam != None %} value="{{Active_Cam.cam_stop}}" {% else %} value="17:00:00" {% endif %} onchange="checkValidTimeRange()" style="cursor: pointer;" required>
+      </a>
+    </div>
+    <p class="d-flex flex-column justify-content-between align-items-start" style="width: 320px;">
+      <span class="d-flex align-items-center effected">Used AI Detection:</span>
+      <a class="d-flex ml-1 align-items-center" style="text-decoration: none;">
+        {% if Active_Cam == None %}
+          <input name='gender_detection' type="checkbox" class="effected" checked> 
+        {% else %}
+          {% if Active_Cam.gender_detection == True %}
+            <input name='gender_detection' type="checkbox" class="effected" checked> 
+          {% else %}
+            <input name='gender_detection' type="checkbox" class="effected">
+          {% endif %}
+        {% endif %}
+        <span class="ml-2 effected">Gender Detection</span>
+      </a>
+
+      <span class="mb-2 effected" style="font-size: 13px; font-style: italic; text-align: justify; margin-left: 25px;">Enable gender detection to detect the gender of the person that enters the area</span>
+
+      <a class="d-flex ml-1 align-items-center" style="text-decoration: none;">
+        {% if Active_Cam == None %}
+          <input name="face_detection" type="checkbox" class="effected" checked>
+        {% else %}
+          {% if Active_Cam.face_detection == True %}
+            <input name="face_detection" type="checkbox" class="effected" checked> 
+          {% else %}
+            <input name="face_detection" type="checkbox" class="effected"> 
+          {% endif %}
+        {% endif %}
+        <span class="ml-2 effected">Face Recognition</span>
+      </a>
+
+      <span class="effected" style="font-size: 13px; font-style: italic; text-align: justify; margin-left: 25px;">Enable face recognition to recognize registered personnel when entering the area</span>  
+    </p>
+
+    <div class="d-flex justify-content-between align-items-center gap-2" style="width: 320px;">
+      <button 
+        type="button" 
+        class="btn btn-danger btn-user btn-block m-0" 
+        style="border-radius: 20px; padding-left: 2%; padding-right: 2%;"
+        onclick="cancelEdit()">
+        Cancel
+      </button>
+      {% if Active_Cam == None %}
+        <button 
+          class="btn btn-primary btn-user btn-block m-0" 
+          type="submit"
+          style="border-radius: 20px; padding-left: 2%; padding-right: 2%;">
+          Add Camera
+        </button>
+      {% else %}
+        <button 
+          type="submit" 
+          class="btn btn-success btn-user btn-block m-0" 
+          style="border-radius: 20px; padding-left: 2%; padding-right: 2%;">
+          Save
+        </button>
+      {% endif %}
+    </div>
+  </form>
+  {% if Active_Cam != None %}
+  <a
+    class="align-self-center mt-2 text-center" 
+    style="border-radius: 20px; padding-left: 2%; padding-right: 2%; width: 200px; color: red; font-weight: 600; cursor: pointer; text-decoration: none;"
+    href="{% url 'delete_camera' %}">
+    Delete Camera
+  </a>
+  {% endif %}
+</div>
+
+
+<script>
+  var labels = document.getElementsByTagName('label');
+  for (var i = 0; i < labels.length; i++) {
+    labels[i].classList.add('effected')
+  }
+
+  elements = document.getElementsByClassName("effected")
+  
+  for (var i = 0; i<elements.length; i++){
+    if (localStorage.getItem('darkMode') == 'enabled') {
+        elements[i].classList.add("dark-mode")
+    }else {
+        elements[i].classList.add("light-mode")
+    }
+  }
+</script>
+
+<script>
+  var currentStartTime = document.getElementById('start-time').value
+  var currentEndTime = document.getElementById('end-time').value
+
+  function cancelEdit(){
+    window.location.href = "{% url 'camera' %}"
+  }
+
+  function checkValidTimeRange(){
+    var inputStart = document.getElementById('start-time')
+    var inputEnd = document.getElementById('end-time')
+
+    var startHour = inputStart.value.split(':')[0]
+    var startMinute = inputStart.value.split(':')[1]
+    var endHour = inputEnd.value.split(':')[0]
+    var endMinute = inputEnd.value.split(':')[1]
+
+    var startTime = parseInt(startHour + startMinute)
+    var endTime = parseInt(endHour + endMinute)
+
+    if (startTime > endTime){
+      Swal.fire({
+          title: "Invalid Time Range!",
+          icon: "error"
+      });
+      inputStart.value = currentStartTime
+      inputEnd.value = currentEndTime
+    }else{
+      currentStartTime = document.getElementById('start-time').value
+      currentEndTime = document.getElementById('end-time').value
+    }
+    
+  }
+</script>
+
+<!-- end logged cases -->
+{% endblock %}

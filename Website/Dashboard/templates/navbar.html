@@ -1,0 +1,79 @@
+{% if user.is_authenticated %} {%load static%}
+<nav
+  class="navbar navbar-expand navbar-light bg-white mb-4 static-top p-3"
+>
+  <!-- Sidebar Toggle (Topbar) -->
+  <form class="form-inline">
+    <button
+      id="sidebarToggleTop"
+      class="btn btn-link d-md-none rounded-circle mr-3"
+    >
+      <i class="fa fa-bars"></i>
+    </button>
+  </form>
+  <!-- Topbar Navbar -->
+  <ul class="navbar-nav ml-auto">
+    <!-- Nav Item - User Information -->
+    <li class="nav-item dropdown no-arrow">
+      <a
+        class="nav-link dropdown-toggle"
+        href="#"
+        id="userDropdown"
+        role="button"
+        data-toggle="dropdown"
+        aria-haspopup="true"
+        aria-expanded="false"
+      >
+        <span class="mr-2 d-none d-lg-inline text-gray-600 small"></span>
+        <img
+          class="img-profile rounded-circle"
+          src="{% static 'Dashboard/img/undraw_profile.svg' %}"
+        />
+      </a>
+      <!-- Dropdown - User Information -->
+      <div
+        class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
+        aria-labelledby="userDropdown"
+      >
+        <a class="dropdown-item" href="">
+          <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
+          Profile
+        </a>
+        <div class="dropdown-divider"></div>
+        <a
+          class="dropdown-item"
+          href="#"
+          data-toggle="modal"
+          data-target="#logoutModal"
+        >
+          <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
+          Logout
+        </a>
+      </div>
+    </li>
+  </ul>
+</nav>
+{% comment %}
+<nav class="navbar navbar-expand-lg bg-secondary" data-bs-theme="dark">
+  <!-- Navbar content -->
+  <div class="container-fluid">
+    <a class="navbar-brand" href="{% url 'home' %}">
+      <img
+        src="https://getbootstrap.com/docs/5.3/assets/brand/bootstrap-logo.svg"
+        alt="Bootstrap"
+        width="30"
+        height="24"
+      />
+    </a>
+    <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+      <div class="navbar-nav">
+        <a class="nav-link active" aria-current="page" href="#">Home</a>
+        <a class="nav-link" href="{% url 'personnels' %}">Personnels</a>
+        <a class="nav-link" href="{% url 'camera' %}">Camera</a>
+        <a class="nav-link" href="{% url 'settings' %}">Settings</a>
+        <a class="nav-link" href="{% url 'logout' %}">Logout</a>
+      </div>
+    </div>
+  </div>
+</nav>
+{% endcomment %} {% endif %}

@@ -1,0 +1,12 @@
+{% extends 'base.html' %} {% block content %}
+<!-- insert content -->
+<form action="#" method="post">
+  <select name="personnel_name" id="personnel_name">
+    {% for personnel in Personnels %}
+    <option value="{{personnel.name}}">{{personnel.name}}</option>
+    {% endfor %}
+  </select>
+  <input type="file" name="personnel_pic" id="personnel_pic" />
+</form>
+<!-- end logged cases -->
+{% endblock %}

@@ -1,0 +1,1263 @@
+{% extends 'base.html' %}
+<!-- This is comment to prevent Prettifier -->
+{% block content %} {% csrf_token %}
+
+<script>
+
+    if (localStorage.getItem('darkMode') == 'enabled') {
+        document.body.classList.add("dark-mode")
+        document.getElementById("accordionSidebar").classList.add("dark-mode")
+        document.getElementById("toggler-button").classList.add("dark-mode")
+        // personnelScrollmenu.classList.add("dark-mode");
+    }else {
+        document.body.classList.add("light-mode")
+        document.getElementById("accordionSidebar").classList.add("light-mode")
+        document.getElementById("toggler-button").classList.add("light-mode")
+        // personnelScrollmenu.classList.add("light-mode");
+    }
+
+    elements = document.getElementsByClassName("effected")
+
+    for (var i = 0; i<elements.length; i++){
+        if (localStorage.getItem('darkMode') == 'enabled') {
+            elements[i].classList.add("dark-mode")
+        }else {
+            elements[i].classList.add("light-mode")
+        }
+    }
+</script>
+
+<head>
+    <script src="https://cdn.syncfusion.com/ej2/dist/ej2.min.js" type="text/javascript"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+</head>
+
+<h1 class="effected" style="padding-left: 50px; font-size: 30px; margin-bottom: 20px;">
+    Statistics
+</h1>
+
+<div id="camera-scroll-container" class="card p-3 text-center effected closable responsive-card" >
+    <div class="d-flex p-0 mb-2 align-items-center justify-content-between">
+        <a class="d-inline-flex nav-link align-items-center gap-1 p-0 mt-2 ml-3 effected">
+            <i class="d-flex fa-solid fa-camera text-center effected" style="font-size: 20px"></i>
+            {% if Active_Cam == None %} 
+                <span id="camera-list-title" class="ml-1">Please Add Camera</span>
+            {% else %}
+                <span id="camera-list-title" class="ml-1">Select Camera</span>
+            {% endif %}
+        </a>
+        <span class="d-flex text-center mt-2 mr-3 effected" style="font-size: 16px">{{Cams.count}}  Camera</span>
+    </div>
+    
+    <div id="camera-list" class="scrollmenu horizontal-scroll effected" style="align-self: center;">
+        {% for cam in Cams %}
+            <a 
+            {% if Active_Cam.id == cam.id %}
+            class="card mb-1 m-0 text-center camera-item effected active"   
+            {% else %}
+            class="card mb-1 m-0 text-center camera-item effected"   
+            {% endif %} 
+            onclick="selectCamera('{{cam.id}}')">
+                {% load static %}
+                    
+                {% if Active_Cam.id == cam.id %}
+                    <div class="camera-marker effected" style="padding: 0; border-radius: 0px 0px 8px 8px; position: absolute; height: 6px; width: 100px; top: 0; margin-left: auto; margin-right: auto; left: 0; right: 0;"></div>
+                {% endif %}
+
+                <div class="container d-flex flex-column justify-content-between align-items-center text-center" style="padding: 10px; width: 100%; height: 100%; padding-top: 20px; padding-bottom: 20px;">
+                    <div class="d-flex align-items-center justify-content-center mb-2" style="border-radius: 50%; width: 105px; height: 105px; background-color: #ffffff;">
+                    {% if cam.cam_is_active == False %}
+                    <i class="d-flex fa-solid fa-video-slash text-center effected" style="font-size: 40px; cursor: pointer; color: #B80F0A;"></i>
+                    {% else %}
+                    <i class="d-flex fa-solid fa-video text-center effected" style="font-size: 40px; cursor: pointer; color: #0A5C36;"></i>
+                    {% endif %}    
+                    </div>
+                    <p class="mb-0">{{cam.cam_name}}</p>
+                    {% if cam.cam_is_active == False %}
+                    <p class="m-0" style="font-size: 12px;">Inactive</p>
+                    {% else %}
+                    <p class="m-0" style="font-size: 12px;">Active</p>
+                    {% endif %}
+                </div> 
+            </a>
+        {% endfor %}
+    </div>
+
+    {% if Active_Cam != None %}
+    <div class="w-100 mt-1">
+        <a class="d-flex nav-link align-items-center justify-content-center gap-1 p-0 effected">
+            <i class="d-flex fa-solid fa-chevron-up text-center effected" style="font-size: 20px; cursor: pointer;" onclick="toggleCollapsed()"></i>
+        </a>
+    </div>
+    {% endif %}
+</div>
+
+{% if Active_Cam != None %}
+<div class="d-flex justify-content-between align-items-center gap-4 mt-4 responsive realtime-container responsive-card">
+    <div class="card p-3 h-100 effected" style="width: 40%;">
+        <a class="d-flex nav-link text-dark align-items-center gap-2 effected">
+            <i class="fa-solid fa-chart-pie text-center" style="font-size: 20px"></i>
+            <span>Real-time Pie Chart</span>
+        </a>
+        {% if Active_Cam.cam_is_active == True and AI_Status == True %}
+        <div class="container w-100 h-100" style="display: flex; justify-content: center; align-items: center; flex-direction: column;">
+            <div id="pie-chart" class="text-center w-100"></div>
+            <div class="w-100 d-flex flex-row gap-4 justify-content-center align-items-center mb-2" style="text-align: right;">
+                <div class="d-flex flex-column align-items-center justify-content-center">
+                    <b id="male-percentage" class="text-center" style="font-size: 40px; color: #49b2e7; width: 110px;">0%</b>
+                    <span class="text-center" style="font-size: 20px; color: #49b2e7;">Male</span>
+                </div>
+                <div class="d-flex flex-column align-items-center justify-content-center">
+                    <b id="female-percentage" class="text-center" style="font-size: 40px; color: #f97070; width: 110px;">0%</b>
+                    <span class="text-center" style="font-size: 20px; color: #f97070;">Female</span>
+                </div>
+            </div>
+        </div>
+        {% elif Active_Cam.cam_is_active == False %}
+        <span style="align-self: center; font-size: small;" class="p-2 effected">Camera is not active !</span>
+        {% elif AI_Status == False %}
+        <span style="align-self: center; font-size: small;" class="p-2 effected">Camera AI is off !</span>
+        {% endif %}
+    </div>
+    
+    <div class="card h-100 p-3 counting-data-card effected" style="width: 60%;" >
+        <a class="d-flex nav-link text-dark align-items-center gap-2 effected">
+            <i class="fa-solid fa-users text-center" style="font-size: 20px"></i>
+            <span>Real-time Counting Data</span>
+        </a>
+        {% if Active_Cam.cam_is_active == True and AI_Status == True %}
+        <div class="d-flex justify-content-center align-items-center w-100 h-100 gap-3 pl-4 pr-4 responsive">
+            <div class="d-flex flex-column justify-content-between w-100 gap-3">
+                <div class="container w-100 h-100 realtime-data-card effected">
+                    <div class="d-flex align-items-center justify-content-center icon" style="background-color: #dafeef;">
+                        <i class="d-flex fa-solid fa-arrow-right-to-bracket text-center effected" style="color: #1acd81;"></i>
+                    </div>
+                    <div class="d-flex flex-column align-items-start justify-content-center">
+                        <b id="enter-count" class="text-center effected">0</b>
+                        <span class="text-center effected">People Enters</span>
+                    </div>
+                </div>
+                <div class="container w-100 h-100 realtime-data-card effected">
+                    <div class="d-flex align-items-center justify-content-center icon" style="background-color: #ffdfdf;">
+                        <i class="d-flex fa-solid fa-arrow-right-from-bracket text-center effected" style="color: #ff3131;"></i>
+                    </div>
+                    <div class="d-flex flex-column align-items-start justify-content-center">
+                        <b id="exit-count" class="text-center effected">0</b>
+                        <span class="text-center effected">People Exits</span>
+                    </div>
+                </div>
+                <div class="container w-100 h-100 realtime-data-card effected">
+                    <div class="d-flex align-items-center justify-content-center icon" style="background-color: #cffefa;">
+                        <i class="d-flex fa-solid fa-users text-center effected" style="color: #08d2cf;"></i>
+                    </div>
+                    <div class="d-flex flex-column align-items-start justify-content-center">
+                        <b id="inside-count" class="text-center effected">0</b>
+                        <span class="text-center effected">People Inside</span>
+                    </div>
+                </div>
+            </div>
+            <div class="d-flex flex-column justify-content-between w-100 gap-3">
+                <div class="container w-100 h-100 realtime-data-card effected">
+                    <div class="d-flex align-items-center justify-content-center icon" style="background-color: #cdfeff;">
+                        <i class="d-flex fa-solid fa-mars text-center effected" style="color: #00c7dc;"></i>
+                    </div>
+                    <div class="d-flex flex-column align-items-start justify-content-center">
+                        <b id="male-count" class="text-center effected">0</b>
+                        <span class="text-center effected">Male Enters</span>
+                    </div>
+                </div>
+                <div class="container w-100 h-100 realtime-data-card effected">
+                    <div class="d-flex align-items-center justify-content-center icon" style="background-color: #ffe7fb;">
+                        <i class="d-flex fa-solid fa-venus text-center effected" style="color: #f73ed4;"></i>
+                    </div>
+                    <div class="d-flex flex-column align-items-start justify-content-center">
+                        <b id="female-count" class="text-center effected">0</b>
+                        <span class="text-center effected">Female Enters</span>
+                    </div>
+                </div>
+                <div class="container w-100 h-100 realtime-data-card effected">
+                    <div class="d-flex align-items-center justify-content-center icon" style="background-color: #f3e7ff;">
+                        <i class="d-flex fa-solid fa-question text-center effected" style="color: #ad5cff;"></i>
+                    </div>
+                    <div class="d-flex flex-column align-items-start justify-content-center">
+                        <b id="unknown-count" class="text-center effected">0</b>
+                        <span class="text-center effected">Unknown Enters</span>
+                    </div>  
+                </div>
+            </div>
+        </div>
+        {% elif Active_Cam.cam_is_active == False %}
+        <span style="align-self: center; font-size: small;" class="p-2 effected">Camera is not active !</span>
+        {% elif AI_Status == False %}
+        <span style="align-self: center; font-size: small;" class="p-2 effected">Camera AI is off !</span>
+        {% endif %}
+    </div>
+</div>
+{% endif %}
+
+{% if Active_Cam != None %}
+<div class="card p-3 mt-4 effected responsive-card" >
+    <div class="d-flex responsive p-0 align-items-center justify-content-between mb-2">
+        <a class="d-inline-flex nav-link align-items-stretch gap-1 p-0 mt-2 ml-3 card-title effected">
+            <i class="d-flex fa-solid fa-chart-simple text-center align-items-center" style="font-size: 20px"></i>
+            <span id="chart-title" class="ml-1">Daily Report</span>
+        </a>
+        <a class="d-inline-flex nav-link align-items-center gap-1 p-0 mt-2 mr-3 responsive effected">   
+            <select class="mr-2 text-white effected" name="report_type" id="report_type" 
+                    onchange="changeReportType(this.value)"
+                    style="padding: 4px 10px;  border: 2px solid transparent; border-right: 10px solid transparent; cursor: pointer; min-height: 38px; background-color: #00d6dc;">
+                <option value="" disabled selected hidden>Switch Report Type</option>
+                <option value="daily_report" style="display: none;">Daily Report</option>
+                <option value="monthly_report">Monthly Report</option>
+                <option value="date_range_report">Date Range Report</option>
+            </select>
+            <button
+            id="excel-chart-btn"
+            class="btn btn-success d-flex align-items-center justify-content-center gap-2 mr-2"
+            style="color: white; font-size: medium; min-height: 38px;"
+            onclick="downloadCountingReport()">
+            Download Excel
+            <i class="d-flex fa-solid fa-table text-center align-items-center justify-content-center text-white" style="font-size: 12px; margin-left: 2px; cursor: pointer;"></i>
+            </button>  
+            <input 
+                id="date-picker"
+                type="date" class="mr-1 date-picker effected"
+                style="width: 170px; cursor: pointer; min-height: 38px;" 
+                onchange="getChartReport()"></input>
+            <input 
+                id="date-picker-start" 
+                type="date" class="mr-1 date-picker effected"
+                style="width: 150px; display: none; cursor: pointer; min-height: 38px;" 
+                onchange="getChartReport()"></input>
+            <i id="date-picker-arrow" class="d-flex fa-solid fa-arrow-right text-center align-items-center justify-content-center mr-1 effected" style="font-size: 12px; display: none !important;"></i>
+            <input 
+                id="date-picker-end" 
+                type="date" class="mr-1 date-picker effected"
+                style="width: 150px; display: none; cursor: pointer; min-height: 38px;" 
+                onchange="getChartReport()"></input>
+        </a>
+    </div>
+    
+    <div class="d-flex align-items-center justify-content-center mt-2">
+        <i class="d-flex fa-solid fa-chevron-left text-center effected" style="font-size: 20px; cursor: pointer;" onclick="changeChartType('left')"></i>
+        <span id="report-title" class="text-center ml-3 mr-3 effected" style="font-size: 25px;font-weight: 600; width: 200px;">Gender Entries</span>
+        <i class="d-flex fa-solid fa-chevron-right text-center effected" style="font-size: 20px; cursor: pointer;" onclick="changeChartType('right')"></i>        
+    </div>
+    
+    <div id="bar-chart" class="text-center w-100 effected"></div>
+
+    
+    <div id="chart-explanation" class="container d-flex mb-3 mt-3 gap-4 w-100 align-self-center justify-content-center">
+        <div id="male-color-info" class="d-flex gap-2">
+            <div class="" style="width: 20px; height: 20px; background-color: #49b2e7; border-radius: 5px;"></div>
+            <span class="effected">Male</span>
+        </div>
+        <div id="female-color-info" class="d-flex gap-2">
+            <div class="" style="width: 20px; height: 20px; background-color: #f97070; border-radius: 5px;"></div>
+            <span class="effected">Female</span>
+        </div>
+        <div id="total-color-info" class="d-flex gap-2" style="display: none !important;">
+            <div class="" style="width: 20px; height: 20px; background-color: #e97e4e; border-radius: 5px;"></div>
+            <span class="effected">Total</span>
+        </div>
+        <div id="exit-color-info" class="d-flex gap-2" style="display: none !important;">
+            <div class="" style="width: 20px; height: 20px; background-color: #f27a93; border-radius: 5px;"></div>
+            <span class="effected">Exit</span>
+        </div>
+        <div id="enter-color-info" class="d-flex gap-2" style="display: none !important;">
+            <div class="" style="width: 20px; height: 20px; background-color: #3de659; border-radius: 5px;"></div>
+            <span class="effected">Enter</span>
+        </div>
+        <div id="occupancy-color-info" class="d-flex gap-2" style="display: none !important;">
+            <div class="" style="width: 20px; height: 20px; background-color: #3dc4e6; border-radius: 5px;"></div>
+            <span class="effected">Occupancy</span>
+        </div>
+    </div>
+</div>
+
+<div id="personnel-report-container" class="card p-3 mt-4 mb-5 effected responsive-card" >
+    <div class="d-flex p-0 align-items-center justify-content-between mb-2 responsive">
+        <a class="d-inline-flex nav-link align-items-center gap-1 p-0 mt-2 ml-3 card-title effected">
+            <i class="d-flex fa-solid fa-table text-center" style="font-size: 20px"></i>
+            <span id="table-title" class="ml-1">Personnel Entries Report</span>
+            <!-- <i class="d-flex fa-solid fa-repeat text-center align-items-center" style="font-size: 10px; margin-left: 2px; cursor: pointer;" onclick="changeChartType()"></i> -->
+        </a>
+        <a class="d-inline-flex nav-link align-items-center gap-1 p-0 mt-2 mr-3 responsive effected">
+            <select class="mr-2 text-white effected" name="report_type" id="entry-type" 
+                    onchange="changePersonnelEntryType(this)"
+                    style="padding: 4px 10px;  border: 2px solid transparent; border-right: 10px solid transparent; cursor: pointer; min-height: 38px; background-color: #00d6dc;">
+                <option value="all_entries" style="display: none;" selected>Show All Entries</option>
+                <option value="first_entry">Show First Entry</option>
+            </select>
+            <button
+                id="excel-personnel-btn"
+                class="btn btn-success d-flex align-items-center justify-content-center gap-2 mr-2"
+                style="color: white; font-size: medium; min-height: 38px;"
+                onclick="downloadPersonnelReport(document.getElementById('personnel-date-picker').value)">
+                Download Excel
+                <i class="d-flex fa-solid fa-table text-center align-items-center justify-content-center text-white" style="font-size: 12px; margin-left: 2px; cursor: pointer;"></i>
+            </button>     
+            <input 
+                id="personnel-date-picker" 
+                type="date" class="mr-1 date-picker effected" 
+                style="cursor: pointer; min-height: 38px;"
+                onchange="getPersonnelReport(this.value)"></input>
+        </a>
+    </div>
+    
+    <div class="w-100 pb-4 pt-3 pr-4 pl-4" style="border-color: transparent; background-color: transparent; display: flex; flex-direction: column; justify-content: center;">
+        <span style="align-self: center; font-size: small; display: none;" class="p-2 effected">No entries yet !</span>
+        <div id="table-container" class="card effected">
+            <div id="personnel-report-field" class="w-100 effected">     
+                <div class="card d-flex w-100 flex-row justify-content-center align-items-center">
+                    <span class="d-flex align-items-center justify-content-center number-field" style="width: 10%;">No</span>
+                    <span class="d-flex align-items-center justify-content-center personnel-name-field" style="width: 50%;">Personnel Name</span>
+                    <span class="d-flex align-items-center justify-content-center entry-time-field" style="width: 40%;">Entry Time</span>
+                </div>
+            </div>
+            <div id="personnel-report-scrollmenu" class="d-flex vertical-scroll flex-column w-100 align-items-center effected"></div>    
+        </div>
+    </div>
+
+</div>
+{% endif %}
+
+<script>
+    elements = document.getElementsByClassName("effected")
+
+    for (var i = 0; i<elements.length; i++){
+        if (localStorage.getItem('darkMode') == 'enabled') {
+            elements[i].classList.add("dark-mode")
+        }else {
+            elements[i].classList.add("light-mode")
+        }
+    }
+</script>
+
+<script>
+    localStorage.removeItem('daily_date')
+    localStorage.removeItem('monthly_date')
+    localStorage.removeItem('personnel_date')
+    localStorage.removeItem('start_date')
+    localStorage.removeItem('end_date')
+
+    var dateList = []
+
+    var todayDate = new Date()
+
+    var chartDataDaily = [{}];
+    
+    var chartDataMonthly = [{}];
+
+    var chartDataDateRange = [{}]
+    
+    var chartData = [{}]
+
+    var pieData = [
+        { x: 'Empty', y: 1, color: "#ababab"}
+    ];
+
+    var reportType = 'gender_entries'
+
+    if (localStorage.getItem('darkMode') == 'enabled'){
+        var textColor = "#FFFFFF"
+    }else {
+        var textColor = "#000000"
+    }
+
+    var animationRunning = false
+
+    let animate = true
+
+    var chartTitle = "Hour"
+
+    function createChart(){
+        if (reportType == 'gender_entries'){
+            var chart = new ej.charts.Chart({
+                //Initializing Primary X Axis
+                primaryXAxis: {
+                    valueType: 'Category',
+                    title: chartTitle,
+                    titleStyle:{
+                        color: textColor,
+                    },
+                    majorGridLines : {
+                        width : 0
+                    },
+                    majorTickLines: { color: textColor},
+                    labelStyle: { color: textColor },
+                    lineStyle: { color: textColor },
+                },
+                //Initializing Primary Y Axis
+                primaryYAxis: {
+                    title: 'Entries',
+                    titleStyle:{
+                        color: textColor,
+                        size: 0
+                    },
+                    majorGridLines : {
+                        color: '#414141',
+                        width : 0
+                    },
+                    majorTickLines: { color: textColor, width: 0 },
+                    labelStyle: { color: textColor, size: 0 },
+                    lineStyle: { width: 0 }
+                },
+        
+                //Initializing Chart Series
+                series: [
+                {
+                    dataSource: chartData,
+                    xName: 'day', yName: 'male', 
+                    type: 'Column',
+                    fill: '#49b2e7',
+                    marker: {dataLabel: { visible: true, font: { color: textColor, }}},
+                    animation: {enable: animate},
+                    cornerRadius: {topLeft: 10, topRight: 10},
+                }, {
+                    dataSource: chartData,
+                    xName: 'day', yName: 'female', 
+                    type: 'Column',
+                    fill: '#f97070',
+                    marker: {dataLabel: { visible: true, font: { color: textColor, }}},
+                    animation: {enable: animate},
+                    cornerRadius: {topLeft: 10, topRight: 10},
+                }
+                ],
+        
+                background: '#ffffff00',
+        
+                width: '98%', height: '100%', 
+                
+                chartArea: {
+                    border: {
+                        color: 'white',
+                        width: 0
+                    }
+                },
+            });
+            chart.appendTo('#bar-chart');
+        }else if (reportType == 'total_entries'){
+            var chart = new ej.charts.Chart({
+                //Initializing Primary X Axis
+                primaryXAxis: {
+                    valueType: 'Category',
+                    title: chartTitle,
+                    titleStyle:{
+                        color: textColor,
+                    },
+                    majorGridLines : {
+                        width : 0
+                    },
+                    majorTickLines: { color: textColor},
+                    labelStyle: { color: textColor },
+                    lineStyle: { color: textColor }
+                },
+                //Initializing Primary Y Axis
+                primaryYAxis: {
+                    title: 'Entries',
+                    titleStyle:{
+                        color: textColor,
+                        size: 0
+                    },
+                    majorGridLines : {
+                        color: '#414141',
+                        width : 0
+                    },
+                    majorTickLines: { color: textColor, width: 0 },
+                    labelStyle: { color: textColor, size: 0 },
+                    lineStyle: { width: 0 }
+                },
+        
+                //Initializing Chart Series
+                series: [
+                {
+                    dataSource: chartData,
+                    xName: 'day', yName: 'total', 
+                    type: 'Column',
+                    fill: '#e97e4e',
+                    marker: {dataLabel: { visible: true, font: { color: textColor, }}},
+                    animation: {enable: animate},
+                    cornerRadius: {topLeft: 10, topRight: 10},
+                }
+                ],
+        
+                background: '#ffffff00',
+        
+                width: '98%', height: '100%', 
+                
+                chartArea: {
+                    border: {
+                        color: 'white',
+                        width: 0
+                    }
+                },
+            });
+            chart.appendTo('#bar-chart');
+        }else if (reportType == 'occupancy'){
+            var chart = new ej.charts.Chart({
+                //Initializing Primary X Axis
+                primaryXAxis: {
+                    valueType: 'Category',
+                    title: chartTitle,
+                    titleStyle:{
+                        color: textColor,
+                    },
+                    majorGridLines : {
+                        width : 0
+                    },
+                    majorTickLines: { color: textColor},
+                    labelStyle: { color: textColor },
+                    lineStyle: { color: textColor }
+                },
+                //Initializing Primary Y Axis
+                primaryYAxis: {
+                    title: 'Entries',
+                    titleStyle:{
+                        color: textColor,
+                        size: 0
+                    },
+                    majorGridLines : {
+                        color: '#414141',
+                        width : 0
+                    },
+                    majorTickLines: { color: textColor, width: 0 },
+                    labelStyle: { color: textColor, size: 0 },
+                    lineStyle: { width: 0 }
+                },
+        
+                //Initializing Chart Series
+                series: [
+                {
+                    dataSource: chartData,
+                    xName: 'day', yName: 'exit', 
+                    type: 'Column',
+                    fill: '#f27a93',
+                    marker: {dataLabel: { visible: true, font: { color: textColor, }}},
+                    animation: {enable: animate},
+                    cornerRadius: {topLeft: 10, topRight: 10},
+                }, {
+                    dataSource: chartData,
+                    xName: 'day', yName: 'enter', 
+                    type: 'Column',
+                    fill: '#3de659',
+                    marker: {dataLabel: { visible: true, font: { color: textColor, }}},
+                    animation: {enable: animate},
+                    cornerRadius: {topLeft: 10, topRight: 10},
+                }, {
+                    dataSource: chartData,
+                    xName: 'day', yName: 'occupancy', 
+                    type: 'Column',
+                    fill: '#3dc4e6',
+                    marker: {dataLabel: { visible: true, font: { color: textColor, }}},
+                    animation: {enable: animate},
+                    cornerRadius: {topLeft: 10, topRight: 10},
+                }
+                ],
+        
+                background: '#ffffff00',
+        
+                width: '98%', height: '100%', 
+                
+                chartArea: {
+                    border: {
+                        color: 'white',
+                        width: 0
+                    }
+                },
+            });
+            chart.appendTo('#bar-chart');
+        }
+    }
+
+    function createPieChart(){
+        if (pieData.length == 1){
+            var pie = new ej.charts.AccumulationChart({
+                //Initializing Series
+                series: [{
+                    dataSource: pieData,
+                    dataLabel: { visible: false, color: 'white', position: 'Inside', font: { color: textColor, }},
+                    innerRadius: '50%',
+                    yName: 'y',
+                    pointColorMapping: 'color',
+                    animation: { enable: false },
+                },
+                ],
+
+                background: '#ffffff00',
+    
+                width: '100%', height: '350px',
+            });
+        }else{
+            var pie = new ej.charts.AccumulationChart({
+                //Initializing Series
+                series: [{
+                    dataSource: pieData,
+                    dataLabel: { visible: true, color: 'white', position: 'Inside', font: { color: textColor, }},
+                    innerRadius: '50%',
+                    yName: 'y',
+                    pointColorMapping: 'color',
+                    animation: { enable: false },
+                },
+                ],
+
+                background: '#ffffff00',
+    
+                width: '100%', height: '350px',
+            });
+        }
+
+        pie.appendTo('#pie-chart');
+    }
+
+    function setDefaultDate(){
+        var d1 = new Date()
+        var dateNow = d1.getFullYear() + "-" + ('0' + (d1.getMonth() + 1)).slice(-2) + "-" + ('0' + d1.getDate()).slice(-2)
+        var monthNow = d1.getFullYear() + "-" + ('0' + (d1.getMonth() + 1)).slice(-2)
+        
+        if (document.getElementById("date-picker").type == 'date'){
+            document.getElementById("date-picker").value = dateNow;
+        } else {
+            document.getElementById("date-picker").value = monthNow;
+        }
+        document.getElementById("date-picker").max = document.getElementById("date-picker").value;
+        document.getElementById("personnel-date-picker").value = dateNow;
+        document.getElementById("personnel-date-picker").max = document.getElementById("personnel-date-picker").value;
+        document.getElementById("date-picker-start").value = dateNow;
+        document.getElementById("date-picker-end").value = dateNow;
+
+        getPersonnelReport(document.getElementById('personnel-date-picker').value)
+        getChartReport();
+    }
+
+    function changeReportType(value) {
+        var op = document.getElementById("report_type").getElementsByTagName("option");
+        for (var i = 0; i < op.length; i++) {
+            (op[i].value.toLowerCase() == value) ? op[i].style.display = 'none' : op[i].style.display = 'block' ;
+        }   
+
+        if (value == "monthly_report") {
+            document.getElementById("chart-title").textContent = "Monthly Report";
+            document.getElementById("report_type").value = "";
+            document.getElementById("date-picker").style.display = 'inline-block';
+            document.getElementById("date-picker-start").style.display = 'none';
+            document.getElementById("date-picker-end").style.display = 'none';
+            document.getElementById("date-picker-arrow").style.setProperty('display', 'none', 'important');
+            document.getElementById("date-picker").type = 'month';
+            chartTitle = "Day";
+            if (localStorage.getItem('monthly_date') != null) {
+                document.getElementById("date-picker").value = localStorage.getItem('monthly_date');
+                getChartReport();
+            } else {
+                setDefaultDate();
+            }
+
+            if (reportType == 'occupancy'){
+                setChart('gender_entries')
+            }
+        } else if (value == "date_range_report") {
+            document.getElementById("chart-title").textContent = "Date Range Report";
+            document.getElementById("report_type").value = "";
+            document.getElementById("date-picker").style.display = 'none';
+            document.getElementById("date-picker-start").max = document.getElementById("date-picker-end").value
+            document.getElementById("date-picker-end").min = document.getElementById("date-picker-start").value
+            document.getElementById("date-picker-start").style.display = 'inline-block';
+            document.getElementById("date-picker-end").style.display = 'inline-block';
+            document.getElementById("date-picker-arrow").style.display = 'inline-block';
+            document.getElementById("date-picker-start").type = 'date';
+            document.getElementById("date-picker-end").type = 'date';
+            chartTitle = "Date";
+            if (localStorage.getItem('range_date_start') != null && localStorage.getItem('range_date_end') != null) {
+                document.getElementById("date-picker-start").value = localStorage.getItem('range_date_start');
+                document.getElementById("date-picker-end").value = localStorage.getItem('range_date_end');
+                getChartReport();
+            } else {
+                setDefaultDate();
+            }
+
+            if (reportType == 'occupancy'){
+                setChart('gender_entries')
+            }
+        } else if (value == "daily_report") {
+            document.getElementById("chart-title").textContent = "Daily Report";
+            document.getElementById("report_type").value = "";
+            document.getElementById("date-picker").style.display = 'inline-block';
+            document.getElementById("date-picker-start").style.display = 'none';
+            document.getElementById("date-picker-end").style.display = 'none';
+            document.getElementById("date-picker-arrow").style.setProperty('display', 'none', 'important');
+            document.getElementById("date-picker").type = 'date';
+            chartTitle = "Hour";
+            if (localStorage.getItem('daily_date') != null) {
+                document.getElementById("date-picker").value = localStorage.getItem('daily_date');
+                getChartReport();
+            } else {
+                setDefaultDate();
+            }
+        }
+    }
+    
+    function setCameraContainer(){
+        if (parseInt(window.innerWidth) < 992){
+            width = 0
+        }else{
+            width = parseInt(document.getElementById('accordionSidebar').offsetWidth)
+        }
+        width2 = parseInt(document.body.clientWidth)
+        computedStyle = getComputedStyle(document.querySelector('.responsive-card'))
+        cardMarginRight = parseInt(computedStyle.marginRight)
+        cardMarginLeft = parseInt(computedStyle.marginLeft)
+
+        width3 = (width2 - width - 50 - cardMarginLeft - cardMarginRight).toString();
+
+        document.getElementById("camera-list").style.width = width3 + "px";
+    }
+
+    function selectCamera(id){
+        var csrftoken = document.querySelector("[name=csrfmiddlewaretoken]").value;
+        var xhttp = new XMLHttpRequest();
+        var data = "command=change_cam" + "&id=" + id;
+        
+        localStorage.setItem('cam_list_scroll_value', document.getElementById('camera-list').scrollLeft) 
+        
+        xhttp.open("POST", "");
+        xhttp.setRequestHeader("X-CSRFToken", csrftoken);
+        xhttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        xhttp.onload = function(){
+            window.location.reload();
+        };
+        xhttp.send(data);
+    }
+
+    function updateVariables(){
+        var csrftoken = document.querySelector("[name=csrfmiddlewaretoken]").value;
+        var xhttp = new XMLHttpRequest();
+        var data = "command=update_var"
+        
+        xhttp.open("POST", "");
+        xhttp.setRequestHeader("X-CSRFToken", csrftoken);
+        xhttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        xhttp.onload = function(){
+            updateElement(JSON.parse(xhttp.responseText))
+            setTimeout(() => { updateVariables() }, 1000)
+        };
+        xhttp.send(data);
+    }
+
+    function updateElement(json){
+        document.getElementById('inside-count').textContent = json['inside']
+        document.getElementById('exit-count').textContent = json['total_exit']
+        document.getElementById('enter-count').textContent = json['total_enter']
+        document.getElementById('male-count').textContent = json['total_male_enter']
+        document.getElementById('female-count').textContent = json['total_female_enter']
+        document.getElementById('unknown-count').textContent = json['total_unknown_enter']
+        document.getElementById('male-percentage').textContent = json['male_percent'] + "%"
+        document.getElementById('female-percentage').textContent = json['female_percent'] + "%"
+
+        if (parseInt(json['total_male_enter']) + parseInt(json['total_female_enter']) == 0){
+            pieData = [
+                { x: 'Empty', y: 1, color: "#ababab"}
+            ];
+        }else {
+            pieData = [
+                { x: 'Female', y: parseInt(json['total_female_enter']), color: '#f97070'},
+                { x: 'Male', y: parseInt(json['total_male_enter']), color: "#49b2e7"}
+            ];
+        }
+
+        createPieChart()
+
+        var d1 = new Date()
+        var dateNow = d1.getFullYear() + "-" + ('0' + (d1.getMonth() + 1)).slice(-2) + "-" + ('0' + d1.getDate()).slice(-2)
+        var monthNow = d1.getFullYear() + "-" + ('0' + (d1.getMonth() + 1)).slice(-2)
+
+        if (animationRunning == false){
+            if (document.getElementById('date-picker').style.display == 'none'){
+                var now =  ('0' + (d1.getMonth() + 1)).slice(-2) + "/" + ('0' + d1.getDate()).slice(-2) + "/" + d1.getFullYear()
+                var dateNowIdx = null
+                for (var i = 0; i<dateList.length; i++){
+                    if (dateList[i] == now){
+                        dateNowIdx = i
+                        break
+                    }
+                }
+                if (dateNowIdx != null){
+                    if (reportType == 'gender_entries'){
+                        chartData[dateNowIdx] = { day: dateList[dateNowIdx], male: json['total_male_enter'], female: json['total_female_enter']}
+                    } else if (reportType = 'total_entries') {
+                        chartData[dateNowIdx] = { day: dateList[dateNowIdx], total: (parseInt(json['total_male_enter']) + parseInt(json['total_female_enter']) + parseInt(json['total_unknown_enter'])).toString()}
+                    }
+            
+                    animate = false
+        
+                    createChart()
+                }
+            }else { 
+                if (document.getElementById('date-picker').type == 'date' && document.getElementById('date-picker').value == dateNow){
+                    if (todayDate.getHours() != d1.getHours()){
+                        getChartReport()
+                    }else {
+                        chartData.pop()
+                        
+                        if (reportType == 'gender_entries'){
+                            chartData.push({ day: todayDate.getHours().toString() + '-' + (todayDate.getHours()+1).toString(), male: json['current_male_enter'], female: json['current_female_enter']})
+                        } else if (reportType == 'total_entries') {
+                            chartData.push({ day: todayDate.getHours().toString() + '-' + (todayDate.getHours()+1).toString(), total: (parseInt(json['current_male_enter']) + parseInt(json['current_female_enter']) + parseInt(json['current_unknown_enter'])).toString()})
+                        } else if (reportType == 'occupancy') {
+                            chartData.push({ day: todayDate.getHours().toString() + '-' + (todayDate.getHours()+1).toString(), exit: json['current_exit'], enter: (parseInt(json['current_male_enter']) + parseInt(json['current_female_enter']) + parseInt(json['current_unknown_enter'])).toString(), occupancy: json['inside']})    
+                        }
+                
+                        animate = false
+            
+                        createChart()
+                    }
+                        
+                } else if (document.getElementById('date-picker').type == 'month' && document.getElementById('date-picker').value == monthNow){
+                    chartData.pop()
+                    
+                    if (reportType == 'gender_entries'){
+                        chartData.push({ day: todayDate.getDate().toString(), male: json['total_male_enter'], female: json['total_female_enter']})
+                    } else if (reportType = 'total_entries') {
+                        chartData.push({ day: todayDate.getDate().toString(), total: (parseInt(json['total_male_enter']) + parseInt(json['total_female_enter']) + parseInt(json['total_unknown_enter'])).toString()})
+                    }
+            
+                    animate = false
+        
+                    createChart()
+                }
+            }
+
+            if (todayDate.getHours() != d1.getHours()){
+                todayDate = new Date()
+            }
+        }
+        
+        if (document.getElementById('personnel-date-picker').value == dateNow){
+            getPersonnelReport(document.getElementById('personnel-date-picker').value)
+        }
+
+        if(json['ai_status'] != '{{AI_Status}}'){
+            window.location.reload()
+        }
+    }
+
+    function getPersonnelReport(date){
+        var csrftoken = document.querySelector("[name=csrfmiddlewaretoken]").value;
+        var xhttp = new XMLHttpRequest();
+        var data = "command=get_personnel_report&date=" + date + "&entry_type=" + document.getElementById('entry-type').value
+
+        xhttp.open("POST", "");
+        xhttp.setRequestHeader("X-CSRFToken", csrftoken);
+        xhttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        xhttp.onload = function(){
+            createPersonnelTable(JSON.parse(xhttp.responseText))
+        };
+        xhttp.send(data);
+    }
+    
+    function getChartReport(){
+        animationRunning = true
+
+        var csrftoken = document.querySelector("[name=csrfmiddlewaretoken]").value;
+        var xhttp = new XMLHttpRequest();
+        if (document.getElementById('date-picker').style.display == 'none'){
+            document.getElementById("date-picker-start").max = document.getElementById("date-picker-end").value
+            document.getElementById("date-picker-end").min = document.getElementById("date-picker-start").value
+            
+            start_date = document.getElementById('date-picker-start').value
+            end_date = document.getElementById('date-picker-end').value
+            
+            var data = "command=get_date_range_report&start_date=" + start_date + "&end_date=" + end_date
+        }else{
+            date = document.getElementById('date-picker').value
+            if (document.getElementById('date-picker').type == 'date'){
+                var data = "command=get_daily_report&date=" + date
+            }else {
+                var data = "command=get_monthly_report&date=" + date
+            }
+        } 
+        
+        xhttp.open("POST", "");
+        xhttp.setRequestHeader("X-CSRFToken", csrftoken);
+        xhttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        xhttp.onload = function(){
+            updateReport(JSON.parse(xhttp.responseText))
+        };
+        xhttp.send(data);
+    }
+
+    function updateReport(json){
+        if (document.getElementById('date-picker').style.display == 'none'){
+            chartDataDateRange = [];
+
+            dateList = json['date_list']
+    
+            if (reportType == 'gender_entries'){
+                for (var i = 0; i<dateList.length; i++){
+                    if (json['male_entries'][i] != null && json['female_entries'][i] != null){
+                        chartDataDateRange.push({ day: dateList[i], male: json['male_entries'][i], female: json['female_entries'][i]})
+                    }
+                }
+            }else if (reportType == 'total_entries'){
+                for (var i = 0; i<dateList.length; i++){
+                    if (json['total_entries'][i] != null){
+                        chartDataDateRange.push({ day: dateList[i], total: json['total_entries'][i]})
+                    }
+                }
+            }
+            
+            if (chartDataDateRange.length == 0){
+                var d1 = new Date()
+                var dateNow = d1.getFullYear() + "-" + ('0' + (d1.getMonth() + 1)).slice(-2) + "-" + ('0' + d1.getDate()).slice(-2)
+                if (document.getElementById('date-picker-start').value === dateNow && document.getElementById('date-picker-end').value === dateNow){
+                    localStorage.setItem('start-date', document.getElementById('date-picker-start').value)
+                    localStorage.setItem('end-date', document.getElementById('date-picker-end').value)
+                    chartData = chartDataDateRange
+                    createChart()
+                }else {
+                    if (localStorage.getItem('start-date') != null){
+                        document.getElementById('date-picker-start').value = localStorage.getItem('start-date')
+                    } else {
+                        document.getElementById('date-picker-start').valueAsDate = dateNow
+                    }
+
+                    if (localStorage.getItem('end-date') != null){
+                        document.getElementById('date-picker-end').value = localStorage.getItem('end-date')
+                    } else {
+                        document.getElementById('date-picker-end').valueAsDate = dateNow
+                    }
+                    
+                    Swal.fire({
+                        title: "Data Not Found!",
+                        text: "Data Between Date Range is Not Found",
+                        icon: "error"
+                    });
+                }
+            }else {
+                localStorage.setItem('start-date', document.getElementById('date-picker-start').value)
+                localStorage.setItem('end-date', document.getElementById('date-picker-end').value)
+                chartData = chartDataDateRange
+                animate = true
+                createChart()
+                document.getElementById('chart-explanation').style.display = 'block'
+            }
+        }else{
+            if (document.getElementById('date-picker').type == 'date'){
+                chartDataDaily = [];
+    
+                if (reportType == 'gender_entries'){
+                    for (var i = 1; i<25; i++){
+                        if (json['male_entries'][i] != null && json['female_entries'][i] != null){
+                            chartDataDaily.push({ day: i.toString() + '-' + (i+1), male: json['male_entries'][i], female: json['female_entries'][i]})
+                        }
+                    }
+                }else if (reportType == 'total_entries'){
+                    for (var i = 1; i<25; i++){
+                        if (json['total_entries'][i] != null){
+                            chartDataDaily.push({ day: i.toString() + '-' + (i+1), total: json['total_entries'][i]})
+                        }
+                    }
+                }else if (reportType == 'occupancy'){
+                    for (var i = 1; i<25; i++){
+                        if (json['exits'][i] != null && json['total_entries'][i] != null && json['occupancies'][i] != null){
+                            chartDataDaily.push({ day: i.toString() + '-' + (i+1), exit: json['exits'][i], enter: json['total_entries'][i], occupancy: json['occupancies'][i]})
+                        }
+                    }
+                }
+        
+                if (chartDataDaily.length == 0){
+                    var d1 = new Date()
+                    var dateNow = d1.getFullYear() + "-" + ('0' + (d1.getMonth() + 1)).slice(-2) + "-" + ('0' + d1.getDate()).slice(-2)
+    
+                    if (document.getElementById('date-picker').value === dateNow){
+                        localStorage.setItem('daily_date', document.getElementById('date-picker').value)
+                        chartData = chartDataDaily
+                        createChart()
+                    }else {
+                        if (localStorage.getItem('daily_date') != null){
+                            document.getElementById('date-picker').value = localStorage.getItem('daily_date')
+                        } else {
+                            document.getElementById('date-picker').valueAsDate = dateNow
+                        }
+                        Swal.fire({
+                            title: "Data Not Found!",
+                            icon: "error"
+                        });
+                    }
+                }else {
+                    localStorage.setItem('daily_date', document.getElementById('date-picker').value)
+                    chartData = chartDataDaily
+                    animate = true
+                    createChart()
+                    document.getElementById('chart-explanation').style.display = 'block'
+                }
+            }else {
+                chartDataMonthly = [];
+    
+                if (reportType == 'gender_entries'){
+                    for (var i = 1; i<32; i++){
+                        if (json['male_entries'][i] != null && json['female_entries'][i] != null){
+                            chartDataMonthly.push({ day: i, male: json['male_entries'][i], female: json['female_entries'][i]})
+                        }
+                    }
+                }else if (reportType == 'total_entries'){
+                    for (var i = 1; i<32; i++){
+                        if (json['total_entries'][i] != null){
+                            chartDataMonthly.push({ day: i, total: json['total_entries'][i]})
+                        }
+                    }
+                }
+                
+                if (chartDataMonthly.length == 0){
+                    var d1 = new Date()
+                    var dateNow = d1.getFullYear() + "-" + ('0' + (d1.getMonth() + 1)).slice(-2)
+                    if (document.getElementById('date-picker').value === dateNow){
+                        localStorage.setItem('monthly_date', document.getElementById('date-picker').value)
+                        chartData = chartDataMonthly
+                        createChart()
+                    }else {
+                        if (localStorage.getItem('monthly_date') != null){
+                            document.getElementById('date-picker').value = localStorage.getItem('monthly_date')
+                        } else {
+                            document.getElementById('date-picker').valueAsDate = dateNow
+                        }
+                        Swal.fire({
+                            title: "Data Not Found!",
+                            icon: "error"
+                        });
+                    }
+                }else {
+                    localStorage.setItem('monthly_date', document.getElementById('date-picker').value)
+                    chartData = chartDataMonthly
+                    animate = true
+                    createChart()
+                    document.getElementById('chart-explanation').style.display = 'block'
+                }
+            }
+        }
+
+        setTimeout(() => { animationRunning = false }, 2000)
+    }
+
+    function toggleCollapsed(){
+        document.getElementById("camera-scroll-container").classList.toggle("closed")
+
+        if (document.getElementById("camera-scroll-container").classList.contains("closed")){
+            localStorage.setItem('statistic_cam_list', 'closed')
+        }else {
+            localStorage.setItem('statistic_cam_list', 'opened')
+        }
+        
+        checkClosed()
+    }
+
+    function checkClosed(){
+        if (document.getElementById("camera-scroll-container").classList.contains("closed")){
+            if ("{{Active_Cam.cam_is_active}}" == "False"){
+                document.getElementById("camera-list-title").textContent = "{{Active_Cam.cam_name}}" + " - Inactive"
+            } else{
+                document.getElementById("camera-list-title").textContent = "{{Active_Cam.cam_name}}" + " - Active"
+            }
+        }else{
+            document.getElementById("camera-list-title").textContent = "Select Camera"
+        }
+    }
+
+    function changeChartType(arrowType){
+        if (document.getElementById('date-picker').type == 'date' && document.getElementById('date-picker').style.display != 'none'){
+            if (reportType == 'gender_entries') {
+                if (arrowType == 'right')
+                    setChart('total_entries')
+                else
+                    setChart('occupancy')
+            }else if (reportType == 'total_entries') {
+                if (arrowType == 'right')
+                    setChart('occupancy')
+                else
+                    setChart('gender_entries')
+            }else if (reportType == 'occupancy') {
+                if (arrowType == 'right')
+                    setChart('gender_entries')
+                else
+                    setChart('total_entries')
+            }
+        } else {
+            if (reportType == 'gender_entries'){
+                setChart('total_entries')
+            }else{
+                setChart('gender_entries')
+            }
+        }
+    }
+
+    function setChart(type){
+        if (type == 'gender_entries'){
+            document.getElementById('report-title').textContent = "Gender Entries"
+            document.getElementById('male-color-info').style.cssText = "display:"
+            document.getElementById('female-color-info').style.cssText = "display:"
+            document.getElementById('total-color-info').style.cssText = "display: none !important"
+            document.getElementById('exit-color-info').style.cssText = "display: none !important"
+            document.getElementById('enter-color-info').style.cssText = "display: none !important"
+            document.getElementById('occupancy-color-info').style.cssText = "display: none !important"
+            reportType = 'gender_entries'
+        } else if (type == 'total_entries'){
+            document.getElementById('report-title').textContent = "Total Entries"
+            document.getElementById('male-color-info').style.cssText = "display: none !important"
+            document.getElementById('female-color-info').style.cssText = "display: none !important"
+            document.getElementById('total-color-info').style.cssText = "display:"
+            document.getElementById('exit-color-info').style.cssText = "display: none !important"
+            document.getElementById('enter-color-info').style.cssText = "display: none !important"
+            document.getElementById('occupancy-color-info').style.cssText = "display: none !important"
+            reportType = 'total_entries'
+        } else if (type == 'occupancy'){
+            document.getElementById('report-title').textContent = "Occupancy"
+            document.getElementById('male-color-info').style.cssText = "display: none !important"
+            document.getElementById('female-color-info').style.cssText = "display: none !important"
+            document.getElementById('total-color-info').style.cssText = "display: none !important"
+            document.getElementById('exit-color-info').style.cssText = "display:"
+            document.getElementById('enter-color-info').style.cssText = "display:"
+            document.getElementById('occupancy-color-info').style.cssText = "display:"
+            reportType = 'occupancy'
+        }
+        
+        getChartReport()
+    }
+
+    function createTableItems(number, personnel_name, personnel_time){
+        var div = document.createElement('div');
+        if (number % 2 == 0){
+            div.setAttribute('class', 'card personnel-report-items color-secondary')
+        }else {
+            div.setAttribute('class', 'card personnel-report-items color-primary')
+        }
+
+        var span1 = document.createElement('span')
+        span1.setAttribute('class', 'number')
+        span1.textContent = number
+
+        var span2 = document.createElement('span')
+        span2.setAttribute('class', 'personnel-name text-truncate')
+        span2.textContent = personnel_name        
+
+        var span3 = document.createElement('span')
+        span3.setAttribute('class', 'personnel-time')
+        span3.textContent = personnel_time
+
+        div.appendChild(span1)
+        div.appendChild(span2)
+        div.appendChild(span3)
+
+        document.getElementById('personnel-report-scrollmenu').appendChild(div)
+    }
+
+    function createPersonnelTable(json){
+        var personnel_entries_list = json['Personnel_Entries']
+        var personnel_field = document.getElementById('personnel-report-field') 
+        var noDataWarning = document.getElementById('table-container').parentElement.closest('div').querySelector('span')
+        var report_items = document.getElementsByClassName('personnel-report-items');
+
+        var d1 = new Date()
+        var dateNow = d1.getFullYear() + "-" + ('0' + (d1.getMonth() + 1)).slice(-2) + "-" + ('0' + d1.getDate()).slice(-2)
+
+        if (personnel_entries_list.length != 0){
+            personnel_field.style.display = 'block'
+            noDataWarning.style.display = 'none'
+            document.getElementById('table-container').style.display = 'block'
+
+            localStorage.setItem('personnel_date', document.getElementById('personnel-date-picker').value)
+
+            while(report_items.length > 0){
+                report_items[0].parentNode.removeChild(report_items[0]);
+            }
+    
+            for (var i=0; i<personnel_entries_list.length; i++){
+                createTableItems(i+1, personnel_entries_list[i][0], personnel_entries_list[i][1])
+            }
+        }else{
+            if (document.getElementById('personnel-date-picker').value == dateNow){
+                personnel_field.style.display = 'none'
+                noDataWarning.style.display = 'block'
+                document.getElementById('table-container').style.display = 'none'
+                localStorage.setItem('personnel_date', document.getElementById('personnel-date-picker').value)
+            }else{
+                if (localStorage.getItem('personnel_date') != null){
+                    document.getElementById('personnel-date-picker').value = localStorage.getItem('personnel_date')
+                }else{
+                    document.getElementById('personnel-date-picker').valueAsDate = dateNow
+                }
+    
+                Swal.fire({
+                    title: "Data Not Found!",
+                    text: "No data found in selected date",
+                    icon: "error"
+                });
+            }
+        }
+    }
+
+    function downloadPersonnelReport(date){
+        var csrftoken = document.querySelector("[name=csrfmiddlewaretoken]").value;
+        var xhttp = new XMLHttpRequest();
+        var data = "command=download_personnel_report&date=" + date
+
+        xhttp.open("POST", "");
+        xhttp.setRequestHeader("X-CSRFToken", csrftoken);
+        xhttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        xhttp.onload = function(){
+            window.location.replace("download");
+        };
+        xhttp.send(data);
+    }
+
+    function downloadCountingReport(){
+        var csrftoken = document.querySelector("[name=csrfmiddlewaretoken]").value;
+        var xhttp = new XMLHttpRequest();
+        if (document.getElementById('date-picker').style.display == 'none'){
+            var start_date = document.getElementById('date-picker-start').value
+            var end_date = document.getElementById('date-picker-end').value
+            var data = "command=download_counting_report&start_date=" + start_date + "&end_date=" + end_date + "&chart_type=date_range"
+        }else {
+            var date = document.getElementById('date-picker').value
+            var data = "command=download_counting_report&date=" + date + "&chart_type=" + document.getElementById('date-picker').type
+        }
+
+        xhttp.open("POST", "");
+        xhttp.setRequestHeader("X-CSRFToken", csrftoken);
+        xhttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        xhttp.onload = function(){
+            window.location.replace("download");
+        };
+        xhttp.send(data);
+    }
+
+    function changePersonnelEntryType(element){
+        var op = element.getElementsByTagName("option");
+        var value = element.value
+        for (var i = 0; i < op.length; i++) {
+            (op[i].value.toLowerCase() == value) ? op[i].style.display = 'none' : op[i].style.display = 'block';
+        }
+
+        getPersonnelReport(document.getElementById('personnel-date-picker').value)
+    }
+
+    if (localStorage.getItem('statistic_cam_list') == 'closed'){
+        document.getElementById('camera-scroll-container').classList.add("closed")
+        checkClosed()
+    }
+    
+    if ('{{Active_Cam.cam_is_active}}' == "True"){
+        updateVariables()
+    }
+    
+    setDefaultDate()
+    setCameraContainer()
+
+    if (localStorage.getItem('cam_list_scroll_value') !=  null){
+        document.getElementById('camera-list').scrollLeft = parseInt(localStorage.getItem('cam_list_scroll_value'))
+    }
+
+    window.addEventListener("resize", setCameraContainer, false);
+</script>
+
+{% endblock %}

@@ -1,0 +1,229 @@
+{% load static %}
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+    <meta name="description" content="" />
+    <meta name="author" content="" />
+    <title>
+      Office Personel Counter System | {% block title %}{% endblock %}
+    </title>
+    <link
+      href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
+      crossorigin="anonymous"
+    />
+    {%block javascript_custom%} {%endblock%}
+    <!-- Custom fonts for this template -->
+    <link
+      href="{% static 'Dashboard/vendor/fontawesome-free/css/all.min.css' %}"
+      rel="stylesheet"
+      type="text/css"
+    />
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer"/>
+
+    <link
+      href="{% static 'Dashboard/css/style.css' %}"
+      rel="stylesheet"
+      type="text/css"
+    />
+
+    <link
+      href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
+      rel="stylesheet"
+    />
+    <link
+      href="{% static 'Dashboard/css/sb-admin-2.min.css' %}"
+      rel="stylesheet"
+    />
+
+    <!-- Custom styles for this page -->
+    <!-- <link
+      href="{% static 'Dashboard/vendor/datatables/dataTables.bootstrap4.min.css' %}"
+      rel="stylesheet"
+    /> -->
+    <script
+      src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
+      integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js"
+      integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+"
+      crossorigin="anonymous"
+    ></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <link rel="shortcut icon" type="image/x-icon" href="{% static 'Dashboard/logo_small_white.png' %}" />
+
+    <!-- <link rel="stylesheet" href="{% static 'css/styles.css' %}" /> -->
+  </head>
+
+  <style>
+
+    ::-webkit-scrollbar {
+      width: 10px;
+      height: 10px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 25px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #8a8a8a;
+      border-radius: 25px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: #9d9d9d;
+    }
+  </style>
+
+  <body class="effected">
+    <div class="overlay hidden"></div>
+
+    <div class="d-flex">
+      {% include 'sidenav.html' %}
+
+      <i id="menu-btn" class="d-flex fa-solid fa-bars text-center" style="color: #8a8a8a; font-size: 0px; position: absolute; top: 20px; right: 20px;" onclick="toggleSidebar()"></i>
+
+      <div id="content-container" class="d-flex flex-column w-100">
+        <!-- Warning message if there is error / success messages -->
+        {% if messages %} {% for message in messages %}
+        <div
+          class="alert alert-warning alert-dismissable fade show"
+          role="alert"
+        >
+          {{message}}
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="alert"
+            aria-label="Close"
+          ></button>
+        </div>
+        {% endfor %} {% endif %}
+        <!-- Warning message if there is error / success messages -->
+        <br />
+        <!-- base html inner content -->
+        {% block content %}
+        <!-- insert content in the corresponding .html -->
+        {% endblock %}
+        <!-- base html inner content -->  
+        {% include 'footer.html' %}
+      </div>
+    </div>
+    <!-- <a class="scroll-to-top rounded" href="#page-top">
+      <i class="fas fa-angle-up"></i>
+    </a> -->
+    <!-- Logout Modal-->
+    <div
+      class="modal fade"
+      id="logoutModal"
+      tabindex="-1"
+      role="dialog"
+      aria-labelledby="exampleModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Ready to Leave?</h5>
+            <button
+              class="close"
+              type="button"
+              data-dismiss="modal"
+              aria-label="Close"
+            >
+              <span aria-hidden="true">×</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            Select "Logout" below if you are ready to end your current session.
+          </div>
+          <div class="modal-footer">
+            <button
+              class="btn btn-secondary"
+              type="button"
+              data-dismiss="modal"
+            >
+              Cancel
+            </button>
+            <a class="btn btn-primary" href="{% url 'logout' %}">Logout</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+      crossorigin="anonymous"
+    ></script>
+    <!-- Bootstrap core JavaScript-->
+    <script src="{% static 'Dashboard/vendor/jquery/jquery.min.js' %}"></script>
+    <script src="{% static 'Dashboard/vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+
+    <!-- Core plugin JavaScript-->
+    <script src="{% static 'Dashboard/vendor/jquery-easing/jquery.easing.min.js' %}"></script>
+
+    <!-- Custom scripts for all pages-->
+    <script src="{% static 'Dashboard/js/sb-admin-2.min.js' %}"></script>
+
+    <!-- Page level plugins -->
+    <!-- <script src="{% static 'Dashboard/vendor/datatables/jquery.dataTables.min.js' %}"></script> -->
+    <!-- <script src="{% static 'Dashboard/vendor/datatables/dataTables.bootstrap4.min.js' %}"></script> -->
+
+    <!-- Page level custom scripts -->
+    <!-- <script src="{% static 'Dashboard/js/demo/datatables-demo.js' %}"></script> -->
+    <!-- <script src="{% static 'Dashboard/vendor/chart.js/Chart.min.js' %}"></script> -->
+    <!-- <script src="{% static 'Dashboard/vendor/chart.js/Chart.extension.js' %}"></script> -->
+    {% block script %} {% endblock %}
+  </body>
+
+  <script>
+    function toggleSidebar(){
+      document.getElementById('accordionSidebar').classList.toggle('toggled')
+      document.querySelector('.overlay').classList.toggle('hidden')
+    }
+
+    document.querySelector('.overlay').addEventListener("click", function(e) {
+      if (document.getElementById('updating-personnel-loader') != null){
+        if (document.getElementById('updating-personnel-loader').style.display == 'none'){
+          document.querySelector('.overlay').classList.add('hidden')
+        }
+      } else {
+        document.querySelector('.overlay').classList.add('hidden')
+      }
+
+      try {
+        document.getElementById('img_stream').classList.remove('expand-vertical')
+        document.getElementById('img_stream').classList.remove('expand-horizontal')
+      } catch {}
+
+      try {
+        document.querySelector('.my-modal').classList.add('hidden')
+      } catch {}
+        
+      if (e.target != document.getElementById('accordionSidebar') && parseInt(window.innerWidth) < 992){
+        document.getElementById('accordionSidebar').classList.add('toggled')
+      }
+    });
+  </script>
+
+</html>

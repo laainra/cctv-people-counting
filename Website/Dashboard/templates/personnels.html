@@ -1,0 +1,597 @@
+{% extends 'base.html' %} {% block content %} {% csrf_token %}
+<!-- insert content -->
+
+<script>
+  if (localStorage.getItem('darkMode') == 'enabled') {
+      document.body.classList.add("dark-mode")
+      document.getElementById("accordionSidebar").classList.add("dark-mode")
+      document.getElementById("toggler-button").classList.add("dark-mode")
+  }else {
+      document.body.classList.add("light-mode")
+      document.getElementById("accordionSidebar").classList.add("light-mode")
+      document.getElementById("toggler-button").classList.add("light-mode")
+  }
+</script>
+
+<h1 class="effected" style="padding-left: 50px; font-size: 30px; margin-bottom: 20px;">
+    Personnels
+</h1>
+
+<section class="my-modal personnel hidden">
+  <div class="card align-items-center effected pl-5 pr-5 pt-4 pb-4 align-self-center" style="border-radius: 25px; width: fit-content;">
+    <span id="form-title" class="mb-4 effected" style="font-weight: 600; font-size: 30px;">Edit Personnel</span>
+    <form id="personnel-form" action="{% url 'edit_personnel' %}" method="POST" class="d-flex flex-column w-100 justify-content-center align-items-center mb-1">
+      <div class="form-group">
+        {% csrf_token %} 
+        <p class="mb-3" style="display: flex; flex-direction: column; justify-content: center; align-items: start; width: 100%;">
+          <label for="name" class="mb-1 effected">Personnel Name:</label>
+          <input name="name" type="text" class="effected" style="width:320px;" maxlength="20" placeholder="Insert Personnel Name" required>
+        </p>
+        <p class="mb-3" style="display: flex; flex-direction: column; justify-content: center; align-items: start; width: 100%;">
+          <label for="gender" class="mb-1 effected">Personnel Gender:</label>
+          <select name="gender" id="id_gender" class="effected" style="padding: 8px 10px; border: 2px solid transparent; border-right: 15px solid transparent; cursor: pointer; width: 100%;">
+            <option value="M">Male</option>
+            <option value="F">Female</option>
+          </select>
+        </p>
+        <div class="d-flex justify-content-between align-items-center mt-4 gap-2" style="width: 320px;">
+          <button 
+            type="button" 
+            class="btn btn-danger btn-user btn-block m-0" 
+            style="border-radius: 8px; padding-left: 2%; padding-right: 2%;"
+            onclick="closeModal()">
+            Cancel
+          </button>
+          <button 
+          type="submit" 
+          class="btn btn-success btn-user btn-block m-0" 
+          style="border-radius: 8px; padding-left: 2%; padding-right: 2%;">
+          Save
+          </button>
+          <button type="submit" class="btn btn-primary btn-user btn-block m-0" style="display: none; border-radius: 8px; padding-left: 2%; padding-right: 2%; width: 320px;">
+            Add Personnel
+          </button>
+        </div>
+      </div>
+    </form>
+    <button
+      class="btn btn-danger btn-block align-self-center text-center delete-button effected"
+      onclick="deletePersonnel()">
+      Delete Personnel
+    </button>
+  </div>
+</section>
+
+<div id="updating-personnel-loader" class="loader" style="display: none; position: fixed; top: 0; bottom: 0; right: 0; left: 0; margin: auto auto auto auto;"></div>
+
+<div class="d-flex justify-content-between align-items-start mb-5 gap-4 h-100 responsive responsive-card">
+  <div id="folder-container" class="card p-3 effected" style="width: 350px; height: 560px;">
+    <div id="folder-container-loader" class="loader" style="width: 110px !important;"></div>
+    
+    <div class="d-flex justify-content-between align-items-center gap-0 mb-2">
+      <a class="d-flex nav-link text-dark align-items-center gap-2 effected">
+        <i id="folder-icon" class="fa-solid fa-users text-center" style="font-size: 20px"></i>
+        <span id="folder-title" >Personnels List</span>
+      </a>
+    
+      <i id="add-personnel" title="Add Personnel" class="d-flex text-center align-items-center mr-2 fa-solid fa-plus float-right effected" style="height: 100%; cursor: pointer; font-size: 15px;" onclick="openModal(); addPersonnel()"></i>
+
+      <i id="cancel" title="Cancel" class="fa-solid fa-xmark float-right effected mt-3" style="width: 20px; height: 100%; display: none; cursor: pointer;" onclick="cancelChooseFolder()"></i>
+    </div>
+
+  
+    <div id="folders" class="container scrollmenu vertical-scroll w-100 h-100 d-flex justify-content-center effected" style="padding-left: 0; padding-right: 0; display: -ms-grid;">
+      <div class="row">
+      {% for personnel_data in Personnels %}
+        {% with 'img/personnel_pics/'|add:personnel_data.0|add:'/'|add:personnel_data.1 as profile_pic %}
+          <a 
+          {% if Selected.name == personnel_data.0 %}
+          id="selected-personnel" class="card col-md-auto mb-1 text-center effected active"
+          {% else %}  
+          class="card col-md-auto mb-1 text-center effected" 
+          {% endif %}
+          style="width: 200px; height: 200px; margin: 0 auto; border-radius: 20px; cursor: pointer;"
+          onclick="selectPersonnel('{{personnel_data.0}}')">
+            {% load static %}
+            {% if Selected.name == personnel_data.0 %}
+              <!-- <div class="camera-marker effected" style="padding: 0; border-radius: 0px 0px 8px 8px; position: absolute; height: 6px; width: 100px; top: 0; margin-left: auto; margin-right: auto; left: 0; right: 0;"></div> -->
+              <div class="camera-marker effected" style="padding: 0; border-radius: 0px 8px 8px 0px; position: absolute; height: 100px; width: 6px !important; top: 0; bottom: 0; margin-bottom: auto; margin-top: auto; left: 0;"></div>
+            {% endif %}
+            <div class="container d-flex flex-column justify-content-between align-items-center text-center" style="padding: 10px; width: 100%; height: 100%; padding-top: 30px; padding-bottom: 30px;">
+              <img {% if personnel_data.1 == None %} src="{% static 'img/user_default.png' %}" {% else %} src="{% static profile_pic %}" {% endif %} style="border-radius: 50%; width: 95px; height: 95px; object-fit: cover;"/>
+              <p class="m-0">{{personnel_data.0}}</p>
+            </div>  
+          </a> 
+        {% endwith %}
+      {% endfor %}
+      </div>
+    </div>
+  </div>
+  
+  <div id="image-container" class="card p-3 effected" style="width: 100%; height: 560px; ">
+    <div id="image-container-loader" class="loader" style="width: 110px !important;"></div>
+
+    <div id="image-container-title" class="d-flex p-0 align-items-center justify-content-between mb-3 responsive" style="position: relative;">
+      <div class="d-flex align-items-stretch justify-content-between gap-1 p-0 mt-2 ml-3" href="{% url 'edit_personnel' %}">
+        <i class="d-flex fa-solid fa-user align-items-center text-center effected mr-1" style="font-size: 20px"></i>
+        
+        {% if Selected.name != 'Unknown' %}
+        <div class="d-flex ml-1 align-items-start justify-content-center flex-column">
+          <div class="d-flex flex-row align-items-center justify-content-start">
+            <span id="personnel-name" class="effected">{{Selected.name}}</span>
+            <i title="Edit Personnel" id="edit-name" class="d-flex text-center align-items-center fa-solid fa-pencil effected" style="margin-left: 10px; font-size: 10px; cursor: pointer;" onclick="openModal(); editPersonnel()"></i>
+            <!-- <a class="d-flex text-center align-items-start effected" href="{% url 'edit_personnel' %}" style="text-decoration: none; margin-left: 10px;">
+            </a> -->
+          </div>
+          {% if Selected.gender == 'M' %}
+            <span id="personnel-gender" class="effected" style="font-size: 12px;">Male</span>
+          {% else %}
+            <span id="personnel-gender" class="effected" style="font-size: 12px;">Female</span>
+          {% endif %}
+        </div>
+        {% else %}
+        <span id="personnel-name" class="ml-1 w-100 effected">{{Selected.name}}</span>
+        {% endif %}
+
+        {% if Selected.name != 'Unknown' %}
+        <form id="add-image-form" class="post-form1 align-self-end mr-3 h-100" method="POST" enctype="multipart/form-data" style="justify-self: end; display: none;">
+          {% csrf_token %}
+          <label for="file-input">
+            <i title="Add Image" id="add-image" class="d-flex fa-solid fa-plus text-center align-items-center effected" style="font-size: 15px; cursor: pointer;"></i>
+          </label>
+          <input id="file-input" name="image_file" type="file" style="display: none;" accept="image/*" onchange="document.getElementById('add-image-form').submit()" multiple/>
+        </form>
+        {% else %}
+        <i title="Clear Folder" id="clear-image" class="d-flex eraser1 fa-solid fa-eraser text-center align-self-end mr-3 h-100 effected" style="font-size: 0px; margin-left: 2px; cursor: pointer; justify-self: end !important;" onclick="clearUnknown()"></i>
+        {% endif %}
+      </div>
+      <a class="d-inline-flex align-items-stretch gap-4 p-0 mt-2 mr-3 effected">
+        <i title="Set As Profile Picture" id="set-profile-pic" class="d-flex fa-solid fa-user text-center align-items-center" style="display: none !important; margin-left: 2px; cursor: pointer;" onclick="setProfilePic()"></i>
+        <i title="Move Image" id="move-image" class="d-flex fa-solid fa-folder text-center align-items-center" style="display: none !important; margin-left: 2px; cursor: pointer;" onclick="chooseFolder()"></i>
+        <i title="Delete Image" id="delete-image" class="d-flex fa-solid fa-trash text-center align-items-center" style="display: none !important; margin-left: 2px; cursor: pointer;" onclick="deleteImage()"></i>
+        {% if Selected.name != 'Unknown' %}
+        <form id="add-image-form" class="post-form2 align-self-end" method="POST" enctype="multipart/form-data" style="justify-self: end;">
+          {% csrf_token %}
+          <label for="file-input">
+            <i title="Add Image" id="add-image" class="d-flex fa-solid fa-plus text-center align-items-center effected" style="font-size: 15px; cursor: pointer;"></i>
+          </label>
+          <input id="file-input" name="image_file" type="file" style="display: none;" accept="image/*" onchange="document.getElementById('add-image-form').submit()" multiple/>
+        </form>
+        {% else %}
+        <i title="Clear Folder" id="clear-image" class="d-flex eraser2 fa-solid fa-eraser text-center align-items-center" style="font-size: 15px; margin-left: 2px; cursor: pointer;" onclick="clearUnknown()"></i>
+        {% endif %}
+      </a>
+    </div>
+    
+    <div id="image-container-scroll" class="container d-flex justify-content-center scrollmenu vertical-scroll w-100 h-100 text-center effected" style="padding-left: 0; padding-right: 0; display: -ms-grid;">
+      <div id="image-container-scroll-row" class="row w-100 gap-3 justify-content-center ">
+      {% for image in Img_List %}
+        {% with 'img/personnel_pics/'|add:Selected.name|add:'/'|add:image as personnel_photo %}
+          <a class="card col-md-auto mb-1 text-center effected p-2 m-0 image" style="width: 200px; height: 200px; margin: 0 auto; border-radius: 10px; cursor: pointer;" onclick="selectPhoto('{{image}}', this)">
+            {% load static %}
+            <div class="container d-flex align-items-center justify-content-center" style="width: 100%; height: 100%; padding: 0;">
+              <img src="{% static personnel_photo %}" style="margin: auto; object-fit: cover; display: block; border-radius: 10px; width: 95%; height: 95%;"/>
+            </div>  
+          </a>
+        {% endwith %}
+      {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  elements = document.getElementsByClassName("effected")
+
+  for (var i = 0; i<elements.length; i++){
+    if (localStorage.getItem('darkMode') == 'enabled') {
+        elements[i].classList.add("dark-mode")
+    }else {
+        elements[i].classList.add("light-mode")
+    }
+  }
+</script>
+
+<script>
+  var image_count = 0;
+  var isChoosingFolder = false
+
+  function selectPersonnel(name){
+    var csrftoken = document.querySelector("[name=csrfmiddlewaretoken]").value;
+    var xhttp = new XMLHttpRequest();
+    if (isChoosingFolder){
+      var data = "command=move_image" + "&name=" + name; 
+      document.getElementById('folder-container-loader').style.display = 'block'
+      var folders = document.getElementById("folder-container").getElementsByTagName('a')
+
+      for (var i = 0; i < folders.length; i++){
+        folders[i].style.display = 'none'
+      }
+
+    }else {
+      localStorage.setItem('personnel_scroll_value', document.getElementById('folders').scrollTop)
+      var data = "command=personnel" + "&name=" + name;
+    }
+
+    xhttp.open("POST", "personnels");
+    xhttp.setRequestHeader("X-CSRFToken", csrftoken);
+    xhttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+    xhttp.onload = function(){
+      window.location.reload();
+    };
+    xhttp.send(data);
+  }
+
+  function selectPhoto(img_name, element){
+    element.classList.toggle('active')
+
+    if (element.classList.contains('active')){
+      var data = "command=select_image" + "&name=" + img_name;
+      image_count++
+    }else{
+      var data = "command=unselect_image" + "&name=" + img_name;
+      image_count--
+    }
+
+    if (image_count == 0){
+      document.getElementById('move-image').setAttribute('style', 'display:none !important');
+      document.getElementById('delete-image').setAttribute('style', 'display:none !important');
+    } else{
+      document.getElementById('move-image').setAttribute('style', 'display:inline !important');
+      document.getElementById('delete-image').setAttribute('style', 'display:inline !important');;
+    }
+
+    if (image_count == 1 && '{{Selected.name}}' != 'Unknown'){
+      document.getElementById('set-profile-pic').setAttribute('style', 'display:inline !important');
+    }else{
+      document.getElementById('set-profile-pic').setAttribute('style', 'display:none !important');
+    }
+    
+    sendData(data)
+  }
+
+  function deleteImage(){
+    Swal.fire({
+      title: "Are you sure?",
+      text: "Images will be deleted!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!"
+    }).then((result) => {
+      if (result.isConfirmed) {
+        var csrftoken = document.querySelector("[name=csrfmiddlewaretoken]").value;
+        var xhttp = new XMLHttpRequest();
+        var data = "command=delete_image";
+
+        document.getElementById('image-container-loader').style.display = 'block'
+        var images = document.getElementById("image-container").getElementsByTagName('a')
+
+        for (var i = 0; i < images.length; i++){
+          images[i].style.display = 'none'
+        }
+
+        xhttp.open("POST", "personnels");
+        xhttp.setRequestHeader("X-CSRFToken", csrftoken);
+        xhttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        xhttp.onload = function(){
+          window.location.reload();
+        };
+        xhttp.send(data);
+      }
+    });
+  }
+
+  function chooseFolder(){
+    if (parseInt(window.innerWidth) < 992){
+      document.getElementById("image-container").style.setProperty('display', 'none', 'important');
+      // document.getElementById("image-container").style.height = "0%"
+    } else {
+      document.getElementById("folder-container").style.width = "100%"
+      document.getElementById("image-container").style.width = "0%"
+    }
+      
+    document.getElementById("image-container-title").style.cssText = "display: none !important"
+    document.getElementById("folder-title").textContent = "Move To"
+    document.getElementById("add-personnel").style.setProperty('display', 'none', 'important');
+    document.getElementById("selected-personnel").style.display = "none"
+    document.getElementById("cancel").style.display = "block"
+    document.getElementById("folder-icon").classList.remove('fa-users')
+    document.getElementById("folder-icon").classList.add('fa-folder')
+
+    isChoosingFolder = true
+  }
+
+  function cancelChooseFolder(){
+    document.getElementById("image-container").style.setProperty('display', 'flex', 'important');
+
+    document.getElementById("image-container").style.width = "100%"
+    document.getElementById("image-container-title").style.cssText = ""
+    document.getElementById("folder-title").textContent = "Personnel List"
+    document.getElementById("add-personnel").style.display = "block"
+    document.getElementById("cancel").style.display = "none"
+    document.getElementById("selected-personnel").style.display = "block"
+    document.getElementById("folder-container").style.width = "350px"
+
+    document.getElementById("folder-icon").classList.remove('fa-folder')
+    document.getElementById("folder-icon").classList.add('fa-users')
+
+    isChoosingFolder = false
+  }
+
+  function sendData(data){
+    var csrftoken = document.querySelector("[name=csrfmiddlewaretoken]").value;
+    var xhttp = new XMLHttpRequest();
+
+    xhttp.open("POST", "personnels");
+    xhttp.setRequestHeader("X-CSRFToken", csrftoken);
+    xhttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+    xhttp.send(data);    
+  }
+
+  function clearUnknown(){
+    Swal.fire({
+      title: "Are you sure?",
+      text: "All picture in this folder will be deleted!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!"
+    }).then((result) => {
+      if (result.isConfirmed) {
+
+        var csrftoken = document.querySelector("[name=csrfmiddlewaretoken]").value;
+        var xhttp = new XMLHttpRequest();
+        var data = "command=clear_unknown"
+    
+        document.getElementById('image-container-loader').style.display = 'block'
+        document.getElementById('image-container').style.opacity = 0.5
+        var images = document.getElementById("image-container").getElementsByTagName('a')
+    
+        for (var i = 0; i < images.length; i++){
+          images[i].style.display = 'none'
+        }
+    
+        xhttp.open("POST", "personnels");
+        xhttp.setRequestHeader("X-CSRFToken", csrftoken);
+        xhttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        xhttp.onload = function(){
+          window.location.reload();
+        };
+        xhttp.send(data);
+      }
+    });
+  }
+
+  function sendImage(event){
+    file = event.target.files[0]
+
+    url  = window.URL.createObjectURL(file)
+
+    var data = "command=add_image&files=" + url
+
+    sendData(data)
+  }
+
+  function setProfilePic(){
+    var csrftoken = document.querySelector("[name=csrfmiddlewaretoken]").value;
+    var xhttp = new XMLHttpRequest();
+    data = 'command=set_profile_pic'
+
+    xhttp.open("POST", "personnels");
+    xhttp.setRequestHeader("X-CSRFToken", csrftoken);
+    xhttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+    xhttp.onload = function(){
+      window.location.reload();
+    };
+    xhttp.send(data);
+  }
+
+  function deletePersonnel(){
+    Swal.fire({
+      title: "Are you sure?",
+      text: "Personnel will be deleted!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!"
+    }).then((result) => {
+      if (result.isConfirmed) {
+        var csrftoken = document.querySelector("[name=csrfmiddlewaretoken]").value;
+        var xhttp = new XMLHttpRequest();
+        var data = "command=delete_personnel";  
+    
+        xhttp.open("POST", "personnels");
+        xhttp.setRequestHeader("X-CSRFToken", csrftoken);
+        xhttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        xhttp.onload = function(){
+          window.location.replace("personnels");
+        };
+        xhttp.send(data);
+      }
+    });
+  }
+
+  var modal = document.querySelector(".my-modal");
+  var overlay = document.querySelector(".overlay");
+
+  var saveBtn = document.querySelector(".btn-success")
+  var addPersonnelBtn = document.querySelector(".btn-primary")
+  var deletePersonnelBtn = document.querySelector(".delete-button")
+  
+  var inputName = document.querySelector("input[name='name']")
+  var inputGender = document.querySelector("select[name='gender']")
+
+  var personnelForm = document.getElementById('personnel-form')
+
+  var formTitle = document.getElementById('form-title')
+
+  function addPersonnel(){
+    saveBtn.style.display = 'none'
+    deletePersonnelBtn.style.display = 'none'
+    addPersonnelBtn.style.display = 'block'
+    inputName.value = ''
+    inputGender.value = 'M'
+    personnelForm.action = "{% url 'add_personnel' %}"
+    formTitle.textContent = "Insert Personnel"
+  }
+
+  function editPersonnel(){
+    saveBtn.style.display = 'block'
+    deletePersonnelBtn.style.display = 'block'
+    addPersonnelBtn.style.display = 'none'
+    inputName.value = '{{Selected.name}}'
+    inputGender.value = '{{Selected.gender}}'
+    personnelForm.action = "{% url 'edit_personnel' %}"
+    formTitle.textContent = "Edit Personnel"
+  }
+
+  function closeModal(){
+    modal.classList.add('hidden')
+    overlay.classList.add('hidden')
+  }
+
+  function openModal(){
+    modal.classList.remove('hidden')
+    overlay.classList.remove('hidden')
+  }
+
+  if (localStorage.getItem('personnel_scroll_value') !=  null){
+    document.getElementById('folders').scrollTop = parseInt(localStorage.getItem('personnel_scroll_value'))
+  }
+
+  document.getElementById('image-container').addEventListener("click", function(e) {
+    if (e.target == document.getElementById('image-container') || 
+        e.target == document.getElementById('image-container-scroll') || 
+        e.target == document.getElementById('image-container-scroll-row') ||
+        e.target == document.getElementById('image-container-title')){
+    
+      var images = document.getElementById('image-container-scroll').getElementsByTagName('a')
+
+      for (var i = 0; i < images.length; i++){
+        if (images[i].classList.contains('active')){
+          images[i].classList.remove('active')
+        }
+      }
+
+      image_count = 0
+
+      document.getElementById('move-image').setAttribute('style', 'display:none !importantad');
+      document.getElementById('delete-image').setAttribute('style', 'display:none !important');
+      document.getElementById('set-profile-pic').setAttribute('style', 'display:none !important');
+    }
+  });
+
+  if ('{{request.session.status}}' == 'name_error'){
+    Swal.fire({
+      title: "Failed!",
+      text: "Name already exist.",
+      icon: "error"
+    });
+  } else if ('{{request.session.status}}' == 'adding_error') {
+    Swal.fire({
+      title: "Failed!",
+      text: "Personnel can't be added.",
+      icon: "error"
+    });
+  } else if ('{{request.session.status}}' == 'adding_success') {
+    Swal.fire({
+      title: "Success!",
+      text: "Personnel has been added.",
+      icon: "success"
+    });
+  } else if ('{{request.session.status}}' == 'edit_error') {
+    Swal.fire({
+      title: "Saving Failed!",
+      text: "Personnel data can't be saved.",
+      icon: "error"
+    });
+  } else if ('{{request.session.status}}' == 'edit_success') {
+    Swal.fire({
+      title: "Change Saved!",
+      text: "Personnel data has been saved.",
+      icon: "success"
+    });
+  } else if ('{{request.session.status}}' == 'personnel_deleted') {
+    Swal.fire({
+      title: "Deleted!",
+      text: "Personnel has been deleted.",
+      icon: "success",
+    });
+  } else if ('{{request.session.status}}' == 'unknown_cleared') {
+    Swal.fire({
+      title: "Cleared!",
+      text: "Folder has been cleared.",
+      icon: "success",
+    });
+  } else if ('{{request.session.status}}' == 'image_deleted') {
+    Swal.fire({
+      title: "Deleted!",
+      text: "Your images has been deleted.",
+      icon: "success",
+    });
+  } else if ('{{request.session.status}}' == 'image_moved') {
+    Swal.fire({
+      title: "Success!",
+      text: "Your images has been moved to the destination folder.",
+      icon: "success",
+    });
+  } else if ('{{request.session.status}}' == 'profile_updated') {
+    Swal.fire({
+      title: "Success!",
+      text: "Personnel profile picture has been updated.",
+      icon: "success",
+    });
+  } else if ('{{request.session.status}}' == 'img_adding_success') {
+    Swal.fire({
+      title: "Success!",
+      text: "Images has been added.",
+      icon: "success",
+    });
+  } else if ('{{request.session.status}}' == 'img_adding_error1') {
+    Swal.fire({
+      title: "Warning!",
+      text: "No face detected in some images.",
+      icon: "warning",
+    });
+  }  else if ('{{request.session.status}}' == 'img_adding_error2') {
+    Swal.fire({
+      title: "Warning!",
+      text: "No face detected in the selected images.",
+      icon: "warning",
+    });
+  } 
+    
+  var csrftoken = document.querySelector("[name=csrfmiddlewaretoken]").value;
+  var xhttp = new XMLHttpRequest();
+  var data = "command=" + 'reset_status';
+
+  xhttp.open("POST", "personnels");
+  xhttp.setRequestHeader("X-CSRFToken", csrftoken);
+  xhttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+  xhttp.onload = function(){
+    if (JSON.parse(xhttp.responseText)['required_update'] === true){
+      document.querySelector('.overlay').classList.remove('hidden')
+      document.getElementById('updating-personnel-loader').style.display = 'block'
+
+      var data = "command=" + 'update_personnel_data';
+
+      xhttp.open("POST", "personnels");
+      xhttp.setRequestHeader("X-CSRFToken", csrftoken);
+      xhttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+      xhttp.onload = function(){
+        document.querySelector('.overlay').classList.add('hidden')
+        document.getElementById('updating-personnel-loader').style.display = 'none'
+      };
+      xhttp.send(data);
+    }
+  
+  };
+  xhttp.send(data);
+
+</script>
+
+{% endblock %}
