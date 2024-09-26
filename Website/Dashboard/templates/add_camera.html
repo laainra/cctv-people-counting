@@ -18,7 +18,7 @@
       <br>
       <input name="feed_src" type="text" class="effected edit-text" style="width:320px;" value="{{Active_Cam.feed_src}}" placeholder="Insert RTSP Link" required>
     </p>
-    <div class="d-flex justify-content-between mb-3" style="width: 320px;">
+    {% comment %} <div class="d-flex justify-content-between mb-3" style="width: 320px;">
       <a>
         <span class="effected">AI Start At:</span>
         <br>
@@ -29,6 +29,32 @@
         <span class="effected">AI Stop At:</span>
         <br>
         <input id="end-time" title="Camera Stop Time" name="cam_stop" type="time" step="300" class="effected time-input" {% if Active_Cam != None %} value="{{Active_Cam.cam_stop}}" {% else %} value="17:00:00" {% endif %} onchange="checkValidTimeRange()" style="cursor: pointer;" required>
+      </a>
+    </div> {% endcomment %}
+    <div class="d-flex justify-content-between mb-3" style="width: 320px;">
+      <a>
+        <span class="effected">Attendance Time Start At:</span>
+        <br>
+        <input id="attendance-start-time" title="Attendance Start Time" name="attendance_time_start" type="time" step="300" class="effected time-input" {% if Active_Cam != None %} value="{{Active_Cam.attendance_time_start}}" {% else %} value="08:00:00" {% endif %} onchange="checkValidTimeRange()" style="cursor: pointer;" required>
+      </a>
+      <span class="d-flex align-items-center effected">to</span>
+      <a>
+        <span class="effected">Attendance Time Stop At:</span>
+        <br>
+        <input id="attendance-end-time" title="Attendance Stop Time" name="attendance_time_end" type="time" step="300" class="effected time-input" {% if Active_Cam != None %} value="{{Active_Cam.attendance_time_end}}" {% else %} value="17:00:00" {% endif %} onchange="checkValidTimeRange()" style="cursor: pointer;" required>
+      </a>
+    </div>
+    <div class="d-flex justify-content-between mb-3" style="width: 320px;">
+      <a>
+        <span class="effected">Leaving Time Start At:</span>
+        <br>
+        <input id="leaving-start-time" title="Leaving Start Time" name="leaving_time_start" type="time" step="300" class="effected time-input" {% if Active_Cam != None %} value="{{Active_Cam.leaving_time_start}}" {% else %} value="08:00:00" {% endif %} onchange="checkValidTimeRange()" style="cursor: pointer;" required>
+      </a>
+      <span class="d-flex align-items-center effected">to</span>
+      <a>
+        <span class="effected">Leaving Time Stop At:</span>
+        <br>
+        <input id="leaving-end-time" title="Leaving Stop Time" name="leaving_time_end" type="time" step="300" class="effected time-input" {% if Active_Cam != None %} value="{{Active_Cam.leaving_time_stop}}" {% else %} value="17:00:00" {% endif %} onchange="checkValidTimeRange()" style="cursor: pointer;" required>
       </a>
     </div>
     <p class="d-flex flex-column justify-content-between align-items-start" style="width: 320px;">

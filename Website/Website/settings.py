@@ -25,7 +25,8 @@ SECRET_KEY = 'django-insecure-x6)r*_5q%u&!qihu*k$h3*-(y&(9=^%lp935e*0^%p8&b_fxqg
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-CSRF_TRUSTED_ORIGINS=['https://obim.tmp.stechoq.com','http://obim.tmp.stechoq.com']
+CSRF_TRUSTED_ORIGINS = ['https://obim.tmp.stechoq.com',
+                        'http://obim.tmp.stechoq.com']
 
 ALLOWED_HOSTS = ['*']
 
@@ -38,12 +39,15 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    
+    # 'django_browser_reload',
+
     'django_celery_beat',
     'django_celery_results',
-    
+
     'Dashboard',
-]   
+    # 'tailwind',
+    # 'theme',
+]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -54,6 +58,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
+    "django_browser_reload.middleware.BrowserReloadMiddleware",
 ]
 
 ROOT_URLCONF = 'Website.urls'
@@ -84,7 +89,7 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'db_cctvproject',
-        'USER': 'root', 
+        'USER': 'root',
         'PASSWORD': '',
         'HOST': '127.0.0.1',
         'PORT': '3306',
@@ -152,3 +157,11 @@ CELERY_TASK_SERIALIZER = 'json'
 CELERY_TIMEZONE = 'Asia/Jakarta'
 
 CELERY_RESULT_BACKEND = 'django-db'
+
+# TAILWIND_APP_NAME = 'theme'
+
+# INTERNAL_IPS = [
+#     "127.0.0.1",
+# ]
+
+# NPM_BIN_PATH = 'npm.cmd'

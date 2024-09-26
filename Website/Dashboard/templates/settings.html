@@ -1,337 +1,465 @@
-{% extends 'base.html' %} {% block content %} {% csrf_token %}
+{% extends 'base.html' %}
+{% block title %}
+Settings {% endblock %} 
 
-<h1 class="effected" style="padding-left: 50px; font-size: 30px; margin-bottom: 20px;">
-    Settings
-</h1>
+{% block page_title %} Settings {% endblock %}
 
-<div class="d-flex flex-column justify-content-between align-items-center mb-5 gap-4 responsive-card">
-    <div class="card d-flex p-3 w-100 h-100 effected">
-        <div>
-            <a class="d-flex nav-link text-dark align-items-center gap-2 effected">
-                <i class="fa-solid fa-user text-center" style="font-size: 20px"></i>
-                <span>User Settings</span>
-            </a>
-        </div>
-        <div class="d-flex flex-row justify-content-stretch align-items-center p-3 w-100 user-settings responsive">
-            <div class="d-flex flex-column align-items-start justify-content-center w-50">
-                <b class="mb-1 effected">Username</b>
-                <div style="display: flex; flex-direction: row; align-items: center; justify-content: start;" class="fontuser w-100 m-0">
-                    <input name="username" type="text" class="w-100 edit-text effected" value="{{Username}}" placeholder="Username" required disabled> 
-                    <!-- <hr class="effected" style="width: 20px; transform: rotate(90deg);"/> -->
-                    <i class="fa-regular fa-pen-to-square text-center ml-2 effected"></i>
-                    <i class="fa-solid fa-check text-center ml-2 effected" style="display: none;" onclick="saveUsername(this.closest('div').querySelector('input').value)"></i>
-                    <!-- <i class="fa-solid fa-user text-center effected"></i> -->
-                </div>
-            </div>
-            <div class="d-flex flex-column align-items-start justify-content-start w-50">
-                <b class="mb-1 effected">Password</b>
-                <div style="display: flex; flex-direction: row; align-items: center; justify-content: start;" class="fontuser w-100 m-0">
-                    <input id="user-password" name="password" type="password" class="w-100 edit-text effected" placeholder="Password" required disabled> 
-                    <hr class="effected" style="width: 20px; transform: rotate(90deg); display: none;"/>
-                    <i class="fa-regular fa-pen-to-square text-center ml-2 effected"></i>
-                    <i class="fa-solid fa-check text-center ml-2 effected" style="display: none;"></i>
-                    <i class="fa-regular fa-eye text-center toggle-visible effected" style="display: none;" onclick="togglePasswordVisibility(this)"></i>    
-                    <!-- <i class="fa-solid fa-lock text-center effected"></i> -->
-                </div>
-            </div>
-        </div>
+{% block content %} {% csrf_token %} 
+
+<div
+  class="d-flex flex-column justify-content-between align-items-center mb-5 gap-4 responsive-card"
+>
+  <div class="card d-flex p-3 w-100 h-100 effected">
+    <div>
+      <a class="d-flex nav-link text-dark align-items-center gap-2 effected">
+        <i class="fa-solid fa-user text-center" style="font-size: 20px"></i>
+        <span>User Settings</span>
+      </a>
     </div>
-
-    <div class="card d-flex p-3 h-100 w-100 effected">
-        <div>
-            <a class="d-flex nav-link mb-1 text-dark align-items-center gap-2 effected">
-                <i class="fa-solid fa-users text-center" style="font-size: 20px"></i>
-                <span>Personnel Settings</span>
-            </a>
+    <div
+      class="d-flex flex-row justify-content-stretch align-items-center p-3 w-100 user-settings responsive"
+    >
+      <div
+        class="d-flex flex-column align-items-start justify-content-center w-50"
+      >
+        <b class="mb-1 effected">Username</b>
+        <div
+          style="
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: start;
+          "
+          class="fontuser w-100 m-0"
+        >
+          <input
+            name="username"
+            type="text"
+            class="w-100 edit-text effected"
+            value="{{Username}}"
+            placeholder="Username"
+            required
+            disabled
+          />
+          <!-- <hr class="effected" style="width: 20px; transform: rotate(90deg);"/> -->
+          <i class="fa-regular fa-pen-to-square text-center ml-2 effected"></i>
+          <i
+            class="fa-solid fa-check text-center ml-2 effected"
+            style="display: none"
+            onclick="saveUsername(this.closest('div').querySelector('input').value)"
+          ></i>
+          <!-- <i class="fa-solid fa-user text-center effected"></i> -->
         </div>
-        <div class="p-3 w-100 align-self-center" style="display: flex; flex-direction: row; align-items: center; justify-content: center;">
-            <div class="d-flex align-items-center justify-content-between border-container w-100 pl-4 pr-3 effected">
-                <div class="d-flex flex-row align-items-center justify-content-start" style="width: 85%;">
-                    <i class="d-flex align-items-center fa-solid fa-trash-can text-center mr-4 effected" style="font-size: 25px;"></i>
-                    <div class="d-flex flex-column justify-content-center">
-                        <b style="align-items: start; width: fit-content" class="effected">
-                            Auto Delete
-                        </b>
-                        <span style="align-items: start; width: fit-content; font-size: 15px;" class="effected">
-                            Set the exipiration time for unknown pictures
-                        </span>
-                    </div>
-                </div>
-                <select id="deletion_time" class="effected" style="padding: 8px 10px; border: 2px solid transparent; border-right: 15px solid transparent; cursor: pointer; min-width: 15%;" onchange="setDeletionTime(this.value)">
-                    <option value="1">1 Day</option>
-                    <option value="3">3 Days</option>
-                    <option value="7">7 Days</option>
-                    <option value="14">2 Weeks</option>
-                    <option value="30">1 Month</option>
-                </select>
-            </div>
+      </div>
+      <div
+        class="d-flex flex-column align-items-start justify-content-start w-50"
+      >
+        <b class="mb-1 effected">Password</b>
+        <div
+          style="
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: start;
+          "
+          class="fontuser w-100 m-0"
+        >
+          <input
+            id="user-password"
+            name="password"
+            type="password"
+            class="w-100 edit-text effected"
+            placeholder="Password"
+            required
+            disabled
+          />
+          <hr
+            class="effected"
+            style="width: 20px; transform: rotate(90deg); display: none"
+          />
+          <i class="fa-regular fa-pen-to-square text-center ml-2 effected"></i>
+          <i
+            class="fa-solid fa-check text-center ml-2 effected"
+            style="display: none"
+          ></i>
+          <i
+            class="fa-regular fa-eye text-center toggle-visible effected"
+            style="display: none"
+            onclick="togglePasswordVisibility(this)"
+          ></i>
+          <!-- <i class="fa-solid fa-lock text-center effected"></i> -->
         </div>
+      </div>
     </div>
+  </div>
 
-    <div class="card p-3 h-100 w-100 effected">
-        <div>
-            <a class="d-flex nav-link text-dark align-items-center gap-2 effected">
-                <i class="fa-solid fa-brush text-center" style="font-size: 20px"></i>
-                <span>Theme</span>
-            </a>
-        </div>
-        <div class="p-3 w-100 align-self-center" style="display: flex; flex-direction: row; align-items: center; justify-content: center;">
-            <div class="d-flex align-items-center justify-content-between border-container w-100 pl-4 pr-4 effected">
-                <div class="d-flex flex-row align-items-center justify-content-start" style="width: 85%;">
-                    <i class="d-flex align-items-center fa-solid fa-moon text-center mr-4 effected" style="font-size: 25px;"></i>
-                    <div class="d-flex flex-column justify-content-center">
-                        <b style="align-items: start; width: fit-content" class="effected">
-                            Dark Mode
-                        </b>
-                        <span style="align-items: start; width: fit-content; font-size: 15px;" class="effected">
-                            Enable dark mode theme
-                        </span>
-                    </div>
-                </div>
-                <label class="switch">
-                    <input id="toggle-switch" type="checkbox" onclick="toggleDarkMode()">
-                    <span class="slider round"></span>
-                </label>
-                <!-- <i class="switch fa-solid fa-toggle-on text-center effected" style="font-size: 35px; cursor: pointer;" onclick="toggleDarkMode()"></i> -->
-            </div>
-        </div>
+  <div class="card d-flex p-3 h-100 w-100 effected">
+    <div>
+      <a
+        class="d-flex nav-link mb-1 text-dark align-items-center gap-2 effected"
+      >
+        <i class="fa-solid fa-users text-center" style="font-size: 20px"></i>
+        <span>Personnel Settings</span>
+      </a>
     </div>
+    <div
+      class="p-3 w-100 align-self-center"
+      style="
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
+      "
+    >
+      <div
+        class="d-flex align-items-center justify-content-between border-container w-100 pl-4 pr-3 effected"
+      >
+        <div
+          class="d-flex flex-row align-items-center justify-content-start"
+          style="width: 85%"
+        >
+          <i
+            class="d-flex align-items-center fa-solid fa-trash-can text-center mr-4 effected"
+            style="font-size: 25px"
+          ></i>
+          <div class="d-flex flex-column justify-content-center">
+            <b style="align-items: start; width: fit-content" class="effected">
+              Auto Delete
+            </b>
+            <span
+              style="align-items: start; width: fit-content; font-size: 15px"
+              class="effected"
+            >
+              Set the exipiration time for unknown pictures
+            </span>
+          </div>
+        </div>
+        <select
+          id="deletion_time"
+          class="effected"
+          style="
+            padding: 8px 10px;
+            border: 2px solid transparent;
+            border-right: 15px solid transparent;
+            cursor: pointer;
+            min-width: 15%;
+          "
+          onchange="setDeletionTime(this.value)"
+        >
+          <option value="1">1 Day</option>
+          <option value="3">3 Days</option>
+          <option value="7">7 Days</option>
+          <option value="14">2 Weeks</option>
+          <option value="30">1 Month</option>
+        </select>
+      </div>
+    </div>
+  </div>
 
-
+  <div class="card p-3 h-100 w-100 effected">
+    <div>
+      <a class="d-flex nav-link text-dark align-items-center gap-2 effected">
+        <i class="fa-solid fa-brush text-center" style="font-size: 20px"></i>
+        <span>Theme</span>
+      </a>
+    </div>
+    <div
+      class="p-3 w-100 align-self-center"
+      style="
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
+      "
+    >
+      <div
+        class="d-flex align-items-center justify-content-between border-container w-100 pl-4 pr-4 effected"
+      >
+        <div
+          class="d-flex flex-row align-items-center justify-content-start"
+          style="width: 85%"
+        >
+          <i
+            class="d-flex align-items-center fa-solid fa-moon text-center mr-4 effected"
+            style="font-size: 25px"
+          ></i>
+          <div class="d-flex flex-column justify-content-center">
+            <b style="align-items: start; width: fit-content" class="effected">
+              Dark Mode
+            </b>
+            <span
+              style="align-items: start; width: fit-content; font-size: 15px"
+              class="effected"
+            >
+              Enable dark mode theme
+            </span>
+          </div>
+        </div>
+        <label class="switch">
+          <input
+            id="toggle-switch"
+            type="checkbox"
+            onclick="toggleDarkMode()"
+          />
+          <span class="slider round"></span>
+        </label>
+        <!-- <i class="switch fa-solid fa-toggle-on text-center effected" style="font-size: 35px; cursor: pointer;" onclick="toggleDarkMode()"></i> -->
+      </div>
+    </div>
+  </div>
 </div>
 
 <script>
-    elements = document.getElementsByClassName("effected")
+  elements = document.getElementsByClassName("effected");
 
-    var usernameInput = document.querySelector("input[name='username']") 
-    var editUsernameBtn = usernameInput.parentElement.closest('div').querySelector('.fa-pen-to-square')
-    var confirmUsernameBtn = usernameInput.parentElement.closest('div').querySelector('.fa-check')
+  var usernameInput = document.querySelector("input[name='username']");
+  var editUsernameBtn = usernameInput.parentElement
+    .closest("div")
+    .querySelector(".fa-pen-to-square");
+  var confirmUsernameBtn = usernameInput.parentElement
+    .closest("div")
+    .querySelector(".fa-check");
 
-    var passwordInput = document.querySelector("input[name='password']") 
-    var passHr = passwordInput.parentElement.closest('div').querySelector('hr')
-    var editPasswordBtn = passwordInput.parentElement.closest('div').querySelector('.fa-pen-to-square')
-    var confirmPasswordBtn = passwordInput.parentElement.closest('div').querySelector('.fa-check')
-    var eyeIcon = passwordInput.parentElement.closest('div').querySelector('.toggle-visible')
+  var passwordInput = document.querySelector("input[name='password']");
+  var passHr = passwordInput.parentElement.closest("div").querySelector("hr");
+  var editPasswordBtn = passwordInput.parentElement
+    .closest("div")
+    .querySelector(".fa-pen-to-square");
+  var confirmPasswordBtn = passwordInput.parentElement
+    .closest("div")
+    .querySelector(".fa-check");
+  var eyeIcon = passwordInput.parentElement
+    .closest("div")
+    .querySelector(".toggle-visible");
 
-    var changePassStat = 'checking'
+  var changePassStat = "checking";
 
-    function toggleDarkMode(){
-        for (var i = 0; i<elements.length; i++){
-            elements[i].classList.toggle('dark-mode')
-            elements[i].classList.toggle('light-mode')
+  function toggleDarkMode() {
+    for (var i = 0; i < elements.length; i++) {
+      elements[i].classList.toggle("dark-mode");
+      elements[i].classList.toggle("light-mode");
 
-            if (elements[i].classList.contains('dark-mode')) {
-                localStorage.setItem('darkMode', 'enabled')
-            } else {
-                localStorage.setItem('darkMode', 'disabled')
-            }
-        }
-        
+      if (elements[i].classList.contains("dark-mode")) {
+        localStorage.setItem("darkMode", "enabled");
+      } else {
+        localStorage.setItem("darkMode", "disabled");
+      }
     }
+  }
 
-    function togglePasswordVisibility(icon){
-        element = document.getElementById('user-password')
-        if (element.type == 'password'){
-            element.type = 'text'
-            icon.classList.remove('fa-eye')
-            icon.classList.add('fa-eye-slash')
-        }else{
-            element.type = 'password'
-            icon.classList.remove('fa-eye-slash')
-            icon.classList.add('fa-eye')
-        }
+  function togglePasswordVisibility(icon) {
+    element = document.getElementById("user-password");
+    if (element.type == "password") {
+      element.type = "text";
+      icon.classList.remove("fa-eye");
+      icon.classList.add("fa-eye-slash");
+    } else {
+      element.type = "password";
+      icon.classList.remove("fa-eye-slash");
+      icon.classList.add("fa-eye");
     }
+  }
 
-    for (var i = 0; i<elements.length; i++){
-        if (localStorage.getItem('darkMode') == 'enabled') {
-            elements[i].classList.add("dark-mode")
-            document.getElementById('toggle-switch').checked = true
-        }else {
-            elements[i].classList.add("light-mode")
-            document.getElementById('toggle-switch').checked = false
-        }
+  for (var i = 0; i < elements.length; i++) {
+    if (localStorage.getItem("darkMode") == "enabled") {
+      elements[i].classList.add("dark-mode");
+      document.getElementById("toggle-switch").checked = true;
+    } else {
+      elements[i].classList.add("light-mode");
+      document.getElementById("toggle-switch").checked = false;
     }
+  }
 
-    function saveUsername(username){
-        var csrftoken = document.querySelector("[name=csrfmiddlewaretoken]").value;
-        var xhttp = new XMLHttpRequest();
-        data = 'command=save_username&username=' + username
+  function saveUsername(username) {
+    var csrftoken = document.querySelector("[name=csrfmiddlewaretoken]").value;
+    var xhttp = new XMLHttpRequest();
+    data = "command=save_username&username=" + username;
 
-        editUsernameBtn.style.display = 'block'
-        confirmUsernameBtn.style.display = 'none'
-        usernameInput.disabled = true
+    editUsernameBtn.style.display = "block";
+    confirmUsernameBtn.style.display = "none";
+    usernameInput.disabled = true;
 
-        xhttp.open("POST", "settings");
-        xhttp.setRequestHeader("X-CSRFToken", csrftoken);
-        xhttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-        xhttp.onload = function(){
-            Swal.fire({
-                title: "Success!",
-                text: "Username has been changed.",
-                icon: "success",
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    window.location.reload();    
-                }
-            });
+    xhttp.open("POST", "settings");
+    xhttp.setRequestHeader("X-CSRFToken", csrftoken);
+    xhttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+    xhttp.onload = function () {
+      Swal.fire({
+        title: "Success!",
+        text: "Username has been changed.",
+        icon: "success",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          window.location.reload();
+        }
+      });
+    };
+    xhttp.send(data);
+  }
+
+  function checkPassword(password) {
+    var csrftoken = document.querySelector("[name=csrfmiddlewaretoken]").value;
+    var xhttp = new XMLHttpRequest();
+    data = "command=check_pass&password=" + password;
+
+    xhttp.open("POST", "settings");
+    xhttp.setRequestHeader("X-CSRFToken", csrftoken);
+    xhttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+    xhttp.onload = function () {
+      json = JSON.parse(xhttp.responseText);
+
+      if (json["status"] == false) {
+        editPasswordBtn.style.display = "block";
+        confirmPasswordBtn.style.display = "none";
+        passwordInput.disabled = true;
+        eyeIcon.style.display = "none";
+        passHr.style.display = "none";
+        passwordInput.value = "";
+        passwordInput.placeholder = "Password";
+
+        changePassStat = "checking";
+
+        Swal.fire({
+          title: "Wrong Password!",
+          icon: "error",
+        });
+      } else {
+        passwordInput.value = "";
+        passwordInput.placeholder = "Insert New Password";
+        passwordInput.type = "password";
+        passwordInput.focus();
+        if (eyeIcon.classList.contains("fa-eye-slash")) {
+          eyeIcon.classList.add("fa-eye");
+          eyeIcon.classList.remove("fa-eye-slash");
+        }
+
+        changePassStat = "saving";
+
+        confirmPasswordBtn.onclick = function () {
+          savePassword(passwordInput.value);
         };
-        xhttp.send(data);
-    }
+      }
+    };
+    xhttp.send(data);
+  }
 
-    function checkPassword(password){
-        var csrftoken = document.querySelector("[name=csrfmiddlewaretoken]").value;
-        var xhttp = new XMLHttpRequest();
-        data = 'command=check_pass&password=' + password
+  function savePassword(password) {
+    var csrftoken = document.querySelector("[name=csrfmiddlewaretoken]").value;
+    var xhttp = new XMLHttpRequest();
+    data = "command=save_pass&password=" + password;
 
-        
-        xhttp.open("POST", "settings");
-        xhttp.setRequestHeader("X-CSRFToken", csrftoken);
-        xhttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-        xhttp.onload = function(){
-            json = JSON.parse(xhttp.responseText)
-            
-            if (json['status'] == false){
-                editPasswordBtn.style.display = 'block'
-                confirmPasswordBtn.style.display = 'none'
-                passwordInput.disabled = true
-                eyeIcon.style.display = 'none'
-                passHr.style.display = 'none'
-                passwordInput.value = ''
-                passwordInput.placeholder = 'Password'
+    changePassStat = "checking";
 
-                changePassStat = 'checking'
-
-                Swal.fire({
-                    title: "Wrong Password!",
-                    icon: "error"
-                });
-            }else{
-                passwordInput.value = ''
-                passwordInput.placeholder = 'Insert New Password'
-                passwordInput.type = 'password'
-                passwordInput.focus()
-                if (eyeIcon.classList.contains('fa-eye-slash')){
-                    eyeIcon.classList.add('fa-eye')
-                    eyeIcon.classList.remove('fa-eye-slash')
-                }
-
-                changePassStat = 'saving'
-
-                confirmPasswordBtn.onclick = function() { savePassword(passwordInput.value); }
-            }
-        };
-        xhttp.send(data);
-    }
-    
-    function savePassword(password){
-        var csrftoken = document.querySelector("[name=csrfmiddlewaretoken]").value;
-        var xhttp = new XMLHttpRequest();
-        data = 'command=save_pass&password=' + password
-
-        changePassStat = 'checking'
-
-        xhttp.open("POST", "settings");
-        xhttp.setRequestHeader("X-CSRFToken", csrftoken);
-        xhttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-        xhttp.onload = function(){
-            Swal.fire({
-                title: "Success!",
-                text: "Password has been changed.",
-                icon: "success",
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    window.location.reload();    
-                }
-            });
-        };
-        xhttp.send(data);
-    }
-
-    function setDeletionTime(time){
-        var csrftoken = document.querySelector("[name=csrfmiddlewaretoken]").value;
-        var xhttp = new XMLHttpRequest();
-        data = 'command=save_del_time&time=' + time
-
-        xhttp.open("POST", "settings");
-        xhttp.setRequestHeader("X-CSRFToken", csrftoken);
-        xhttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-        xhttp.send(data);
-    }
-
-    editUsernameBtn.onclick = function(event) {
-        usernameInput.disabled = false
-        usernameInput.focus()
-        editUsernameBtn.style.display = 'none'
-        confirmUsernameBtn.style.display = 'block'
-
-        var val = usernameInput.value;
-        usernameInput.value = '';
-        usernameInput.value = val;
-    }
-
-    editPasswordBtn.onclick = function(event) {
-        passwordInput.disabled = false
-        passwordInput.type = 'password'
-        passwordInput.placeholder = 'Insert Current Password'
-        passwordInput.focus()
-        editPasswordBtn.style.display = 'none'
-        confirmPasswordBtn.style.display = 'block'
-        passHr.style.display = 'block'
-        eyeIcon.style.display = 'block'
-        if (eyeIcon.classList.contains('fa-eye-slash')){
-            eyeIcon.classList.add('fa-eye')
-            eyeIcon.classList.remove('fa-eye-slash')
+    xhttp.open("POST", "settings");
+    xhttp.setRequestHeader("X-CSRFToken", csrftoken);
+    xhttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+    xhttp.onload = function () {
+      Swal.fire({
+        title: "Success!",
+        text: "Password has been changed.",
+        icon: "success",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          window.location.reload();
         }
+      });
+    };
+    xhttp.send(data);
+  }
 
-        confirmPasswordBtn.onclick = function() { checkPassword(passwordInput.value); }
+  function setDeletionTime(time) {
+    var csrftoken = document.querySelector("[name=csrfmiddlewaretoken]").value;
+    var xhttp = new XMLHttpRequest();
+    data = "command=save_del_time&time=" + time;
 
-        var val = passwordInput.value;
-        passwordInput.value = '';
-        passwordInput.value = val;
+    xhttp.open("POST", "settings");
+    xhttp.setRequestHeader("X-CSRFToken", csrftoken);
+    xhttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+    xhttp.send(data);
+  }
+
+  editUsernameBtn.onclick = function (event) {
+    usernameInput.disabled = false;
+    usernameInput.focus();
+    editUsernameBtn.style.display = "none";
+    confirmUsernameBtn.style.display = "block";
+
+    var val = usernameInput.value;
+    usernameInput.value = "";
+    usernameInput.value = val;
+  };
+
+  editPasswordBtn.onclick = function (event) {
+    passwordInput.disabled = false;
+    passwordInput.type = "password";
+    passwordInput.placeholder = "Insert Current Password";
+    passwordInput.focus();
+    editPasswordBtn.style.display = "none";
+    confirmPasswordBtn.style.display = "block";
+    passHr.style.display = "block";
+    eyeIcon.style.display = "block";
+    if (eyeIcon.classList.contains("fa-eye-slash")) {
+      eyeIcon.classList.add("fa-eye");
+      eyeIcon.classList.remove("fa-eye-slash");
     }
 
-    window.addEventListener("click", function(e) {
-        console.log(e.target)
-        if (usernameInput.disabled == false){
-            if (e.target != editUsernameBtn && e.target != usernameInput && e.target != confirmUsernameBtn){
-                editUsernameBtn.style.display = 'block'
-                confirmUsernameBtn.style.display = 'none'
-                usernameInput.value = "{{Username}}"
-                usernameInput.disabled = true
-            }
-        }
+    confirmPasswordBtn.onclick = function () {
+      checkPassword(passwordInput.value);
+    };
 
-        if (passwordInput.disabled == false){
-            if (e.target != editPasswordBtn && e.target != passwordInput && e.target != confirmPasswordBtn && e.target != eyeIcon){
-                editPasswordBtn.style.display = 'block'
-                confirmPasswordBtn.style.display = 'none'
-                passwordInput.disabled = true
-                eyeIcon.style.display = 'none'
-                passHr.style.display = 'none'
-                passwordInput.type = 'password'
-                passwordInput.placeholder = 'Password'
-                passwordInput.value = ''
-                changePassStat = 'checking'
-            }
-        }
-    });
+    var val = passwordInput.value;
+    passwordInput.value = "";
+    passwordInput.value = val;
+  };
 
-    passwordInput.addEventListener("keyup", function(event) {
-        if (event.key === "Enter" || event.keyCode === 13) {
-            if(changePassStat == 'checking')
-                checkPassword(passwordInput.value);
-            else
-                savePassword(passwordInput.value);
-        }
-    });
+  window.addEventListener("click", function (e) {
+    console.log(e.target);
+    if (usernameInput.disabled == false) {
+      if (
+        e.target != editUsernameBtn &&
+        e.target != usernameInput &&
+        e.target != confirmUsernameBtn
+      ) {
+        editUsernameBtn.style.display = "block";
+        confirmUsernameBtn.style.display = "none";
+        usernameInput.value = "{{Username}}";
+        usernameInput.disabled = true;
+      }
+    }
 
-    usernameInput.addEventListener("keyup", function(event) {
-        if (event.key === "Enter" || event.keyCode === 13) {
-            saveUsername(usernameInput.value);
-        }
-    });
+    if (passwordInput.disabled == false) {
+      if (
+        e.target != editPasswordBtn &&
+        e.target != passwordInput &&
+        e.target != confirmPasswordBtn &&
+        e.target != eyeIcon
+      ) {
+        editPasswordBtn.style.display = "block";
+        confirmPasswordBtn.style.display = "none";
+        passwordInput.disabled = true;
+        eyeIcon.style.display = "none";
+        passHr.style.display = "none";
+        passwordInput.type = "password";
+        passwordInput.placeholder = "Password";
+        passwordInput.value = "";
+        changePassStat = "checking";
+      }
+    }
+  });
 
-    document.querySelector('#deletion_time').value = '{{Deletion_Time}}'
+  passwordInput.addEventListener("keyup", function (event) {
+    if (event.key === "Enter" || event.keyCode === 13) {
+      if (changePassStat == "checking") checkPassword(passwordInput.value);
+      else savePassword(passwordInput.value);
+    }
+  });
+
+  usernameInput.addEventListener("keyup", function (event) {
+    if (event.key === "Enter" || event.keyCode === 13) {
+      saveUsername(usernameInput.value);
+    }
+  });
+
+  document.querySelector("#deletion_time").value = "{{Deletion_Time}}";
 </script>
 
 <!-- This is comment to prevent Prettifier -->

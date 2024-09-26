@@ -1,4 +1,14 @@
-{% extends 'base.html' %} {% block content %} {% csrf_token %}
+{% extends 'base.html' %}
+
+{% block title %}
+Personnels
+{% endblock %}
+
+{% block page_title %}
+Personnels
+{% endblock %}
+
+{% block content %} {% csrf_token %}
 <!-- insert content -->
 
 <script>
@@ -13,9 +23,6 @@
   }
 </script>
 
-<h1 class="effected" style="padding-left: 50px; font-size: 30px; margin-bottom: 20px;">
-    Personnels
-</h1>
 
 <section class="my-modal personnel hidden">
   <div class="card align-items-center effected pl-5 pr-5 pt-4 pb-4 align-self-center" style="border-radius: 25px; width: fit-content;">
@@ -32,6 +39,13 @@
           <select name="gender" id="id_gender" class="effected" style="padding: 8px 10px; border: 2px solid transparent; border-right: 15px solid transparent; cursor: pointer; width: 100%;">
             <option value="M">Male</option>
             <option value="F">Female</option>
+          </select>
+        </p>
+        <p class="mb-3" style="display: flex; flex-direction: column; justify-content: center; align-items: start; width: 100%;">
+          <label for="employment_status" class="mb-1 effected">Personnel Employment Status:</label>
+          <select name="employment_status" id="id_employment_status" class="effected" style="padding: 8px 10px; border: 2px solid transparent; border-right: 15px solid transparent; cursor: pointer; width: 100%;">
+            <option value="S">Staff</option>
+            <option value="I">Intern</option>
           </select>
         </p>
         <div class="d-flex justify-content-between align-items-center mt-4 gap-2" style="width: 320px;">
