@@ -1,37 +1,107 @@
-{% extends "base.html" %}
-{% load static %}
-{%block title %} Login {%endblock%} {%block content%}
+{% extends "base.html" %} {% load static %} {%block title %} Login {%endblock%}
+{%block content%}
 
 <div class="row justify-content-center align-items-center">
-  <div class="col-xl-10 col-lg-12 col-md-9 d-flex flex-column align-items-center justify-content-center">
-    <div class="card o-hidden border-0"  style="position: fixed; top: 0; bottom: 0; margin: auto 30px auto 30px; width: 100%; max-width: 540px; max-height: 540px; background-color: white; border-radius: 25px; box-shadow: 0 8px 24px rgba(149, 157, 165, 0.2);">
-      <div class="mt-4 w-100 text-center align-self-center" style="padding: 0px 10px 0px 10px;">
+  <div
+    class="col-xl-10 col-lg-12 col-md-9 d-flex flex-column align-items-center justify-content-center"
+  >
+    <div
+      class="card o-hidden border-0"
+      style="
+        position: fixed;
+        top: 0;
+        bottom: 0;
+        margin: auto 30px auto 30px;
+        width: 100%;
+        max-width: 540px;
+        max-height: 540px;
+        background-color: white;
+        border-radius: 25px;
+        box-shadow: 0 8px 24px rgba(149, 157, 165, 0.2);
+      "
+    >
+      <div
+        class="mt-4 w-100 text-center align-self-center"
+        style="padding: 0px 10px 0px 10px"
+      >
         <img
-        src="{% static 'Dashboard/logo_small_color.png' %}"
-        class="img-fluid rounded-start align-center"
-        alt="..."
-        style="width: 200px;"
+          src="{% static 'Dashboard/img/logo_small_color.png' %}"
+          class="img-fluid rounded-start align-center"
+          alt="..."
+          style="width: 200px"
         />
       </div>
       <div class="text-center mb-3">
-        <h1 class="h4" style="color: black; font-weight: 600;">CCTV People Counting</h1>
+        <h1 class="h4" style="color: black; font-weight: 600">
+          CCTV People Counting
+        </h1>
       </div>
-      <div style="padding: 5px 50px 5px 50px;">
+      <div style="padding: 5px 50px 5px 50px">
         <form action="#" method="post" class="user">
-          <div class="form-group d-flex flex-column align-items-start justify-content-center">
+          <div
+            class="form-group d-flex flex-column align-items-start justify-content-center"
+          >
             {% csrf_token %}
             <label for="id_username" class="mb-1">Username:</label>
-            <div style="display: flex; flex-direction: row; align-items: center; justify-content: start;" class="fontuser w-100 m-0">
-              <input type="text" name="username" placeholder="Username" maxlength="30" id="id_username" class="w-100 effected light-mode" required>
+            <div
+              style="
+                display: flex;
+                flex-direction: row;
+                align-items: center;
+                justify-content: start;
+              "
+              class="fontuser w-100 m-0"
+            >
+              <input
+                type="text"
+                name="username"
+                placeholder="Username"
+                maxlength="30"
+                id="id_username"
+                class="w-100 effected light-mode"
+                required
+              />
             </div>
             <label for="password" class="mb-1 mt-3">Password:</label>
-            <div style="display: flex; flex-direction: row; align-items: center; justify-content: start;" class="fontuser w-100 m-0">  
-              <input type="password" name="password" placeholder="Password" maxlength="30" id="id_password" class="w-100 effected light-mode" required>
-              <hr class="light-mode" style="width: 25px; transform: rotate(90deg); right: 32px;"/>
-              <i class="fa-regular fa-eye text-center toggle-visible light-mode" style="right: 15px;" onclick="togglePasswordVisibility(this, false)"></i>    
+            <div
+              style="
+                display: flex;
+                flex-direction: row;
+                align-items: center;
+                justify-content: start;
+              "
+              class="fontuser w-100 m-0"
+            >
+              <input
+                type="password"
+                name="password"
+                placeholder="Password"
+                maxlength="30"
+                id="id_password"
+                class="w-100 effected light-mode"
+                required
+              />
+              <hr
+                class="light-mode"
+                style="width: 25px; transform: rotate(90deg); right: 32px"
+              />
+              <i
+                class="fa-regular fa-eye text-center toggle-visible light-mode"
+                style="right: 15px"
+                onclick="togglePasswordVisibility(this, false)"
+              ></i>
             </div>
-              <!-- {{ form.as_p }} -->
-            <button type="submit" class="btn btn-primary btn-user btn-block mt-4 mb-4 align-self-center" style="font-size: 15px; border-radius: 8px;  width: 200px; padding: 8px 0px 8px 0px;">
+            <!-- {{ form.as_p }} -->
+            <button
+              type="submit"
+              class="btn btn-primary btn-user btn-block mt-4 mb-4 align-self-center"
+              style="
+                font-size: 15px;
+                border-radius: 8px;
+                width: 200px;
+                padding: 8px 0px 8px 0px;
+              "
+            >
               Login
             </button>
           </div>
@@ -42,48 +112,47 @@
 </div>
 
 <script>
-  function togglePasswordVisibility(icon, hover){
-    element = document.getElementById('id_password')
-    if (icon.classList.contains('fa-eye')){
-      if (!hover){
-        element.type = 'text'
+  function togglePasswordVisibility(icon, hover) {
+    element = document.getElementById("id_password");
+    if (icon.classList.contains("fa-eye")) {
+      if (!hover) {
+        element.type = "text";
       }
-      icon.style.right = '14px'
-      icon.classList.remove('fa-eye')
-      icon.classList.add('fa-eye-slash')
-    }else{
-      if (!hover){
-        element.type = 'password'
+      icon.style.right = "14px";
+      icon.classList.remove("fa-eye");
+      icon.classList.add("fa-eye-slash");
+    } else {
+      if (!hover) {
+        element.type = "password";
       }
-      icon.style.right = '15px'
-      icon.classList.remove('fa-eye-slash')
-      icon.classList.add('fa-eye')
+      icon.style.right = "15px";
+      icon.classList.remove("fa-eye-slash");
+      icon.classList.add("fa-eye");
     }
   }
 
-  if ('{{request.session.status}}' == 'login_error') {
+  if ("{{request.session.status}}" == "login_error") {
     Swal.fire({
       title: "Login Failed!",
       text: "Credentials doesn't match.",
-      icon: "error"
+      icon: "error",
     });
-  } else if ('{{request.session.status}}' == 'logout') {
+  } else if ("{{request.session.status}}" == "logout") {
     Swal.fire({
       title: "Success!",
       text: "User has been logged out.",
-      icon: "success"
+      icon: "success",
     });
-  } 
+  }
 
   var csrftoken = document.querySelector("[name=csrfmiddlewaretoken]").value;
   var xhttp = new XMLHttpRequest();
-  var data = "command=" + 'reset_status';
+  var data = "command=" + "reset_status";
 
   xhttp.open("POST", "login");
   xhttp.setRequestHeader("X-CSRFToken", csrftoken);
   xhttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
   xhttp.send(data);
-
 </script>
 
 {%endblock%}
@@ -97,4 +166,3 @@
 
 <!-- Custom scripts for all pages-->
 <script src="{% static 'js/sb-admin-2.min.js' %}"></script>
-

@@ -41,6 +41,7 @@ class CameraStream:
         self.camera = camera
 
         # Processed frame
+        
         self.frame = []
 
         # Predicted frame

@@ -97,7 +97,16 @@
     }
   }
 </script>
-{%endblock%} {% block content %} {% csrf_token %}
+{%endblock%}
+
+{% block title %}
+Camera
+{% endblock %}
+
+{% block page_title %}
+Camera
+{% endblock %}
+{% block content %} {% csrf_token %}
 
 <script>
   if (localStorage.getItem('darkMode') == 'enabled') {
@@ -111,9 +120,9 @@
   }
 </script>
 
-<h1 id="header" class="effected" style="padding-left: 50px; font-size: 30px; margin-bottom: 20px;">
+{% comment %} <h1 id="header" class="effected" style="padding-left: 50px; font-size: 30px; margin-bottom: 20px;">
   Camera
-</h1>
+</h1> {% endcomment %}
 
 <section class="my-modal camera hidden">
   <div class="card align-items-center effected pl-5 pr-5 pt-4 pb-4 align-self-center" style="border-radius: 25px; width: fit-content;">

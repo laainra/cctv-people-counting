@@ -1,4 +1,10 @@
 {% extends 'base.html' %}
+{% block title %}
+Dashboard
+{% endblock %}
+{% block page_title %}
+Dashboard
+{% endblock %}
 <!-- This is comment to prevent Prettifier -->
 {% block content %} {% csrf_token %}
 
@@ -34,9 +40,9 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 </head>
 
-<h1 class="effected" style="padding-left: 50px; font-size: 30px; margin-bottom: 20px;">
-    Statistics
-</h1>
+{% comment %} <h1 class="effected" style="padding-left: 50px; font-size: 30px; margin-bottom: 20px;">
+    Dashboard
+</h1> {% endcomment %}
 
 <div id="camera-scroll-container" class="card p-3 text-center effected closable responsive-card" >
     <div class="d-flex p-0 mb-2 align-items-center justify-content-between">
