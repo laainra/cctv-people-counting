@@ -1,7 +1,7 @@
 # CCTV People Counting
-##### _by **OBIM Developers**_
+##### _by **duovision**_
 
-[![OBIM](/Website/Dashboard/static/img/logo.png)](https://s.id/obim-cctv)
+[![duovision](https://github.com/user-attachments/assets/87e91980-75c3-4fd3-a8a0-ac020a777483)](https://s.id/duovision)
 
 CCTV People Counting is an application developed to monitor the number of people density in a place by counting the number of people entering and leaving a location and detecting people seen by CCTV cameras by combining object detection and people counting algorithms based on the YOLO (You Only Look Once) model. 
 
