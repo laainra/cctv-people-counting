@@ -3,6 +3,7 @@ import numpy as np
 from datetime import datetime, timedelta
 from datetime import date as set_date
 from xlsxwriter.workbook import Workbook
+from .var import var
 
 # Backend Library
 
@@ -168,10 +169,10 @@ def home(request):
             return JsonResponse({'Personnel_Entries': personnel_entries_report})
 
         elif request.POST['command'] == 'download_personnel_report':
-            for file in os.listdir(os.path.join(os.path.dirname(__file__), 'static')):
+            for file in os.listdir(var.report_path):
                 if file.endswith('.xlsx'):
                     os.remove(os.path.join(
-                        os.path.dirname(__file__), 'static', file))
+                        var.report_path, file))
 
             date = datetime.strptime(
                 request.POST['date'], "%Y-%m-%d").strftime("%m/%d/%y")

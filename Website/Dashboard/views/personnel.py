@@ -313,8 +313,7 @@ def edit_personnel(request):
 @login_required(login_url='login')
 def delete_personnel(request, id):
     data = models.Personnels.objects.get(id=id)
-    shutil.rmtree(os.path.join(os.path.dirname(__file__) +
-                  '/static/img/personnel_pics/', data.name))
+    shutil.rmtree(os.path.join(var.personnel_path, data.name))
     data.delete()
     return redirect('personnels')
 
@@ -322,6 +321,6 @@ def delete_personnel(request, id):
 
 
 def handle_uploaded_file(request, f, filename):
-    with open(os.path.join(os.path.dirname(__file__), 'static/img/personnel_pics', request.session['selected_personnel'], filename), "wb+") as destination:
+    with open(os.path.join(var.personnel_path, request.session['selected_personnel'], filename), "wb+") as destination:
         for chunk in f.chunks():
             destination.write(chunk)

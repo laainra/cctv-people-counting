@@ -97,16 +97,7 @@
     }
   }
 </script>
-{%endblock%}
-
-{% block title %}
-Camera
-{% endblock %}
-
-{% block page_title %}
-Camera
-{% endblock %}
-{% block content %} {% csrf_token %}
+{%endblock%} {% block content %} {% csrf_token %}
 
 <script>
   if (localStorage.getItem('darkMode') == 'enabled') {
@@ -120,9 +111,9 @@ Camera
   }
 </script>
 
-{% comment %} <h1 id="header" class="effected" style="padding-left: 50px; font-size: 30px; margin-bottom: 20px;">
+<h1 id="header" class="effected" style="padding-left: 50px; font-size: 30px; margin-bottom: 20px;">
   Camera
-</h1> {% endcomment %}
+</h1>
 
 <section class="my-modal camera hidden">
   <div class="card align-items-center effected pl-5 pr-5 pt-4 pb-4 align-self-center" style="border-radius: 25px; width: fit-content;">
@@ -205,7 +196,7 @@ Camera
     </a>
     
     <div class="d-inline-flex nav-link align-items-center gap-3 p-0 mt-2 mr-3 effected">
-      <i title="Add Camera" id="add-camera" class="d-flex fa-solid fa-plus text-center effected" style="font-size: 20px; cursor: pointer;" onclick="addCamera(); openModal()"></i>
+      <i title="Add Camera" id="add-camera" class="d-flex fa-solid fa-plus text-center effected" style="font-size: 20px; cursor: pointer;" onclick="redirectToAddCamera()"></i>
       <!-- <a class="effected" href="{% url 'add_camera' %}" style="text-decoration: none;">
       </a> -->
     </div>
@@ -659,6 +650,9 @@ Camera
     
   }
 
+  function redirectToAddCamera() {
+    window.location.href = '/add_camera';
+}
 
   function closeModal(){
     modal.classList.add('hidden')

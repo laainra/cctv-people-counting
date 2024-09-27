@@ -3,7 +3,7 @@ import cv2
 import numpy as np
 
 # Backend Library
-from . import var
+from .var import var
 from django.shortcuts import render, redirect, HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.http.response import StreamingHttpResponse, JsonResponse
@@ -14,6 +14,7 @@ from ..Artificial_Intelligence.variables import RecognitionVariable as RV
 from ..Artificial_Intelligence.multi_camera import MultiCamera as MC
 
 # ================================================== CAMERA DASHBOARD ================================================== #
+
 
 @login_required(login_url='login')
 def camera(request):
@@ -288,3 +289,4 @@ def save_coordinates(request):
     MC.set_polygon(cam.id, poly)
 
     return HttpResponse("Success")
+
