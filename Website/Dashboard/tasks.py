@@ -2,10 +2,11 @@ from celery import shared_task
 from . import models
 import os, shutil
 from datetime import datetime
+from .views.var import var
 
 @shared_task(bind=True)
 def deleteUnknownEveryDay(self):
-    folder = os.path.join(os.path.dirname(__file__), 'static/img/personnel_pics/Unknown')
+    folder = os.path.join(var.personnel_path, 'Unknown')
     now = datetime.now().date()
     for filename in os.listdir(folder):
         file_path = os.path.join(folder, filename)

@@ -205,6 +205,42 @@ div.realtime-data-card.dark-mode {
   border: 1px solid var(--dark-border);
 }
 
+.my-modal {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1000;
+  background-color: rgba(0, 0, 0, 0.5); /* Background overlay */
+}
+
+.my-modal .card {
+  max-height: 80vh; /* Modal won't exceed 80% of the viewport height */
+  overflow-y: auto; /* Enables scrolling inside the modal */
+  width: fit-content;
+  background-color: white;
+  border-radius: 25px;
+  padding: 20px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.my-modal .card::-webkit-scrollbar {
+  width: 6px;
+}
+
+.my-modal .card::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.3);
+  border-radius: 10px;
+}
+
+.my-modal.hidden {
+  display: none; /* Hides the modal when necessary */
+}
+
 /* LIGHT MODE */
 
 input.light-mode {
@@ -554,6 +590,7 @@ div.closable div a i.fa-chevron-up {
   right: 0;
   margin-left: auto;
   margin-right: auto;
+  z-index: 10;
 }
 
 .handle {

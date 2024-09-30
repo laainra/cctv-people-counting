@@ -97,16 +97,7 @@
     }
   }
 </script>
-{%endblock%}
-
-{% block title %}
-Camera
-{% endblock %}
-
-{% block page_title %}
-Camera
-{% endblock %}
-{% block content %} {% csrf_token %}
+{%endblock%} {% block content %} {% csrf_token %}
 
 <script>
   if (localStorage.getItem('darkMode') == 'enabled') {
@@ -125,7 +116,7 @@ Camera
 </h1> {% endcomment %}
 
 <section class="my-modal camera hidden">
-  <div class="card align-items-center effected pl-5 pr-5 pt-4 pb-4 align-self-center" style="border-radius: 25px; width: fit-content;">
+  {% comment %} <div class="card align-items-center effected pl-5 pr-5 pt-4 pb-4 align-self-center" style="border-radius: 25px; width: fit-content;">
     <span id="form-title" class="mb-4 effected" style="font-weight: 600; font-size: 30px;">Camera Settings</span>
     <form id="camera-form" method="POST" class="d-flex flex-column justify-content-center align-items-center mb-3" style="width: fit-content;">
       {% csrf_token %}
@@ -194,7 +185,7 @@ Camera
       Delete Camera
     </button>
 
-  </div>
+  </div> {% endcomment %}
 </section>
 
 <div id="camera-scroll-container" class="card p-3 mb-4 text-center effected closable responsive-card">
@@ -205,7 +196,7 @@ Camera
     </a>
     
     <div class="d-inline-flex nav-link align-items-center gap-3 p-0 mt-2 mr-3 effected">
-      <i title="Add Camera" id="add-camera" class="d-flex fa-solid fa-plus text-center effected" style="font-size: 20px; cursor: pointer;" onclick="addCamera(); openModal()"></i>
+      <i title="Add Camera" id="add-camera" class="d-flex fa-solid fa-plus text-center effected" style="font-size: 20px; cursor: pointer;" onclick="redirectToAddCamera()"></i>
       <!-- <a class="effected" href="{% url 'add_camera' %}" style="text-decoration: none;">
       </a> -->
     </div>
@@ -226,7 +217,10 @@ Camera
         {% endif %}
 
         <div class="container d-flex flex-column justify-content-between align-items-center text-center">
-          <i title="Open Camera Settings" class="d-flex fa-solid fa-gear text-center effected" onclick=" editCamera('{{cam.id}}')"></i>
+          
+
+            <i title="Open Camera Settings" class="d-flex fa-solid fa-gear text-center effected"  onclick="RedirectToEditCamera({{ cam.id }})"> </i>
+          
           <div class="d-flex align-items-center justify-content-center mb-2 apply-shadow" style="border-radius: 50%; width: 105px; height: 105px; background-color: #ffffff;">
             {% if cam.cam_is_active == False %}
             <i class="d-flex fa-solid fa-video-slash text-center effected" style="font-size: 40px; cursor: pointer; color: #B80F0A;"></i>
@@ -566,68 +560,41 @@ Camera
     deleteCameraBtn.style.display = 'none'
     formTitle.textContent = 'Insert Camera'
   }
+  function editCamera(id) {
+    event.stopPropagation();
 
-  function editCamera(id){
-    event.stopPropagation()
-    
+    {% comment %} alert('Function called with ID: ' + id); {% endcomment %}
     var csrftoken = document.querySelector("[name=csrfmiddlewaretoken]").value;
     var xhttp = new XMLHttpRequest();
-    var data = "command=" + 'get_camera' + "&id=" + id;
+    var data = "command=get_camera&id=" + id;
 
     xhttp.open("POST", "camera");
     xhttp.setRequestHeader("X-CSRFToken", csrftoken);
     xhttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-    xhttp.onload = function(){
-      json = JSON.parse(xhttp.responseText)
+    xhttp.onload = function() {
+        var json = JSON.parse(xhttp.responseText);
 
-      var edit_url = "{% url 'edit_camera' id=123 %}";
-      edit_url = edit_url.replace("123", id);
-      cameraForm.action = edit_url
+        // Pre-fill the form with the camera data
+        document.getElementById('cameraName').value = json['cam_name'];
+        document.getElementById('feedSrc').value = json['feed_src'];
+        document.getElementById('timeStart').value = json['cam_start'];
+        document.getElementById('timeStop').value = json['cam_stop'];
+        document.getElementById('genderCheckbox').checked = Boolean(json['gender_detection']);
+        document.getElementById('faceCheckbox').checked = Boolean(json['face_detection']);
+        
+        // Show the save and delete buttons
+        document.getElementById('addCameraBtn').style.display = 'none';
+        document.getElementById('saveBtn').style.display = 'block';
+        document.getElementById('deleteCameraBtn').style.display = 'block';
+        document.getElementById('formTitle').textContent = 'Camera Settings';
 
-      cameraName.value = json['cam_name']
-      feedSrc.value = json['feed_src']
-      timeStart.value = json['cam_start']
-      timeStop.value = json['cam_stop']
-      genderCheckbox.checked = Boolean(json['gender_detection'])
-      faceCheckbox.checked = Boolean(json['face_detection'])
-      addCameraBtn.style.display = 'none'
-      saveBtn.style.display = 'block'
-      deleteCameraBtn.style.display = 'block'
-      formTitle.textContent = 'Camera Settings'
-
-      deleteCameraBtn.onclick= function(event) {
-        Swal.fire({
-          title: "Are you sure?",
-          text: "All camera data will be deleted!",
-          icon: "warning",
-          showCancelButton: true,
-          confirmButtonColor: "#3085d6",
-          cancelButtonColor: "#d33",
-          confirmButtonText: "Yes, delete it!"
-        }).then((result) => {
-          if (result.isConfirmed) {
-            var delete_url = "{% url 'delete_camera' id=123 %}";
-            delete_url = delete_url.replace("123", id);
-            window.location.href = delete_url 
-            
-            // Swal.fire({
-            //   title: "Deleted!",
-            //   text: "Camera has been deleted.",
-            //   icon: "success",
-            // }).then((result) => {
-            //   if (result.isConfirmed) {
-            //   }
-            // });
-            
-          }
-        });
-      }
-
-      openModal();
+        // Redirect to the edit camera page
+        var edit_url = "{% url 'edit_camera' id=123 %}";
+        edit_url = edit_url.replace("123", id);
+        window.location.href = edit_url;
     };
     xhttp.send(data);
-
-  }
+}
 
   var currentStartTime = document.getElementById('start-time').value
   var currentEndTime = document.getElementById('end-time').value
@@ -659,6 +626,13 @@ Camera
     
   }
 
+  function redirectToAddCamera() {
+    window.location.href = '/add_camera';
+}
+
+function RedirectToEditCamera(id) {
+  window.location.href = "{% url 'edit_camera' 'camera_id' %}".replace('camera_id', id);
+}
 
   function closeModal(){
     modal.classList.add('hidden')
@@ -744,6 +718,15 @@ Camera
   xhttp.setRequestHeader("X-CSRFToken", csrftoken);
   xhttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
   xhttp.send(data);
+
+
 </script>
 
+{% endblock %}
+
+{% block title %}
+Camera
+{% endblock %}
+{% block page_title %}
+Camera
 {% endblock %}
