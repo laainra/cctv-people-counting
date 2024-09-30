@@ -188,12 +188,24 @@ def personnels(request):
                 x = 0
                 files = form.cleaned_data["image_file"]
 
+                # Ensure 'selected_personnel' exists in session
+                selected_personnel = request.session.get('selected_personnel')
+
+                if not selected_personnel:
+                    # Handle the case where 'selected_personnel' is not set in the session
+                    request.session['status'] = 'img_adding_error_no_personnel'
+                    # Redirect to an appropriate page
+                    return redirect('some_error_page')
+
                 request.session['status'] = 'img_adding_success'
 
                 no_face_count = 0
 
                 for f in files:
-                    if len(os.listdir(os.path.join(var.personnel_path, request.session['selected_personnel']))) == 0:
+                    personnel_folder = os.path.join(
+                        var.personnel_path, selected_personnel)
+
+                    if len(os.listdir(personnel_folder)) == 0:
                         filename = datetime.now().strftime('%Y-%m-%d_%H-%M-') + \
                             "{:02d}".format(
                                 int(datetime.now().strftime('%S')) + x) + '.jpeg'
@@ -202,22 +214,27 @@ def personnels(request):
                             "{:02d}".format(
                                 int(datetime.now().strftime('%S')) + x) + '.jpg'
 
+                    # Handle file upload
                     handle_uploaded_file(request, f, filename)
 
-                    img = cv2.imread(os.path.join(
-                        var.personnel_path, request.session['selected_personnel'], filename))
+                    img = cv2.imread(os.path.join(personnel_folder, filename))
 
+                    # Get face features
                     feats, _ = RV.get_feature(img)
 
+                    # Set known faces if not already set
                     if len(RV.known_features) == 0:
                         RV.set_all_known_faces()
 
                     if len(feats) == 1:
-                        RV.known_features[request.session['selected_personnel']].append(
-                            feats[0])
+                        # Append features to known_features for selected_personnel
+                        if selected_personnel not in RV.known_features:
+                            RV.known_features[selected_personnel] = []
+
+                        RV.known_features[selected_personnel].append(feats[0])
                     else:
-                        os.remove(os.path.join(
-                            var.personnel_path, request.session['selected_personnel'], filename))
+                        # Remove the file if no face is detected
+                        os.remove(os.path.join(personnel_folder, filename))
                         request.session['status'] = 'img_adding_error1'
                         no_face_count += 1
 
@@ -318,7 +335,6 @@ def delete_personnel(request, id):
     return redirect('personnels')
 
 # Function to upload file for personnel pics
-
 
 def handle_uploaded_file(request, f, filename):
     with open(os.path.join(var.personnel_path, request.session['selected_personnel'], filename), "wb+") as destination:

@@ -6,7 +6,7 @@
 >
   {% if Active_Cam == None %}
   <span class="mb-4 effected" style="font-weight: 600; font-size: 30px"
-    >Add Camera</span
+    >Edit Camera</span
   >
   {% else %}
   <span class="mb-4 effected" style="font-weight: 600; font-size: 30px"
@@ -50,7 +50,8 @@
     </p>
     <div class="d-flex justify-content-between mb-3" style="width: 320px">
       <a>
-        <span class="effected">AI Start At:</span><br />
+        <span class="effected">AI Start At:</span>
+        <br />
         <input
           id="start-time"
           title="Camera Start Time"
@@ -58,7 +59,19 @@
           type="time"
           step="300"
           class="effected time-input"
-          value="{{ Active_Cam.cam_start|default:'08:00:00' }}"
+          {%
+          if
+          Active_Cam
+          !="None"
+          %}
+          value="{{Active_Cam.cam_start}}"
+          {%
+          else
+          %}
+          value="08:00:00"
+          {%
+          endif
+          %}
           onchange="checkValidTimeRange()"
           style="cursor: pointer"
           required
@@ -66,7 +79,8 @@
       </a>
       <span class="d-flex align-items-center effected">to</span>
       <a>
-        <span class="effected">AI Stop At:</span><br />
+        <span class="effected">AI Stop At:</span>
+        <br />
         <input
           id="end-time"
           title="Camera Stop Time"
@@ -74,7 +88,19 @@
           type="time"
           step="300"
           class="effected time-input"
-          value="{{ Active_Cam.cam_stop|default:'17:00:00' }}"
+          {%
+          if
+          Active_Cam
+          !="None"
+          %}
+          value="{{Active_Cam.cam_stop}}"
+          {%
+          else
+          %}
+          value="17:00:00"
+          {%
+          endif
+          %}
           onchange="checkValidTimeRange()"
           style="cursor: pointer"
           required
@@ -84,7 +110,8 @@
 
     <div class="d-flex justify-content-between mb-3" style="width: 320px">
       <a>
-        <span class="effected">Attendance Start:</span><br />
+        <span class="effected">Attendance Start:</span>
+        <br />
         <input
           id="attendance-start-time"
           title="Attendance Start Time"
@@ -92,7 +119,19 @@
           type="time"
           step="300"
           class="effected time-input"
-          value="{{ Active_Cam.attendance_time_start|default:'08:00:00' }}"
+          {%
+          if
+          Active_Cam
+          !="None"
+          %}
+          value="{{Active_Cam.attendance_time_start}}"
+          {%
+          else
+          %}
+          value="08:00:00"
+          {%
+          endif
+          %}
           onchange="checkValidTimeRange()"
           style="cursor: pointer"
           required
@@ -100,7 +139,8 @@
       </a>
       <span class="d-flex align-items-center effected">to</span>
       <a>
-        <span class="effected">Attendance Stop:</span><br />
+        <span class="effected">Attendance End:</span>
+        <br />
         <input
           id="attendance-end-time"
           title="Attendance Stop Time"
@@ -108,7 +148,19 @@
           type="time"
           step="300"
           class="effected time-input"
-          value="{{ Active_Cam.attendance_time_end|default:'17:00:00' }}"
+          {%
+          if
+          Active_Cam
+          !="None"
+          %}
+          value="{{Active_Cam.attendance_time_end}}"
+          {%
+          else
+          %}
+          value="17:00:00"
+          {%
+          endif
+          %}
           onchange="checkValidTimeRange()"
           style="cursor: pointer"
           required
@@ -117,7 +169,8 @@
     </div>
     <div class="d-flex justify-content-between mb-3" style="width: 320px">
       <a>
-        <span class="effected">Leaving Start:</span><br />
+        <span class="effected">Leaving Start:</span>
+        <br />
         <input
           id="leaving-start-time"
           title="Leaving Start Time"
@@ -125,7 +178,19 @@
           type="time"
           step="300"
           class="effected time-input"
-          value="{{ Active_Cam.leaving_time_start|default:'08:00:00' }}"
+          {%
+          if
+          Active_Cam
+          !="None"
+          %}
+          value="{{Active_Cam.leaving_time_start}}"
+          {%
+          else
+          %}
+          value="08:00:00"
+          {%
+          endif
+          %}
           onchange="checkValidTimeRange()"
           style="cursor: pointer"
           required
@@ -133,15 +198,28 @@
       </a>
       <span class="d-flex align-items-center effected">to</span>
       <a>
-        <span class="effected">Leaving Stop:</span><br />
+        <span class="effected">Leaving End:</span>
+        <br />
         <input
-          id="leaving-end-time"
-          title="Leaving Stop Time"
+          id="leaving-time-end"
+          title="Leaving End Time"
           name="leaving_time_end"
           type="time"
           step="300"
           class="effected time-input"
-          value="{{ Active_Cam.leaving_time_end|default:'17:00:00' }}"
+          {%
+          if
+          Active_Cam
+          !="None"
+          %}
+          value="{{Active_Cam.leaving_time_end}}"
+          {%
+          else
+          %}
+          value="17:00:00"
+          {%
+          endif
+          %}
           onchange="checkValidTimeRange()"
           style="cursor: pointer"
           required
@@ -254,7 +332,7 @@
       cursor: pointer;
       text-decoration: none;
     "
-    href="{% url 'delete_camera' %}"
+    href="{% url 'delete_camera' Active_Cam.id %}"
   >
     Delete Camera
   </a>
@@ -311,5 +389,5 @@
     }
   }
 </script>
-<!-- end logged cases -->
-{% endblock %} {% block title %} Add Camera {% endblock %}
+
+{% endblock %} {% block title %} Edit Camera {% endblock %}
