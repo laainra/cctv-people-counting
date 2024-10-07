@@ -1,6 +1,6 @@
 from django.urls import path
-from .views import authentication, camera, home, personnel, settings, var
-
+from .views import authentication, camera, home, personnel, settings, reports
+from .views.presence import presence
 urlpatterns = [
     path('', home.home, name="home"),
     path('login', authentication.login_user, name="login"),
@@ -26,4 +26,7 @@ urlpatterns = [
 
 
     path('download', home.download, name="download"),
+
+    # path('reports/', reports.reports, name='reports'),
+    path('presence/',  presence, name='presence'),
 ]

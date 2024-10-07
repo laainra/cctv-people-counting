@@ -1,0 +1,64 @@
+{% extends 'base.html' %} {% block content %}
+
+<h1>Presence Report for {{ today }}</h1>
+
+<!-- Form for selecting a date -->
+<form method="GET" action="" id="date-form">
+  <label for="date">Select Date: </label>
+  <input
+    type="date"
+    id="date"
+    name="date"
+    value="{{ today }}"
+    onchange="submitForm()"
+  />
+</form>
+
+<!-- Display the table of personnel presence -->
+<table style="border-collapse: collapse; width: 100%">
+  <thead>
+    <tr>
+      <th style="border: 1px solid black; padding: 8px">Personnel ID</th>
+      <th style="border: 1px solid black; padding: 8px">Date</th>
+      <th style="border: 1px solid black; padding: 8px">Time Attended</th>
+      <th style="border: 1px solid black; padding: 8px">Time Leaving</th>
+      <th style="border: 1px solid black; padding: 8px">Work Hours</th>
+      <th style="border: 1px solid black; padding: 8px">Presence Status</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for entry in entries %}
+    <tr>
+      <td style="border: 1px solid black; padding: 8px">{{ entry.0 }}</td>
+      <td style="border: 1px solid black; padding: 8px">
+        {{ entry.1|date:"Y-m-d" }}
+      </td>
+      <td style="border: 1px solid black; padding: 8px">
+        {{ entry.2|default:"-" }}
+      </td>
+      <td style="border: 1px solid black; padding: 8px">
+        {{ entry.3|default:"-" }}
+      </td>
+      <td style="border: 1px solid black; padding: 8px">
+        {% if entry.4 %} {{ entry.4|time:"H" }} hours {% else %} Still Working
+        {% endif %}
+      </td>
+      <td style="border: 1px solid black; padding: 8px">{{ entry.5 }}</td>
+    </tr>
+    {% empty %}
+    <tr>
+      <td colspan="6" style="text-align: center; padding: 8px">
+        No presence data available for the selected date.
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<script>
+  function submitForm() {
+    document.getElementById("date-form").submit();
+  }
+</script>
+
+{% endblock %}
