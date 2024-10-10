@@ -13,8 +13,6 @@
     onchange="submitForm()"
   />
 </form>
-
-<!-- Display the table of personnel presence -->
 <table style="border-collapse: collapse; width: 100%">
   <thead>
     <tr>
@@ -24,6 +22,7 @@
       <th style="border: 1px solid black; padding: 8px">Time Leaving</th>
       <th style="border: 1px solid black; padding: 8px">Work Hours</th>
       <th style="border: 1px solid black; padding: 8px">Presence Status</th>
+      <th style="border: 1px solid black; padding: 8px">Notes</th>
     </tr>
   </thead>
   <tbody>
@@ -44,10 +43,13 @@
         {% endif %}
       </td>
       <td style="border: 1px solid black; padding: 8px">{{ entry.5 }}</td>
+      <td style="border: 1px solid black; padding: 8px">
+        {{ entry.6|default:"No notes" }}
+      </td>
     </tr>
     {% empty %}
     <tr>
-      <td colspan="6" style="text-align: center; padding: 8px">
+      <td colspan="7" style="text-align: center; padding: 8px">
         No presence data available for the selected date.
       </td>
     </tr>

@@ -103,6 +103,7 @@ def presence(request):
                 'date', timezone.now().date().strftime('%Y-%m-%d'))
 
             # SQL query to fetch personnel entries for the given date
+            # SQL query to fetch personnel entries for the given date
             query = '''
             SELECT personnel_id, 
                 DATE(timestamp) AS date, 
@@ -112,11 +113,19 @@ def presence(request):
                     MAX(CASE WHEN presence_status = 'LEAVE' THEN timestamp END), 
                     MIN(CASE WHEN presence_status = 'ONTIME' OR presence_status = 'LATE' THEN timestamp END)
                 ) - INTERVAL 1 HOUR AS work_hours,
-                MAX(presence_status) AS presence_status
+                MAX(presence_status) AS presence_status,
+                CASE 
+                    WHEN TIMEDIFF(MAX(CASE WHEN presence_status = 'LEAVE' THEN timestamp END), MIN(CASE WHEN presence_status = 'ONTIME' OR presence_status = 'LATE' THEN timestamp END)) > '08:00:00' 
+                    THEN CONCAT('Overtime ', HOUR(TIMEDIFF(MAX(CASE WHEN presence_status = 'LEAVE' THEN timestamp END), MIN(CASE WHEN presence_status = 'ONTIME' OR presence_status = 'LATE' THEN timestamp END))) - 9, ' hours')
+                    WHEN TIMEDIFF(MAX(CASE WHEN presence_status = 'LEAVE' THEN timestamp END), MIN(CASE WHEN presence_status = 'ONTIME' OR presence_status = 'LATE' THEN timestamp END)) < '08:00:00' 
+                    THEN CONCAT('Less time ', 9 - HOUR(TIMEDIFF(MAX(CASE WHEN presence_status = 'LEAVE' THEN timestamp END), MIN(CASE WHEN presence_status = 'ONTIME' OR presence_status = 'LATE' THEN timestamp END))), ' hours')
+                    ELSE 'Standard Time'
+                END AS notes
             FROM dashboard_personnel_entries 
             WHERE DATE(timestamp) = %s
             GROUP BY personnel_id, DATE(timestamp)
             '''
+
             with connection.cursor() as cursor:
                 cursor.execute(query, [today])
                 entries = cursor.fetchall()

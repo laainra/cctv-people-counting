@@ -1,10 +1,11 @@
 from django.urls import path
 from .views import authentication, camera, home, personnel, settings, reports
 from .views.presence import presence
+
 urlpatterns = [
     path('', home.home, name="home"),
-    path('login', authentication.login_user, name="login"),
-    path('logout', authentication.logout_user, name="logout"),
+    path('login', authentication.user_login, name="login"),
+    path('logout', authentication.user_logout, name="logout"),
 
     path('personnels', personnel.personnels, name="personnels"),
     path('add_personnel', personnel.add_personnel, name="add_personnel"),
@@ -23,6 +24,7 @@ urlpatterns = [
     path('edit_camera/<str:id>', camera.edit_camera, name="edit_camera"),
     path('edit_personnel', personnel.edit_personnel, name="edit_personnel"),
     path('settings', settings.settings, name="settings"),
+    path('reset-count/', home.reset_today_count, name='reset_today_count'),
 
 
     path('download', home.download, name="download"),

@@ -1,13 +1,14 @@
-# Backend Library
 from django.shortcuts import render, redirect
-from django.contrib.auth import login, logout
+# Rename to avoid conflict
+from django.contrib.auth import login as auth_login, logout as auth_logout
 from django.contrib.auth.decorators import login_required
 
 from .. import forms
 
 # ================================================== AUTHENTICATION ================================================== #
 
-def login_user(request):
+
+def user_login(request):  # Rename the view function
     form = forms.LoginForm(request)
     if request.method == "POST":
         try:
@@ -17,15 +18,16 @@ def login_user(request):
             form = forms.LoginForm(request, data=request.POST)
             if form.is_valid():
                 user = form.get_user()
-                login(request, user)
+                # Use the renamed auth_login function
+                auth_login(request, user)
                 return redirect('home')
             else:
                 request.session['status'] = 'login_error'
-    return render(request, 'login.html', {'form':form})
+    return render(request, 'login.html', {'form': form})
+
 
 @login_required(login_url='login')
-def logout_user(request):
-    logout(request)
+def user_logout(request):  # Rename the logout view function
+    auth_logout(request)  # Use the renamed auth_logout function
     request.session['status'] = 'logout'
     return redirect('login')
-
