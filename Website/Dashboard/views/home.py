@@ -15,6 +15,7 @@ from django.shortcuts import redirect
 from django.utils.timezone import now
 from django.db.models import DateField
 from django.db.models.functions import Cast
+from django.db.models import Q
 from .. import models
 
 # Artificial Intelligence Library
@@ -419,11 +420,13 @@ def download(request):
 
 def reset_today_count(request):
     if request.method == 'POST':
-        today = now().date()  # Get today's date
+        today = now().strftime('%m/%d/%y')  # Get today's date
         # Delete all instances where the date is today
-        models.Counted_Instances.objects.annotate(
-            # Assuming 'created_at' is the field for the timestamp
-            entry_date=Cast('created_at', DateField())
-        ).filter(entry_date=today).delete()
+        instances_to_delete = models.Counted_Instances.objects.filter(
+            Q(timestamp__startswith=today) 
+        )
+
+        if instances_to_delete.exists():
+            instances_to_delete.delete()
 
         return redirect('home')
