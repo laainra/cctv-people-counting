@@ -88,7 +88,7 @@ WSGI_APPLICATION = 'Website.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'cctv_db',
+        'NAME': 'db_cctvproject',
         'USER': 'root',
         'PASSWORD': '',
         'HOST': '127.0.0.1',
