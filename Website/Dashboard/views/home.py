@@ -418,15 +418,15 @@ def download(request):
     raise Http404
 
 
-def reset_today_count(request):
-    if request.method == 'POST':
-        today = now().strftime('%m/%d/%y')  # Get today's date
-        # Delete all instances where the date is today
-        instances_to_delete = models.Counted_Instances.objects.filter(
-            Q(timestamp__startswith=today) 
-        )
+# def reset_today_count(request):
+#     if request.method == 'POST':
+#         today = now().strftime('%m/%d/%y')  # Get today's date
+#         # Delete all instances where the date is today
+#         instances_to_delete = models.Counted_Instances.objects.filter(
+#             Q(timestamp__startswith=today) 
+#         )
 
-        if instances_to_delete.exists():
-            instances_to_delete.delete()
+#         if instances_to_delete.exists():
+#             instances_to_delete.delete()
 
-        return redirect('home')
+#         return redirect('home')
