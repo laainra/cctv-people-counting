@@ -1,0 +1,313 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Presence
+{% endblock %}
+Presence
+{% block page_title %}
+{% endblock %}
+
+{% block content %} {% csrf_token %}
+<!-- insert content -->
+
+<script>
+  if (localStorage.getItem('darkMode') == 'enabled') {
+      document.body.classList.add("dark-mode")
+      document.getElementById("accordionSidebar").classList.add("dark-mode")
+      document.getElementById("toggler-button").classList.add("dark-mode")
+  }else {
+      document.body.classList.add("light-mode")
+      document.getElementById("accordionSidebar").classList.add("light-mode")
+      document.getElementById("toggler-button").classList.add("light-mode")
+  }
+</script>
+
+<section class="my-modal personnel hidden">
+  <div class="card align-items-center effected pl-5 pr-5 pt-4 pb-4 align-self-center" style="border-radius: 25px; width: fit-content;">
+    <span id="form-title" class="mb-4 effected" style="font-weight: 600; font-size: 30px;">Edit Personnel</span>
+    <form id="personnel-form" action="{% url 'edit_personnel' %}" method="POST" class="d-flex flex-column w-100 justify-content-center align-items-center mb-1">
+      <div class="form-group">
+        {% csrf_token %} 
+        <p class="mb-3" style="display: flex; flex-direction: column; justify-content: center; align-items: start; width: 100%;">
+          <label for="name" class="mb-1 effected">Personnel Name:</label>
+          <input name="name" type="text" class="effected" style="width:320px;" maxlength="20" placeholder="Insert Personnel Name" required>
+        </p>
+        <p class="mb-3" style="display: flex; flex-direction: column; justify-content: center; align-items: start; width: 100%;">
+          <label for="gender" class="mb-1 effected">Personnel Gender:</label>
+          <select name="gender" id="id_gender" class="effected" style="padding: 8px 10px; border: 2px solid transparent; border-right: 15px solid transparent; cursor: pointer; width: 100%;">
+            <option value="M">Male</option>
+            <option value="F">Female</option>
+          </select>
+        </p>
+        <p class="mb-3" style="display: flex; flex-direction: column; justify-content: center; align-items: start; width: 100%;">
+          <label for="employment_status" class="mb-1 effected">Personnel Employment Status:</label>
+          <select name="employment_status" id="id_employment_status" class="effected" style="padding: 8px 10px; border: 2px solid transparent; border-right: 15px solid transparent; cursor: pointer; width: 100%;">
+            <option value="S">Staff</option>
+            <option value="I">Intern</option>
+          </select>
+        </p>
+        <div class="d-flex justify-content-between align-items-center mt-4 gap-2" style="width: 320px;">
+          <button 
+            type="button" 
+            class="btn btn-danger btn-user btn-block m-0" 
+            style="border-radius: 8px; padding-left: 2%; padding-right: 2%;"
+            onclick="closeModal()">
+            Cancel
+          </button>
+          <button 
+          type="submit" 
+          class="btn btn-success btn-user btn-block m-0" 
+          style="border-radius: 8px; padding-left: 2%; padding-right: 2%;">
+          Save
+          </button>
+          <button type="submit" class="btn btn-primary btn-user btn-block m-0" style="display: none; border-radius: 8px; padding-left: 2%; padding-right: 2%; width: 320px;">
+            Add Personnel
+          </button>
+        </div>
+      </div>
+    </form>
+    <button
+      class="btn btn-danger btn-block align-self-center text-center delete-button effected"
+      onclick="deletePersonnel()">
+      Delete Personnel
+    </button>
+  </div>
+</section>
+
+<div class="card d-flex w-36 justify-content-between align-items-start mb-1 py-3 responsive responsive-card effected shadow-black shadow-lg">
+    <div class="pl-4">
+      <a class="d-flex nav-link text-dark align-items-center gap-2 effected bg-transparent">
+        <i class="fa-solid fa-swatchbook text-center" style="font-size: 20px"></i>
+        <span style="font-size: 20px; font-weight: 700;">Presence</span>
+      </a>
+    </div>
+</div>
+
+<div id="updating-personnel-loader" class="loader" style="display: none; position: fixed; top: 0; bottom: 0; right: 0; left: 0; margin: auto auto auto auto;"></div>
+
+<div style="margin-top: 10px;">
+    <div class="responsive-card responsive effected" style="background-color: transparent;">
+        <ul class="nav mt-4" style="background-color: transparent;gap: 0.6rem">
+          <li class="nav-item">
+            <a onclick="addActive" class="nav-link nav-item-card p-2" style="background-color: white; border-top-left-radius: 10px; border-top-right-radius: 10px; color: #11468F;">
+                <p></p>
+                <p>All</p>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a onclick="addActive" class="nav-link nav-item-card p-2" style="background-color: #11468F; border-top-left-radius: 10px; border-top-right-radius: 10px; color: white">
+                <p></p>
+                <p>On Time</p>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a onclick="addActive" class="nav-link nav-item-card p-2" style="background-color: #11468F; border-top-left-radius: 10px; border-top-right-radius: 10px; color: white">
+                <p></p>
+                <p>Late</p>
+            </a>
+          </li>
+        </ul>
+    </div>
+    <div class="card mb-5 gap-4 responsive responsive-card effected flex" style="border-top-left-radius: 0%; border-top-right-radius: 0%;">
+        <table id="presence-table">
+          <thead id="presence-table-head">
+            <tr class="presence-table-row">
+              <th>Nama</th>
+              <th>ID Number</th>
+              <th>Attended</th>
+              <th>Status</th>
+              <th>Leave</th>
+              <th>Work Hour</th>
+            </tr>
+            <tr>
+              <td colspan="6">
+                <hr class="table-hr">
+              </td>
+            </tr>
+          </thead>
+          <tbody id="presence-table-body">
+          </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+  elements = document.getElementsByClassName("effected")
+
+  for (var i = 0; i<elements.length; i++){
+    if (localStorage.getItem('darkMode') == 'enabled') {
+        elements[i].classList.add("dark-mode")
+    }else {
+        elements[i].classList.add("light-mode")
+    }
+  }
+
+  let dummyData = '{ "Attendance": ['+
+  '{"Name":"Adhyaksa Waruna Putro", "ID Number":"10044441", "Attended":"08.50", "Status":"Late", "Leave":"17.50", "Work Hour":"8 Jam"},'+
+  '{"Name":"Adhyaksa Waruna Putro", "ID Number":"10044441", "Attended":"08.50", "Status":"Late", "Leave":"17.50", "Work Hour":"8 Jam"},'+
+  '{"Name":"Adhyaksa Waruna Putro", "ID Number":"10044441", "Attended":"07.50", "Status":"On Time", "Leave":"17.50", "Work Hour":"8 Jam"},'+
+  '{"Name":"Adhyaksa Waruna Putro", "ID Number":"10044441", "Attended":"07.59", "Status":"On Time", "Leave":"17.00", "Work Hour":"8 Jam"}]}'
+
+  let parsedData = JSON.parse(dummyData);
+
+  // Function to highlight whether All, On Time, or Late is being highlighted
+  function addActive() {
+    const navLinks = document.querySelectorAll('.nav-item-card');
+    const currentDiv = document.getElementById("presence-table-body");
+
+    // Function to render the table based on the filter condition
+    function renderTable(statusFilter) {
+      let dataOutput = "";
+
+      parsedData.Attendance.forEach(entry => {
+        let presenceStatus = entry.Status === "Late" ? "presence-status-late-container" : "presence-status-ontime-container";
+        let presenceAttended = entry.Attended >= "08.00" ? "presence-attended-late-container" : "presence-attended-ontime-container";
+
+        if (!statusFilter || entry.Status === statusFilter) {
+          dataOutput += `
+            <tr class="presence-table-row-body" class="presence-table-row">
+                <td class="presence-name">
+                  ${entry.Name}
+                </td>
+                <td class="presence-idnumber">${entry["ID Number"]}</td>
+                <td class="presence-attended">
+                  <div class="${presenceAttended}">
+                    ${entry.Attended}
+                  </div>
+                </td>
+                <td class="presence-status">
+                  <div class="${presenceStatus}">
+                    ${entry.Status}
+                  </div>
+                </td>
+                <td class="presence-leave">${entry.Leave}</td>
+                <td class="presence-workhour">${entry["Work Hour"]}</td>
+            </tr>
+            <tr>
+              <td colspan="6">
+                <hr class="table-hr">
+              </td>
+            </tr>
+          `;
+        }
+      });
+
+      currentDiv.innerHTML = dataOutput;
+    }
+
+    renderTable();
+
+    navLinks.forEach((link, index) => {
+      const pElement = link.querySelector('p:first-child');
+
+      if (index === 0) pElement.innerHTML = parsedData.Attendance.length;
+      else if (index === 1) pElement.innerHTML = parsedData.Attendance.filter(entry => entry.Status === "On Time").length;
+      else if (index === 2) pElement.innerHTML = parsedData.Attendance.filter(entry => entry.Status === "Late").length;
+
+      link.addEventListener('click', function () {
+        navLinks.forEach(nav => {
+          nav.style.backgroundColor = '#11468F';
+          nav.style.color = 'white';
+        });
+        this.style.backgroundColor = 'white';
+        this.style.color = '#11468F';
+
+        if (index === 0) {
+          renderTable(); 
+        } else if (index === 1) {
+          renderTable("On Time"); 
+        } else if (index === 2) {
+          renderTable("Late"); 
+        }
+      });
+    });
+  }
+
+  addActive();
+
+</script>
+
+<!-- Gegara style.css error, pake ini sementara -->
+<style>
+  .nav-item-card{
+    width: 150px; 
+    height: 100px;
+  }
+
+  #presence-table {
+    margin: 1%;
+  }
+
+  .presence-table-row {
+    text-align: center;
+  }
+
+  #presence-table-head > .presence-table-row > th {
+    color: #858383;
+    padding: 20px 0 20px 0;
+  } 
+
+  .presence-table-row-body {
+    background-color: #F5F5F5;
+    text-align: center;
+    height: 70px;
+  }
+
+  tr > td:first-of-type {
+    border-top-left-radius: 4px;
+    border-bottom-left-radius: 4px;
+  }
+
+  tr > td:last-of-type {
+    border-top-right-radius: 4px;
+    border-bottom-right-radius: 4px;
+  }
+
+  .table-hr {
+    border: 4px solid lightgray;
+    margin: 8px 1vw 8px 1vw;
+  }
+
+  .presence-attended,
+  .presence-status {
+
+  }
+
+  .presence-idnumber, .presence-leave, .presence-workhour {
+    color: #858383;
+  }
+
+  .presence-status-late-container, .presence-attended-late-container {
+    background-color: #F8E6E6;
+    color: #FF4F65;
+    margin-left: 25%;
+    margin-right: 25%;
+  }
+
+  .presence-status-ontime-container, .presence-attended-ontime-container {
+    background-color: #CCF1ED;
+    color: #08C2AC;
+    margin-left: 25%;
+    margin-right: 25%;
+  }
+
+  @media screen and (max-width: 793px){
+    .table-headers{
+      padding-left: 4rem;
+      padding-right: 4rem;
+    }
+  }
+
+  @media screen and (max-width: 500px){
+    .nav-item-card{
+      width: 100px;
+    }
+
+    .table-headers{
+      padding-left: 1rem;
+      padding-right: 1rem;
+      font-size: small;
+    }
+  }
+</style>
+{% endblock %}

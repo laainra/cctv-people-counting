@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import authentication, camera, home, personnel, settings, var
+from .views import authentication, camera, home, personnel, settings, var, presence
 
 urlpatterns = [
     path('', home.home, name="home"),
@@ -23,6 +23,8 @@ urlpatterns = [
     path('edit_camera/<str:id>', camera.edit_camera, name="edit_camera"),
     path('edit_personnel', personnel.edit_personnel, name="edit_personnel"),
     path('settings', settings.settings, name="settings"),
+
+    path('presence', presence.presence, name="presence"),
 
 
     path('download', home.download, name="download"),
