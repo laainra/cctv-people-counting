@@ -25,7 +25,6 @@ class Personnel_Images(models.Model):
     personnel = models.ForeignKey(
         Personnels, on_delete=models.CASCADE, related_name='images', default=1)
     image_path = models.CharField(max_length=255, null=True)
-    predicted_status = models.BooleanField(default=False)
     createdAt = models.DateTimeField(auto_now_add=True, null=True)
 
 
@@ -85,7 +84,7 @@ class Personnel_Entries(models.Model):
     ]
     id = models.AutoField(primary_key=True)
     camera = models.ForeignKey(Camera_Settings, on_delete=models.CASCADE)
-    timestamp = models.CharField(max_length=200)
+    timestamp = models.DateTimeField()
     presence_status = models.CharField(
         max_length=10, choices=status_choices, default="UNKNOWN")
     personnel = models.ForeignKey(Personnels, on_delete=models.CASCADE)

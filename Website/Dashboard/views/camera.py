@@ -261,7 +261,7 @@ def edit_camera(request, id):
     })
 
 
-def gen(request):
+def generate_stream(request):
     request.session['stream_running'] = True
 
     while request.session['stream_running']:
@@ -279,7 +279,7 @@ def gen(request):
 
 @login_required(login_url='login')
 def video_feed(request):
-    return StreamingHttpResponse(gen(request), content_type='multipart/x-mixed-replace; boundary=frame')
+    return StreamingHttpResponse(generate_stream(request), content_type='multipart/x-mixed-replace; boundary=frame')
 
 
 @login_required
