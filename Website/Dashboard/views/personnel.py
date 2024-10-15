@@ -10,6 +10,7 @@ from .var import var
 
 from django.shortcuts import render, redirect, HttpResponse
 from django.contrib.auth.decorators import login_required
+from django.core.exceptions import ObjectDoesNotExist
 from django.http.response import JsonResponse
 from .. import forms, models
 
@@ -33,11 +34,23 @@ def personnels(request):
     except:
         request.session['selected_image'] = []
 
-    for personnel_name in os.listdir(os.path.join(var.personnel_path)):
-        try:
-            models.Personnels.objects.get(name=personnel_name)
-        except:
-            models.Personnels.objects.create(name=personnel_name, gender="M")
+    try:
+        request.session['selected_personnel']
+    except KeyError:
+        request.session['selected_personnel'] = 'Unknown'
+
+    try:
+        selected_personnel_instance = models.Personnels.objects.get(
+            name=request.session['selected_personnel']
+        )
+        selected_personnel_id = selected_personnel_instance.id
+    except models.Personnels.DoesNotExist:
+        # Handle case where the personnel does not exist
+        request.session['selected_personnel'] = 'Unknown'
+        selected_personnel_instance = models.Personnels.objects.get(
+            name='Unknown'
+        )
+        selected_personnel_id = selected_personnel_instance.id
 
     data = models.Personnels.objects.all()
     data = [personnel.name for personnel in data if personnel.name != 'Unknown']
@@ -195,7 +208,7 @@ def personnels(request):
                     # Handle the case where 'selected_personnel' is not set in the session
                     request.session['status'] = 'img_adding_error_no_personnel'
                     # Redirect to an appropriate page
-                    return redirect('some_error_page')
+                    # return redirect('some_error_page')
 
                 request.session['status'] = 'img_adding_success'
 
@@ -216,6 +229,13 @@ def personnels(request):
 
                     # Handle file upload
                     handle_uploaded_file(request, f, filename)
+
+                    # Save the path and personnel ID in the database
+                    models.Personnel_Images.objects.create(
+                        personnel_id=selected_personnel_id,  # Save personnel ID
+                        # Save the image path
+                        image_path=os.path.join(personnel_folder, filename)
+                    )
 
                     img = cv2.imread(os.path.join(personnel_folder, filename))
 
@@ -334,9 +354,21 @@ def delete_personnel(request, id):
     data.delete()
     return redirect('personnels')
 
+@login_required(login_url='login')
+def personnel_reports(request, id):
+    data = models.Personnels.objects.get(id=id)
+    # shutil.rmtree(os.path.join(var.personnel_path, data.name))
+    # data.delete()
+    # return redirect('personnels')
+
 # Function to upload file for personnel pics
+
 
 def handle_uploaded_file(request, f, filename):
     with open(os.path.join(var.personnel_path, request.session['selected_personnel'], filename), "wb+") as destination:
         for chunk in f.chunks():
             destination.write(chunk)
+
+
+# selected personel must return personnel id not name
+# after uploaded to static/img/personnel_pic/* directory then SAVE TO DB at personnel_images(id, personnel_id(fk to personnels), image_path, predicted_status) table

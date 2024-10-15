@@ -11,6 +11,11 @@ from django.shortcuts import render,  HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.hashers import make_password
 from django.http.response import JsonResponse, Http404
+from django.shortcuts import redirect
+from django.utils.timezone import now
+from django.db.models import DateField
+from django.db.models.functions import Cast
+from django.db.models import Q
 from .. import models
 
 # Artificial Intelligence Library
@@ -411,3 +416,17 @@ def download(request):
                 os.path.basename(file_path)
             return response
     raise Http404
+
+
+# def reset_today_count(request):
+#     if request.method == 'POST':
+#         today = now().strftime('%m/%d/%y')  # Get today's date
+#         # Delete all instances where the date is today
+#         instances_to_delete = models.Counted_Instances.objects.filter(
+#             Q(timestamp__startswith=today) 
+#         )
+
+#         if instances_to_delete.exists():
+#             instances_to_delete.delete()
+
+#         return redirect('home')

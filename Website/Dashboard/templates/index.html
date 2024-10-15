@@ -133,6 +133,19 @@ Dashboard
             <i class="fa-solid fa-users text-center" style="font-size: 20px"></i>
             <span>Real-time Counting Data</span>
         </a>
+{% comment %} 
+        <form id="reset-count-form" method="POST" action="{% url 'reset_today_count' %}">
+            {% csrf_token %}
+            <button
+                type="submit"
+                id="reset-count-btn"
+                class="btn btn-danger d-flex align-items-center justify-content-center gap-2 ml-3"
+                style="color: white; font-size: medium; min-height: 38px;">
+                Reset Today Count
+                <i class="d-flex fa-solid fa-trash text-center align-items-center justify-content-center text-white" style="font-size: 12px; margin-left: 2px; cursor: pointer;"></i>
+            </button>
+        </form> {% endcomment %}
+        
         {% if Active_Cam.cam_is_active == True and AI_Status == True %}
         <div class="d-flex justify-content-center align-items-center w-100 h-100 gap-3 pl-4 pr-4 responsive">
             <div class="d-flex flex-column justify-content-between w-100 gap-3">
