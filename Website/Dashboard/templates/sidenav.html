@@ -45,6 +45,17 @@
     >
   </li>
 
+  <li id="nav-presence" class="nav-item">
+    <a class="nav-link d-flex gap-1" href="{% url 'presence' %}">
+      <i
+        class="fa-solid fa-swatchbook text-center d-flex align-items-center justify-content-center"
+        style="width: 20px; height: 20px"
+      ></i>
+      <span class="">Presence</span></a
+    >
+  </li>
+
+
   <li id="nav-personnel" class="nav-item">
     <a class="nav-link d-flex gap-1" href="{% url 'personnels' %}">
       <i
@@ -136,6 +147,8 @@
 
   if ("{{Page}}" == "Statistic") {
     document.getElementById("nav-statistic").classList.add("active");
+  } else if ("{{Page}}" == "Presence") {
+    document.getElementById("nav-presence").classList.add("active");
   } else if ("{{Page}}" == "Personnels") {
     document.getElementById("nav-personnel").classList.add("active");
   } else if ("{{Page}}" == "Camera") {

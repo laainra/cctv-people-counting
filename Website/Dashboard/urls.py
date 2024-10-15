@@ -1,6 +1,10 @@
 from django.urls import path
+<<<<<<< HEAD
+from .views import authentication, camera, home, personnel, settings, var, presence
+=======
 from .views import authentication, camera, home, personnel, settings
 from .views.presence import presence
+>>>>>>> d044ef22bda34e91079cb43e3dfa5893ca8d4293
 
 urlpatterns = [
     path('', home.home, name="home"),
@@ -25,6 +29,8 @@ urlpatterns = [
     path('edit_personnel', personnel.edit_personnel, name="edit_personnel"),
     path('settings', settings.settings, name="settings"),
     # path('reset-count/', home.reset_today_count, name='reset_today_count'),
+
+    path('presence', presence.presence, name="presence"),
 
 
     path('download', home.download, name="download"),

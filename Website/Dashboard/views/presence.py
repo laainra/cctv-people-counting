@@ -1,3 +1,10 @@
+<<<<<<< HEAD
+from django.shortcuts import render
+from django.http import HttpResponse
+
+def presence(request):
+    return render(request, 'presence.html', {'Page': "Presence"})
+=======
 import json
 from datetime import datetime, timedelta
 import pytz
@@ -143,3 +150,4 @@ def presence(request):
             return JsonResponse({'status': 'error', 'message': str(e)})
 
     return JsonResponse({'status': 'error', 'message': 'Invalid request method.'})
+>>>>>>> d044ef22bda34e91079cb43e3dfa5893ca8d4293

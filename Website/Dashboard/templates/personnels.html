@@ -77,7 +77,16 @@ Personnels
 
 <div id="updating-personnel-loader" class="loader" style="display: none; position: fixed; top: 0; bottom: 0; right: 0; left: 0; margin: auto auto auto auto;"></div>
 
-<div class="d-flex justify-content-between align-items-start mb-5 gap-4 h-100 responsive responsive-card">
+<div class="card d-flex w-36 justify-content-between align-items-start mb-2 py-3 responsive responsive-card effected shadow-black shadow-lg">
+  <div class="pl-4">
+    <a class="d-flex nav-link text-dark align-items-center gap-2 effected bg-transparent">
+      <i class="fa-solid fa-users text-center" style="font-size: 20px"></i>
+      <span style="font-size: 20px; font-weight: 700;">Personnels</span>
+    </a>
+  </div>
+</div>
+
+<div class="d-flex align-items-start mb-5 gap-2 h-100 responsive responsive-card">
   <div id="folder-container" class="card p-3 effected" style="width: 350px; height: 560px;">
     <div id="folder-container-loader" class="loader" style="width: 110px !important;"></div>
     
@@ -121,73 +130,128 @@ Personnels
     </div>
   </div>
   
-  <div id="image-container" class="card p-3 effected" style="width: 100%; height: 560px; ">
-    <div id="image-container-loader" class="loader" style="width: 110px !important;"></div>
+  <div style="width: 100%; height: 560px; display: flex; flex-direction: column; row-gap: 10px;">
+    <div id="image-container" class="card p-3 effected" style="width: 100%; height: 280px;">
+      <div id="image-container-loader" class="loader" style="width: 110px !important;"></div>
 
-    <div id="image-container-title" class="d-flex p-0 align-items-center justify-content-between mb-3 responsive" style="position: relative;">
-      <div class="d-flex align-items-stretch justify-content-between gap-1 p-0 mt-2 ml-3" href="{% url 'edit_personnel' %}">
-        <i class="d-flex fa-solid fa-user align-items-center text-center effected mr-1" style="font-size: 20px"></i>
-        
-        {% if Selected.name != 'Unknown' %}
-        <div class="d-flex ml-1 align-items-start justify-content-center flex-column">
-          <div class="d-flex flex-row align-items-center justify-content-start">
-            <span id="personnel-name" class="effected">{{Selected.name}}</span>
-            <i title="Edit Personnel" id="edit-name" class="d-flex text-center align-items-center fa-solid fa-pencil effected" style="margin-left: 10px; font-size: 10px; cursor: pointer;" onclick="openModal(); editPersonnel()"></i>
-            <!-- <a class="d-flex text-center align-items-start effected" href="{% url 'edit_personnel' %}" style="text-decoration: none; margin-left: 10px;">
-            </a> -->
+      <div id="image-container-title" class="d-flex p-0 align-items-center justify-content-between mb-3 responsive" style="position: relative;">
+        <div class="d-flex align-items-stretch justify-content-between gap-1 p-0 mt-2 ml-3" href="{% url 'edit_personnel' %}">
+          <i class="d-flex fa-solid fa-user align-items-center text-center effected mr-1" style="font-size: 20px"></i>
+          
+          {% if Selected.name != 'Unknown' %}
+          <div class="d-flex ml-1 align-items-start justify-content-center flex-column">
+            <div class="d-flex flex-row align-items-center justify-content-start">
+              <span id="personnel-name" class="effected">{{Selected.name}}</span>
+              <i title="Edit Personnel" id="edit-name" class="d-flex text-center align-items-center fa-solid fa-pencil effected" style="margin-left: 10px; font-size: 10px; cursor: pointer;" onclick="openModal(); editPersonnel()"></i>
+              <!-- <a class="d-flex text-center align-items-start effected" href="{% url 'edit_personnel' %}" style="text-decoration: none; margin-left: 10px;">
+              </a> -->
+            </div>
+            {% if Selected.gender == 'M' %}
+              <span id="personnel-gender" class="effected" style="font-size: 12px;">Male</span>
+            {% else %}
+              <span id="personnel-gender" class="effected" style="font-size: 12px;">Female</span>
+            {% endif %}
           </div>
-          {% if Selected.gender == 'M' %}
-            <span id="personnel-gender" class="effected" style="font-size: 12px;">Male</span>
           {% else %}
-            <span id="personnel-gender" class="effected" style="font-size: 12px;">Female</span>
+          <span id="personnel-name" class="ml-1 w-100 effected">{{Selected.name}}</span>
+          {% endif %}
+
+          {% if Selected.name != 'Unknown' %}
+          <form id="add-image-form" class="post-form1 align-self-end mr-3 h-100" method="POST" enctype="multipart/form-data" style="justify-self: end; display: none;">
+            {% csrf_token %}
+            <label for="file-input">
+              <i title="Add Image" id="add-image" class="d-flex fa-solid fa-plus text-center align-items-center effected" style="font-size: 15px; cursor: pointer;"></i>
+            </label>
+            <input id="file-input" name="image_file" type="file" style="display: none;" accept="image/*" onchange="document.getElementById('add-image-form').submit()" multiple/>
+          </form>
+          {% else %}
+          <i title="Clear Folder" id="clear-image" class="d-flex eraser1 fa-solid fa-eraser text-center align-self-end mr-3 h-100 effected" style="font-size: 0px; margin-left: 2px; cursor: pointer; justify-self: end !important;" onclick="clearUnknown()"></i>
           {% endif %}
         </div>
-        {% else %}
-        <span id="personnel-name" class="ml-1 w-100 effected">{{Selected.name}}</span>
-        {% endif %}
-
-        {% if Selected.name != 'Unknown' %}
-        <form id="add-image-form" class="post-form1 align-self-end mr-3 h-100" method="POST" enctype="multipart/form-data" style="justify-self: end; display: none;">
-          {% csrf_token %}
-          <label for="file-input">
-            <i title="Add Image" id="add-image" class="d-flex fa-solid fa-plus text-center align-items-center effected" style="font-size: 15px; cursor: pointer;"></i>
-          </label>
-          <input id="file-input" name="image_file" type="file" style="display: none;" accept="image/*" onchange="document.getElementById('add-image-form').submit()" multiple/>
-        </form>
-        {% else %}
-        <i title="Clear Folder" id="clear-image" class="d-flex eraser1 fa-solid fa-eraser text-center align-self-end mr-3 h-100 effected" style="font-size: 0px; margin-left: 2px; cursor: pointer; justify-self: end !important;" onclick="clearUnknown()"></i>
-        {% endif %}
+        <a class="d-inline-flex align-items-stretch gap-4 p-0 mt-2 mr-3 effected">
+          <i title="Set As Profile Picture" id="set-profile-pic" class="d-flex fa-solid fa-user text-center align-items-center" style="display: none !important; margin-left: 2px; cursor: pointer;" onclick="setProfilePic()"></i>
+          <i title="Move Image" id="move-image" class="d-flex fa-solid fa-folder text-center align-items-center" style="display: none !important; margin-left: 2px; cursor: pointer;" onclick="chooseFolder()"></i>
+          <i title="Delete Image" id="delete-image" class="d-flex fa-solid fa-trash text-center align-items-center" style="display: none !important; margin-left: 2px; cursor: pointer;" onclick="deleteImage()"></i>
+          {% if Selected.name != 'Unknown' %}
+          <form id="add-image-form" class="post-form2 align-self-end" method="POST" enctype="multipart/form-data" style="justify-self: end;">
+            {% csrf_token %}
+            <label for="file-input">
+              <i title="Add Image" id="add-image" class="d-flex fa-solid fa-plus text-center align-items-center effected" style="font-size: 15px; cursor: pointer;"></i>
+            </label>
+            <input id="file-input" name="image_file" type="file" style="display: none;" accept="image/*" onchange="document.getElementById('add-image-form').submit()" multiple/>
+          </form>
+          {% else %}
+          <i title="Clear Folder" id="clear-image" class="d-flex eraser2 fa-solid fa-eraser text-center align-items-center" style="font-size: 15px; margin-left: 2px; cursor: pointer;" onclick="clearUnknown()"></i>
+          {% endif %}
+        </a>
       </div>
-      <a class="d-inline-flex align-items-stretch gap-4 p-0 mt-2 mr-3 effected">
-        <i title="Set As Profile Picture" id="set-profile-pic" class="d-flex fa-solid fa-user text-center align-items-center" style="display: none !important; margin-left: 2px; cursor: pointer;" onclick="setProfilePic()"></i>
-        <i title="Move Image" id="move-image" class="d-flex fa-solid fa-folder text-center align-items-center" style="display: none !important; margin-left: 2px; cursor: pointer;" onclick="chooseFolder()"></i>
-        <i title="Delete Image" id="delete-image" class="d-flex fa-solid fa-trash text-center align-items-center" style="display: none !important; margin-left: 2px; cursor: pointer;" onclick="deleteImage()"></i>
-        {% if Selected.name != 'Unknown' %}
-        <form id="add-image-form" class="post-form2 align-self-end" method="POST" enctype="multipart/form-data" style="justify-self: end;">
-          {% csrf_token %}
-          <label for="file-input">
-            <i title="Add Image" id="add-image" class="d-flex fa-solid fa-plus text-center align-items-center effected" style="font-size: 15px; cursor: pointer;"></i>
-          </label>
-          <input id="file-input" name="image_file" type="file" style="display: none;" accept="image/*" onchange="document.getElementById('add-image-form').submit()" multiple/>
-        </form>
-        {% else %}
-        <i title="Clear Folder" id="clear-image" class="d-flex eraser2 fa-solid fa-eraser text-center align-items-center" style="font-size: 15px; margin-left: 2px; cursor: pointer;" onclick="clearUnknown()"></i>
-        {% endif %}
-      </a>
+
+      <div id="image-container-scroll" class="container d-flex justify-content-center scrollmenu vertical-scroll w-100 h-100 text-center effected" style="padding-left: 0; padding-right: 0; display: -ms-grid;">
+        <div id="image-container-scroll-row" class="row w-100 gap-3 justify-content-center ">
+        {% for image in Img_List %}
+          {% with 'img/personnel_pics/'|add:Selected.name|add:'/'|add:image as personnel_photo %}
+            <a class="card col-md-auto mb-1 text-center effected p-2 m-0 image" style="width: 200px; height: 200px; margin: 0 auto; border-radius: 10px; cursor: pointer;" onclick="selectPhoto('{{image}}', this)">
+              {% load static %}
+              <div class="container d-flex align-items-center justify-content-center" style="width: 100%; height: 100%; padding: 0;">
+                <img src="{% static personnel_photo %}" style="margin: auto; object-fit: cover; display: block; border-radius: 10px; width: 95%; height: 95%;"/>
+              </div>  
+            </a>
+          {% endwith %}
+        {% endfor %}
+        </div>
+      </div>
+      
     </div>
-    
-    <div id="image-container-scroll" class="container d-flex justify-content-center scrollmenu vertical-scroll w-100 h-100 text-center effected" style="padding-left: 0; padding-right: 0; display: -ms-grid;">
-      <div id="image-container-scroll-row" class="row w-100 gap-3 justify-content-center ">
-      {% for image in Img_List %}
-        {% with 'img/personnel_pics/'|add:Selected.name|add:'/'|add:image as personnel_photo %}
-          <a class="card col-md-auto mb-1 text-center effected p-2 m-0 image" style="width: 200px; height: 200px; margin: 0 auto; border-radius: 10px; cursor: pointer;" onclick="selectPhoto('{{image}}', this)">
-            {% load static %}
-            <div class="container d-flex align-items-center justify-content-center" style="width: 100%; height: 100%; padding: 0;">
-              <img src="{% static personnel_photo %}" style="margin: auto; object-fit: cover; display: block; border-radius: 10px; width: 95%; height: 95%;"/>
-            </div>  
-          </a>
-        {% endwith %}
-      {% endfor %}
+
+    <div style="display: flex;justify-content: end; padding-right: 10vw;">
+
+      <!-- Style error handling sementara -->
+      <style>
+        input[type="date"] {
+            border: 2px solid #E2E2E2;
+            border-radius: 7px;
+            color: #858383;
+            padding: 5px;
+            background: transparent;
+            cursor: pointer;
+        }
+
+        /* Hide the default calendar icon */
+        input[type="date"]::-webkit-calendar-picker-indicator {
+            display: none;
+        }
+
+        /* Custom styles for the input field */
+        input[type="date"]:focus {
+            border-color: #6c757d; /* Change border color on focus */
+            outline: none; /* Remove default outline */
+        }
+
+        /* Style for the dropdown itself (limited) */
+        input[type="date"]::-webkit-inner-spin-button,
+        input[type="date"]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0; /* Remove the margin */
+        }
+      </style>
+
+      <input type="date" class="bg-transparent text-center date-picker" style="border: 2px solid #E2E2E2;border-radius: 7px; color: #858383;" >
+      <hr style="width: 2vw; border-top: 3px solid; margin-left: 1vw; margin-right: 1vw;">
+      <input type="date" class="bg-transparent text-center date-picker" style="border: 2px solid #E2E2E2;border-radius: 7px; color: #858383;">
+    </div>
+
+    <div style="width: 100%; height: 240px; display:flex; column-gap: 10px;">
+      <div id="image-container" class="card p-3 effected" style="width: 70%; height: 100%;">
+        <a class="d-flex nav-link text-dark align-items-center gap-2 effected">
+          <i class="fa-solid fa-chart-pie text-center" style="font-size: 20px"></i>
+          <span id="folder-title" >Data Entries</span>
+        </a>
+      </div>
+      <div id="image-container" class="card p-3 effected" style="width: 30%; height: 100%;">
+        <a class="d-flex nav-link text-dark align-items-center gap-2 effected">
+          <i class="fa-solid fa-chart-bar text-center" style="font-size: 20px"></i>
+          <span id="folder-title">Total</span>
+        </a>
       </div>
     </div>
   </div>
@@ -604,7 +668,14 @@ Personnels
   
   };
   xhttp.send(data);
+  
+  const datePicked = document.getElementsByClassName('date-picker');
 
+  for (let i = 0; i<datePicked.length; i++){
+    datePicked[i].addEventListener('click', () => {
+      datePicked[i].showPicker();
+    })
+  }
 </script>
 
 {% endblock %}
