@@ -20,18 +20,19 @@
     var greenLines = document.getElementById("x");
     var redLines = document.getElementById("y");
 
-    for(var i = 0; i < poly.points.numberOfItems; i++){
-      poly.points[i].x = parseFloat(poly.points[i].x * fx)
-      poly.points[i].y = parseFloat(poly.points[i].y * fx)
+  // Adjust the polygon points and update the lines accordingly
+  for (var i = 0; i < poly.points.numberOfItems; i++) {
+    poly.points[i].x = parseFloat(poly.points[i].x * fx);
+    poly.points[i].y = parseFloat(poly.points[i].y * fx);
 
-      if(i < 4){
-        greenLines.points.getItem(i).x = parseFloat(greenLines.points.getItem(i).x * fx)
-        greenLines.points.getItem(i).y = parseFloat(greenLines.points.getItem(i).y * fx)
-      }else{
-        redLines.points.getItem(i-4).x = parseFloat(redLines.points.getItem(i-4).x * fx)
-        redLines.points.getItem(i-4).y = parseFloat(redLines.points.getItem(i-4).y * fx)
-      }
+    if (i < 4) {
+      greenLines.points.getItem(i).x = poly.points[i].x; // Update line points
+      greenLines.points.getItem(i).y = poly.points[i].y;
+    } else {
+      redLines.points.getItem(i - 4).x = poly.points[i].x; // Update line points
+      redLines.points.getItem(i - 4).y = poly.points[i].y;
     }
+  }
   }
 
   function adjustSVG(){
@@ -111,11 +112,22 @@
   }
 </script>
 
+<div class="card d-flex w-36 justify-content-between align-items-start mb-3 py-3 responsive responsive-card effected shadow-black shadow-lg">
+  <div class="pl-3">
+    <a class="d-flex nav-link text-dark align-items-center gap-2 effected bg-transparent">
+      <i class="fa-solid fa-camera text-center" style="font-size: 20px"></i>
+      <span style="font-size: 20px; font-weight: 700;">Camera</span>
+    </a>
+  </div>
+</div>
 
 <div id="camera-scroll-container" class="card p-3 mb-4 text-center effected closable responsive-card">
   <div class="d-flex p-0 mb-2 align-items-center justify-content-between">
-    <a class="d-inline-flex nav-link align-items-center gap-1 p-0 mt-2 ml-3 effected">
-        <i class="d-flex fa-solid fa-camera text-center effected" style="font-size: 20px"></i>
+    <a class="d-inline-flex nav-link align-items-center gap-1 p-0 mt-2 ml-1 effected">
+      <span class="fa-stack fa-lg" style="font-size: 20px;">
+        <i class="fa fa-camera fa-stack-1x"></i>
+        <i class="fa fa-camera fa-stack-1x" style=" opacity: 0.5; margin-left: 8px; margin-top: 8px;"></i>
+      </span>
         <span id="camera-list-title" class="ml-1">Camera List</span>
     </a>
     
@@ -180,75 +192,6 @@
         <span id="camera-list-title" class="ml-1">Camera Stream</span>
     </a>
     
-    <a class="d-inline-flex nav-link align-items-center gap-3 p-0 mt-2 mr-3 effected responsive">
-      {% if Active_Cam.cam_is_active == True %}
-        {% if Toggle_Settings == True %}
-          <button
-            class="btn btn-info d-flex justify-content-center align-items-center gap-2" 
-            style="text-decoration: none; color: white; font-size: medium; min-height: 38px;" 
-            onclick="window.location.reload()">
-            Reset
-            <i title="Reset" class="d-flex fa-solid fa-refresh text-center effected" style="font-size: 12px; color: white; cursor: pointer;"></i>
-          </button>
-          <button
-            class="btn btn-danger d-flex justify-content-center align-items-center gap-2" 
-            style="text-decoration: none; color: white; font-size: medium; min-height: 38px;" 
-            onclick="changeSettings('close_settings')">
-            Cancel
-            <i title="Cancel" class="d-flex fa-solid fa-xmark text-center effected" style="font-size: 12px; color: white; cursor: pointer;"></i>
-          </button>
-          <button
-            class="btn btn-success d-flex justify-content-center align-items-center gap-2" 
-            style="text-decoration: none; color: white; font-size: medium; min-height: 38px;" 
-            onclick="sendPolylineCoordinates()">
-            Confirm
-            <i title="Confirm" class="d-flex fa-solid fa-check text-center effected" style="font-size: 12px; color: white; cursor: pointer;"></i>
-          </button>
-        {% else %}
-          <button 
-            class="btn btn-success d-flex justify-content-center align-items-center gap-2"
-            style="text-decoration: none; color: white; font-size: medium; min-height: 38px;"
-            onclick="expandStream(this)">
-            Expand Stream
-            <i class="d-flex fa-solid fa-expand text-center text-white" style="font-size: 15px; cursor: pointer;"></i>    
-          </button>
-          <button
-            class="btn btn-info d-flex justify-content-center align-items-center gap-2" 
-            style="text-decoration: none; color: white; font-size: medium; min-height: 38px;" 
-            onclick="changeSettings('open_settings')">
-            Edit Polygon
-            <i title="Edit Polygon" class="d-flex fa-solid fa-draw-polygon text-center text-white" style="font-size: 15px; cursor: pointer;"></i>
-          </button>
-          <form action="{% url 'stop_stream' %}">
-            <button 
-              class="btn btn-danger d-flex justify-content-center align-items-center gap-2"
-              style="text-decoration: none; color: white; font-size: medium; min-height: 38px;">
-              Stop Stream
-              <i class="d-flex fa-solid fa-stop text-center text-white" style="font-size: 15px; cursor: pointer;"></i>    
-            </button>
-          </form>
-          <!-- <a class="effected" href="{% url 'stop_stream' %}" style="text-decoration: none;">
-            <i title="Stop Stream" class="d-flex fa-solid fa-pause text-center effected" style="font-size: 20px; cursor: pointer;"></i>
-          </a> -->
-        {% endif %}
-      {% else %}
-        {% if Active_Cam != None %}
-            <form action="{% url 'start_stream' %}">
-              <button 
-                id="start-stream"
-                class="btn btn-success d-flex justify-content-center align-items-center gap-2"
-                style="text-decoration: none; color: white; font-size: medium; min-height: 38px;"
-                onclick="showLoader()">
-                Start Stream
-                <i class="d-flex fa-solid fa-play text-center text-white" style="font-size: 15px; cursor: pointer;"></i>    
-              </button>
-            </form>
-          <!-- <a class="effected" href="{% url 'start_stream' %}" style="text-decoration: none;">
-            <i title="Start Stream" class="d-flex fa-solid fa-play text-center effected" style="font-size: 20px; cursor: pointer;"></i>
-          </a> -->
-        {% endif %}   
-      {% endif %}
-    </a>
   </div>
 
   <!-- Start Stop Stream -->
@@ -290,6 +233,69 @@
   <div id="camera-stream-loader" class="loader" style="width: 50px; height: 50px; margin: -30px 0 0 -25px;"></div>
   <span id="unactive-warning" class="effected" style="padding: 20px; font-size: small;">{{Active_Cam.cam_name}} Is Not Active !</span>
   {% endif %}
+  <div class="d-flex justify-content-center align-items-center gap-3  my-3 ">
+    {% if Active_Cam.cam_is_active == True %}
+      {% if Toggle_Settings == True %}
+        <button
+          class="btn btn-info d-flex justify-content-center align-items-center gap-2" 
+          style="text-decoration: none; color: white; font-size: medium; min-height: 38px;" 
+          onclick="resetPolygon()">
+          Reset Polygon
+          <i title="Reset" class="d-flex fa-solid fa-refresh text-center effected" style="font-size: 12px; color: white; cursor: pointer;"></i>
+        </button>
+        <button
+          class="btn btn-danger d-flex justify-content-center align-items-center gap-2" 
+          style="text-decoration: none; color: white; font-size: medium; min-height: 38px;" 
+          onclick="changeSettings('close_settings')">
+          Cancel
+          <i title="Cancel" class="d-flex fa-solid fa-xmark text-center effected" style="font-size: 12px; color: white; cursor: pointer;"></i>
+        </button>
+        <button
+          class="btn btn-success d-flex justify-content-center align-items-center gap-2" 
+          style="text-decoration: none; color: white; font-size: medium; min-height: 38px;" 
+          onclick="sendPolylineCoordinates()">
+          Confirm
+          <i title="Confirm" class="d-flex fa-solid fa-check text-center effected" style="font-size: 12px; color: white; cursor: pointer;"></i>
+        </button>
+      {% else %}
+        <button 
+          class="btn btn-success d-flex justify-content-center align-items-center gap-2"
+          style="text-decoration: none; color: white; font-size: medium; min-height: 38px;"
+          onclick="expandStream(this)">
+          Expand Stream
+          <i class="d-flex fa-solid fa-expand text-center text-white" style="font-size: 15px; cursor: pointer;"></i>    
+        </button>
+        <button
+          class="btn btn-info d-flex justify-content-center align-items-center gap-2" 
+          style="text-decoration: none; color: white; font-size: medium; min-height: 38px;" 
+          onclick="changeSettings('open_settings')">
+          Edit Polygon
+          <i title="Edit Polygon" class="d-flex fa-solid fa-draw-polygon text-center text-white" style="font-size: 15px; cursor: pointer;"></i>
+        </button>
+        <form action="{% url 'stop_stream' %}">
+          <button 
+            class="btn btn-danger d-flex justify-content-center align-items-center gap-2"
+            style="text-decoration: none; color: white; font-size: medium; min-height: 38px;">
+            Stop Stream
+            <i class="d-flex fa-solid fa-stop text-center text-white" style="font-size: 15px; cursor: pointer;"></i>    
+          </button>
+        </form>
+      {% endif %}
+    {% else %}
+      {% if Active_Cam != None %}
+        <form action="{% url 'start_stream' %}">
+          <button 
+            id="start-stream"
+            class="btn btn-primary d-flex justify-content-center align-items-center gap-2"
+            style="text-decoration: none; color: white; font-size: medium; min-height: 38px;"
+            onclick="showLoader()">
+            Start Stream
+            <i class="d-flex fa-solid fa-play text-center text-white" style="font-size: 15px; cursor: pointer;"></i>    
+          </button>
+        </form>
+      {% endif %}   
+    {% endif %}
+  </div>
   
 </div>
 
@@ -410,6 +416,50 @@
       window.location.reload();
     };
     xhttp.send(data);
+  }
+
+  function resetPolygon() {
+    var csrftoken = document.querySelector("[name=csrfmiddlewaretoken]").value;
+    var xhttp = new XMLHttpRequest();
+  
+    // Data to reset polygon coordinates
+    var data =
+      "id=" + "{{Active_Cam.id}}" +
+      "&x1=0&y1=0&x2=0&y2=0&x3=0&y3=0&x4=0&y4=0" +
+      "&x5=0&y5=0&x6=0&y6=0&x7=0&y7=0&x8=0&y8=0";
+  
+    xhttp.open("POST", "save_coordinates");
+    xhttp.setRequestHeader("X-CSRFToken", csrftoken);
+    xhttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+  
+    xhttp.onload = function () {
+      if (xhttp.status === 200) {
+        // After resetting, update line points to (0,0)
+        updateLinePoints(); // Ensure line points are updated
+        window.location.reload();  // Reload page to reflect changes if needed
+      } else {
+        alert("Error resetting polygon coordinates!");
+      }
+    };
+  
+    xhttp.send(data);
+  }
+  
+  function updateLinePoints() {
+    var greenLines = document.getElementById("x");
+    var redLines = document.getElementById("y");
+  
+    // Set all green line points to (0,0)
+    for (var i = 0; i < 4; i++) {
+      greenLines.points.getItem(i).x = 0;
+      greenLines.points.getItem(i).y = 0;
+    }
+    
+    // Set all red line points to (0,0)
+    for (var i = 0; i < 4; i++) {
+      redLines.points.getItem(i).x = 0;
+      redLines.points.getItem(i).y = 0;
+    }
   }
 
   function toggleCollapsed(){
@@ -649,8 +699,5 @@ function RedirectToEditCamera(id) {
 {% endblock %}
 
 {% block title %}
-Camera
-{% endblock %}
-{% block page_title %}
 Camera
 {% endblock %}

@@ -285,24 +285,51 @@ def video_feed(request):
 @login_required
 def save_coordinates(request):
     cam = models.Camera_Settings.objects.get(id=request.session['cam_id'])
-    cam.x1 = request.POST['x1']
-    cam.y1 = request.POST['y1']
-    cam.x2 = request.POST['x2']
-    cam.y2 = request.POST['y2']
-    cam.x3 = request.POST['x3']
-    cam.y3 = request.POST['y3']
-    cam.x4 = request.POST['x4']
-    cam.y4 = request.POST['y4']
-    cam.x5 = request.POST['x5']
-    cam.y5 = request.POST['y5']
-    cam.x6 = request.POST['x6']
-    cam.y6 = request.POST['y6']
-    cam.x7 = request.POST['x7']
-    cam.y7 = request.POST['y7']
-    cam.x8 = request.POST['x8']
-    cam.y8 = request.POST['y8']
+    
+    # Check if we are resetting the polygon
+    if request.POST['x1'] == '0' and request.POST['y1'] == '0':
+        # Reset polygon coordinates to zero
+        cam.x1 = 0
+        cam.y1 = 0
+        cam.x2 = 0
+        cam.y2 = 0
+        cam.x3 = 0
+        cam.y3 = 0
+        cam.x4 = 0
+        cam.y4 = 0
+        cam.x5 = 0
+        cam.y5 = 0
+        cam.x6 = 0
+        cam.y6 = 0
+        cam.x7 = 0
+        cam.y7 = 0
+        cam.x8 = 0
+        cam.y8 = 0
+        
+        # Clear the session data for polygon points
+        request.session.pop('polygon_data', None)  # Assuming 'polygon_data' holds your polygon points
+    else:
+        # Update existing coordinates
+        cam.x1 = request.POST['x1']
+        cam.y1 = request.POST['y1']
+        cam.x2 = request.POST['x2']
+        cam.y2 = request.POST['y2']
+        cam.x3 = request.POST['x3']
+        cam.y3 = request.POST['y3']
+        cam.x4 = request.POST['x4']
+        cam.y4 = request.POST['y4']
+        cam.x5 = request.POST['x5']
+        cam.y5 = request.POST['y5']
+        cam.x6 = request.POST['x6']
+        cam.y6 = request.POST['y6']
+        cam.x7 = request.POST['x7']
+        cam.y7 = request.POST['y7']
+        cam.x8 = request.POST['x8']
+        cam.y8 = request.POST['y8']
+    
     cam.save()
 
+    # Create the polygon array regardless of reset or update
     poly = np.array([[cam.x1, cam.y1], [cam.x2, cam.y2], [cam.x3, cam.y3], [cam.x4, cam.y4],
                      [cam.x8, cam.y8], [cam.x7, cam.y7], [cam.x6, cam.y6], [cam.x5, cam.y5]])
 

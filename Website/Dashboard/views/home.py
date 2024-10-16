@@ -1,4 +1,5 @@
 import os
+import random
 import numpy as np
 from datetime import datetime, timedelta
 from datetime import date as set_date
@@ -9,6 +10,7 @@ from .var import var
 
 from django.shortcuts import render,  HttpResponse
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.hashers import make_password
 from django.http.response import JsonResponse, Http404
 from django.shortcuts import redirect
@@ -423,10 +425,48 @@ def download(request):
 #         today = now().strftime('%m/%d/%y')  # Get today's date
 #         # Delete all instances where the date is today
 #         instances_to_delete = models.Counted_Instances.objects.filter(
-#             Q(timestamp__startswith=today) 
+#             Q(timestamp__startswith=today)
 #         )
 
 #         if instances_to_delete.exists():
 #             instances_to_delete.delete()
 
 #         return redirect('home')
+
+@csrf_exempt
+def generate_data(request):
+    if request.method == 'POST':
+        camera_id = request.POST.get('camera_id', 1)
+        date_str = request.POST.get('date', datetime.now().strftime('%Y-%m-%d'))
+        date = datetime.strptime(date_str, '%Y-%m-%d')
+
+        # Create 24 hourly entries for Counted_Instances
+        for hour in range(24):
+            timestamp = date + timedelta(hours=hour)
+            models.Counted_Instances.objects.create(
+                camera_id=camera_id,
+                male_entries=random.randint(5, 20),
+                female_entries=random.randint(10, 25),
+                unknown_gender_entries=random.randint(1, 5),
+                people_exits=random.randint(10, 30),
+                people_inside=random.randint(50, 100),
+                timestamp=timestamp  # Assign datetime object directly
+            )
+
+        # Define personnel IDs to use
+        personnel_ids = [1, 2, 3, 4]  # Assuming these IDs exist in the Personnels table
+
+        # Generate Dummy Data for Personnel_Entries
+        for personnel_id in personnel_ids:
+            # Random entry time between 7am to 5pm
+            entry_time = date + timedelta(hours=random.randint(7, 17))
+            models.Personnel_Entries.objects.create(
+                camera_id=camera_id,
+                timestamp=entry_time,  # Assign datetime object directly
+                personnel_id=personnel_id,  # Use the personnel ID directly
+                presence_status=random.choice(['ONTIME', 'LATE', 'LEAVE', 'UNKNOWN'])  # Set presence status randomly
+            )
+
+        return JsonResponse({'message': 'Dummy data generated successfully'})
+
+    return JsonResponse({'error': 'Invalid request method'}, status=400)

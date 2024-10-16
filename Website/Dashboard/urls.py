@@ -1,10 +1,6 @@
 from django.urls import path
-<<<<<<< HEAD
-from .views import authentication, camera, home, personnel, settings, var, presence
-=======
-from .views import authentication, camera, home, personnel, settings
-from .views.presence import presence
->>>>>>> d044ef22bda34e91079cb43e3dfa5893ca8d4293
+from .views import authentication, camera, home, personnel, settings, presence
+# from .views.presence import presence
 
 urlpatterns = [
     path('', home.home, name="home"),
@@ -34,7 +30,7 @@ urlpatterns = [
 
 
     path('download', home.download, name="download"),
+    path('generate_data', home.generate_data, name="generate_data"),
 
-    # path('reports/', reports.reports, name='reports'),
-    path('presence/',  presence, name='presence'),
+
 ]

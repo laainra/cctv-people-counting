@@ -107,6 +107,46 @@
     ::-webkit-scrollbar-thumb:hover {
       background: #9d9d9d;
     }
+
+    /* Sidebar styles */
+    #accordionSidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 100vh;
+      overflow-y: auto;
+      z-index: 1000;
+      width: 250px; /* Width when sidebar is expanded */
+      transition: width 0.3s; /* Smooth transition for width */
+    }
+
+    /* Toggled state for sidebar */
+    #accordionSidebar.toggled {
+      width: 80px; /* Width when sidebar is collapsed */
+    }
+
+    /* Main content styles */
+    #content-container {
+      margin-left: 230px; /* Default margin when sidebar is expanded */
+      transition: margin-left 0.3s; /* Smooth transition for margin */
+    }
+
+    /* If sidebar is toggled */
+    #accordionSidebar.toggled ~ #content-container {
+      margin-left: 110px; /* Adjust margin when sidebar is collapsed */
+    }
+
+    /* Overlay style */
+    .overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      z-index: 999; /* Below sidebar */
+      display: none; /* Hidden by default */
+    }
   </style>
 
   <body class="effected">
@@ -148,21 +188,6 @@
         {% endfor %} {% endif %}
         <!-- Warning message if there is error / success messages -->
         <br />
-        <div>
-          <h1
-            class="effected"
-            style="
-              padding-left: 50px;
-              font-size: 30px;
-              margin-bottom: 30px;
-              margin-top: 10px;
-            "
-          >
-            {% block page_title %}
-            <!-- insert title in the corresponding .html -->
-            {% endblock %}
-          </h1>
-        </div>
 
         <!-- base html inner content -->
         {% block content %}
@@ -242,9 +267,27 @@
 
   <script>
     function toggleSidebar() {
-      document.getElementById("accordionSidebar").classList.toggle("toggled");
+      const sidebar = document.getElementById("accordionSidebar");
+      const contentContainer = document.getElementById("content-container");
+
+      sidebar.classList.toggle("toggled");
       document.querySelector(".overlay").classList.toggle("hidden");
+
+      // Update the margin-left of content-container based on the sidebar width
+      if (sidebar.classList.contains("toggled")) {
+        contentContainer.style.marginLeft = "110px"; // Collapsed width
+      } else {
+        contentContainer.style.marginLeft = "230px"; // Expanded width
+      }
     }
+
+    document.querySelector(".overlay").addEventListener("click", function (e) {
+      document.querySelector(".overlay").classList.add("hidden");
+      document.getElementById("accordionSidebar").classList.add("toggled");
+
+      // Reset margin-left of content-container when sidebar is hidden
+      document.getElementById("content-container").style.marginLeft = "80px"; // Adjust to collapsed width
+    });
 
     document.querySelector(".overlay").addEventListener("click", function (e) {
       if (document.getElementById("updating-personnel-loader") != null) {
