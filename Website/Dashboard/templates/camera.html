@@ -8,6 +8,7 @@
     height: 1em;
     border-radius: 100%;
   }
+ 
 </style>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.min.js"></script>
@@ -199,7 +200,7 @@
     <p class="mt-3 effected">Plese Add Camera !</p>
   {% elif Active_Cam.cam_is_active == True %}
   <!-- Camera Stream -->
-  <div class="container text-center mb-3">
+  <div class="container text-center mb-6">
     <div id="stream" class="mt-2" style="width: 100%; height: 100%;">
         {% if Toggle_Settings == True %}
           <svg
@@ -226,11 +227,11 @@
           />
           </svg>
         {% endif %}
-        <img id="img_stream" src="{% url 'video_feed' %}" style="width: 100%; border-radius: 10px;" onclick="expandStream(this)"/>
+        <img id="img_stream" src="{% url 'video_feed' %}" style="width: 100%; border-radius: 10px; z-index:1001;" onclick="expandStream(this)"/>
     </div>
   </div>
   {% else %}
-  <div id="camera-stream-loader" class="loader" style="width: 50px; height: 50px; margin: -30px 0 0 -25px;"></div>
+  <div id="camera-stream-loader" class="loader" style="width: 50px; height: 50px; margin: -80px 0 0 -25px;"></div>
   <span id="unactive-warning" class="effected" style="padding: 20px; font-size: small;">{{Active_Cam.cam_name}} Is Not Active !</span>
   {% endif %}
   <div class="d-flex justify-content-center align-items-center gap-3  my-3 ">

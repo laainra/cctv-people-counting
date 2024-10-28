@@ -31,6 +31,12 @@
       integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
       crossorigin="anonymous"
     />
+    <link
+      href="https://cdn.syncfusion.com/ej2/20.3.60/styles/material.css"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.syncfusion.com/ej2/20.3.60/dist/ej2.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     {%block javascript_custom%} {%endblock%}
     <!-- Custom fonts for this template -->
     <link
@@ -147,9 +153,40 @@
       z-index: 999; /* Below sidebar */
       display: none; /* Hidden by default */
     }
+
+    .no-sidebar #content-container {
+      margin-left: 0 !important;
+    }
+
+    @media (max-width: 768px) {
+      #content-container {
+        margin-left: 0 !important; /* Hilangkan margin di layar kecil */
+        padding-left: 0; /* Pastikan tidak ada padding di kiri */
+        padding-right: 0; /* Pastikan tidak ada padding di kanan */
+      }
+
+      /* Jika tidak ada sidebar, pastikan tidak ada margin */
+      body.no-sidebar #content-container {
+        margin-left: 0 !important;
+      }
+
+      /* Untuk halaman login, hilangkan margin */
+      body.login-page #content-container {
+        margin-left: 0 !important;
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+      }
+      body.no-sidebar #accordionSidebar {
+        display: none;
+      }
+      
+      body.no-sidebar #content-container {
+        margin-left: 0 !important;
+      }
+    }
   </style>
 
-  <body class="effected">
+  <body class="{% if request.path == '/login' %}no-sidebar{% endif %}">
     {% comment %} {% include 'navbar.html' %} {% endcomment %}
 
     <div class="overlay hidden"></div>
@@ -166,6 +203,7 @@
           position: absolute;
           top: 20px;
           right: 20px;
+          z-index: 1100;
         "
         onclick="toggleSidebar()"
       ></i>
@@ -269,17 +307,32 @@
     function toggleSidebar() {
       const sidebar = document.getElementById("accordionSidebar");
       const contentContainer = document.getElementById("content-container");
-
+      const overlay = document.querySelector(".overlay");
+      const body = document.body;
+    
       sidebar.classList.toggle("toggled");
-      document.querySelector(".overlay").classList.toggle("hidden");
-
-      // Update the margin-left of content-container based on the sidebar width
+      overlay.classList.toggle("hidden");
+    
+      // Add or remove the `no-sidebar` class to the body element when expanded
+      body.classList.toggle("no-sidebar");
+    
+      // Update the margin-left of content-container based on sidebar visibility
       if (sidebar.classList.contains("toggled")) {
-        contentContainer.style.marginLeft = "110px"; // Collapsed width
+        contentContainer.style.marginLeft = "110px"; // Collapsed sidebar width
       } else {
-        contentContainer.style.marginLeft = "230px"; // Expanded width
+        contentContainer.style.marginLeft = "230px"; // Expanded sidebar width
       }
     }
+    
+    // Close sidebar if overlay is clicked
+    document.querySelector(".overlay").addEventListener("click", function () {
+      const sidebar = document.getElementById("accordionSidebar");
+      sidebar.classList.add("toggled");
+      document.body.classList.add("no-sidebar");
+      document.getElementById("content-container").style.marginLeft = "0";
+      document.querySelector(".overlay").classList.add("hidden");
+    });
+    
 
     document.querySelector(".overlay").addEventListener("click", function (e) {
       document.querySelector(".overlay").classList.add("hidden");

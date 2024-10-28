@@ -459,7 +459,7 @@ def generate_data(request):
         # Generate Dummy Data for Personnel_Entries
         for personnel_id in personnel_ids:
             # Random entry time between 7am to 5pm
-            entry_time = date + timedelta(hours=random.randint(7, 17))
+            entry_time = date + timedelta(hours=random.randint(7, 10))
             models.Personnel_Entries.objects.create(
                 camera_id=camera_id,
                 timestamp=entry_time,  # Assign datetime object directly

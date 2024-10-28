@@ -6,15 +6,106 @@ from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 from django.db import connection
 from django.utils import timezone
+import base64  
+from django.core.files import File  # For handling file operations
+from django.conf import settings  # To access settings
+import os
 
 
 @csrf_exempt
 def presence(request):
+    presence_path = os.path.join(settings.BASE_DIR, 'dashboard', 'static', 'img', 'presence_folder')
     if request.method == 'POST':
         data = json.loads(request.body)
         personnel_id = data.get('personnel_id')
         camera_id = data.get('camera_id')
         timestamp_str = data.get('timestamp')
+        command = data.get('command')
+        image_data = data.get('image')
+        
+        image_path = None
+
+        if image_data:
+            try:
+                # Decode the base64 image data
+                header, encoded = image_data.split(',', 1)
+                image = base64.b64decode(encoded)
+
+                # Define the image filename
+                image_filename = f"{personnel_id}_{timestamp_str.replace(' ', '_')}.jpg"
+                image_path = os.path.join(presence_path, image_filename)
+
+                # Save the image file
+                with open(image_path, 'wb') as f:
+                    f.write(image)
+
+            except Exception as e:
+                return JsonResponse({'status': 'error', 'message': f'Image save error: {str(e)}'})
+
+        if command == "presence-data":
+            date = data.get('date', timezone.now().date().strftime('%Y-%m-%d'))
+            print("Date for presence data:", date)
+            
+            try:
+                query = '''
+                    SELECT 
+                        p.id AS personnel_id,
+                        p.name,
+                        MIN(CASE WHEN presence_status IN ('ONTIME', 'LATE') THEN timestamp END) AS attended_time,
+                        MAX(CASE WHEN presence_status = 'LEAVE' THEN timestamp END) AS leaving_time,
+                        (SELECT presence_status 
+                        FROM dashboard_personnel_entries 
+                        WHERE personnel_id = p.id 
+                        ORDER BY timestamp DESC 
+                        LIMIT 1) AS latest_status,
+                        TIMEDIFF(MAX(CASE WHEN presence_status = 'LEAVE' THEN timestamp END), 
+                                MIN(CASE WHEN presence_status IN ('ONTIME', 'LATE') THEN timestamp END)) AS work_hours,
+                        CASE 
+                            WHEN TIMEDIFF(MAX(CASE WHEN presence_status = 'LEAVE' THEN timestamp END), MIN(CASE WHEN presence_status IN ('ONTIME', 'LATE') THEN timestamp END)) > '08:00:00' 
+                            THEN CONCAT('Overtime ', HOUR(TIMEDIFF(MAX(CASE WHEN presence_status = 'LEAVE' THEN timestamp END), MIN(CASE WHEN presence_status IN ('ONTIME', 'LATE') THEN timestamp END))) - 9, ' hours')
+                            WHEN TIMEDIFF(MAX(CASE WHEN presence_status = 'LEAVE' THEN timestamp END), MIN(CASE WHEN presence_status IN ('ONTIME', 'LATE') THEN timestamp END)) < '08:00:00' 
+                            THEN CONCAT('Less time ', 9 - HOUR(TIMEDIFF(MAX(CASE WHEN presence_status = 'LEAVE' THEN timestamp END), MIN(CASE WHEN presence_status IN ('ONTIME', 'LATE') THEN timestamp END))), ' hours')
+                            ELSE 'Standard Time'
+                        END AS notes
+                    FROM 
+                        dashboard_personnel_entries AS d
+                    JOIN 
+                        dashboard_personnels AS p ON p.id = d.personnel_id
+                    WHERE 
+                        DATE(d.timestamp) = %s
+                    GROUP BY 
+                        p.id
+                '''
+
+
+                with connection.cursor() as cursor:
+                    cursor.execute(query, [date])
+                    entries = cursor.fetchall()
+
+                # Prepare presence data
+                presence_data = []
+                for entry in entries:
+                    attended_time = entry[2].strftime('%H:%M:%S') if entry[2] else '-'
+                    leaving_time = entry[3].strftime('%H:%M:%S') if entry[3] else '-'
+                    presence_data.append({
+                        'id': entry[0],
+                        'name': entry[1],
+                        'attended': attended_time,
+                        'leave': leaving_time,
+                        'status': entry[4],
+                        'work_hours': entry[5] or '-',
+                        'notes': entry[6] or 'No notes',
+                        'image': entry[7] or 'No image',
+                    })
+
+                # Return data in JSON format for AJAX
+                return JsonResponse({'status': 'success', 'presence_data': presence_data})
+
+            except Exception as e:
+                return JsonResponse({'status': 'error', 'message': str(e)})
+            
+            
+
 
         # Convert timestamp string from AI to timezone-aware datetime object
         local_tz = pytz.timezone('Asia/Jakarta')
@@ -86,10 +177,10 @@ def presence(request):
             with connection.cursor() as cursor:
                 cursor.execute(
                     '''
-                    INSERT INTO dashboard_personnel_entries (camera_id, personnel_id, timestamp, presence_status)
+                    INSERT INTO dashboard_personnel_entries (camera_id, personnel_id, timestamp, presence_status, image)
                     VALUES (%s, %s, %s, %s)
                     ''',
-                    [camera_id, personnel_id, detected_time, status]
+                    [camera_id, personnel_id, detected_time, status,image_path]
                 )
             return JsonResponse({'status': 'success', 'message': f'Entry saved as {status}.', 'time': detected_time.strftime('%Y-%m-%d %H:%M:%S')})
 
@@ -99,45 +190,85 @@ def presence(request):
     elif request.method == 'GET':
         try:
             # Get date filter from the frontend, or use today's date as default
-            today = request.GET.get(
-                'date', timezone.now().date().strftime('%Y-%m-%d'))
+            today = request.GET.get('date', timezone.now().date().strftime('%Y-%m-%d'))
+            print("today: " + today)
 
-            # SQL query to fetch personnel entries for the given date
-# SQL query to fetch personnel entries for the given date
             query = '''
-            SELECT personnel_id, 
-                DATE(timestamp) AS date, 
-                MIN(CASE WHEN presence_status = 'ONTIME' OR presence_status = 'LATE' THEN TIME(timestamp) END) AS time_attend, 
-                MAX(CASE WHEN presence_status = 'LEAVE' THEN TIME(timestamp) END) AS time_leaving, 
-                TIMEDIFF(
-                    MAX(CASE WHEN presence_status = 'LEAVE' THEN timestamp END), 
-                    MIN(CASE WHEN presence_status = 'ONTIME' OR presence_status = 'LATE' THEN timestamp END)
-                ) - INTERVAL 1 HOUR AS work_hours,
-                MAX(presence_status) AS presence_status,
-                CASE 
-                    WHEN TIMEDIFF(MAX(CASE WHEN presence_status = 'LEAVE' THEN timestamp END), MIN(CASE WHEN presence_status = 'ONTIME' OR presence_status = 'LATE' THEN timestamp END)) > '08:00:00' 
-                    THEN CONCAT('Overtime ', HOUR(TIMEDIFF(MAX(CASE WHEN presence_status = 'LEAVE' THEN timestamp END), MIN(CASE WHEN presence_status = 'ONTIME' OR presence_status = 'LATE' THEN timestamp END))) - 9, ' hours')
-                    WHEN TIMEDIFF(MAX(CASE WHEN presence_status = 'LEAVE' THEN timestamp END), MIN(CASE WHEN presence_status = 'ONTIME' OR presence_status = 'LATE' THEN timestamp END)) < '08:00:00' 
-                    THEN CONCAT('Less time ', 9 - HOUR(TIMEDIFF(MAX(CASE WHEN presence_status = 'LEAVE' THEN timestamp END), MIN(CASE WHEN presence_status = 'ONTIME' OR presence_status = 'LATE' THEN timestamp END))), ' hours')
-                    ELSE 'Standard Time'
-                END AS notes
-            FROM dashboard_personnel_entries 
-            WHERE DATE(timestamp) = %s
-            GROUP BY personnel_id, DATE(timestamp)
+                SELECT 
+                    p.id AS personnel_id,
+                    p.name,
+                    MIN(CASE WHEN presence_status IN ('ONTIME', 'LATE') THEN timestamp END) AS attended_time,
+                    MAX(CASE WHEN presence_status = 'LEAVE' THEN timestamp END) AS leaving_time,
+                    (SELECT presence_status 
+                    FROM dashboard_personnel_entries 
+                    WHERE personnel_id = p.id 
+                    ORDER BY timestamp DESC 
+                    LIMIT 1) AS latest_status,
+                    TIMEDIFF(MAX(CASE WHEN presence_status = 'LEAVE' THEN timestamp END), 
+                            MIN(CASE WHEN presence_status IN ('ONTIME', 'LATE') THEN timestamp END)) AS work_hours,
+                    CASE 
+                        WHEN TIMEDIFF(MAX(CASE WHEN presence_status = 'LEAVE' THEN timestamp END), MIN(CASE WHEN presence_status IN ('ONTIME', 'LATE') THEN timestamp END)) > '08:00:00' 
+                        THEN CONCAT('Overtime ', HOUR(TIMEDIFF(MAX(CASE WHEN presence_status = 'LEAVE' THEN timestamp END), MIN(CASE WHEN presence_status IN ('ONTIME', 'LATE') THEN timestamp END))) - 9, ' hours')
+                        WHEN TIMEDIFF(MAX(CASE WHEN presence_status = 'LEAVE' THEN timestamp END), MIN(CASE WHEN presence_status IN ('ONTIME', 'LATE') THEN timestamp END)) < '08:00:00' 
+                        THEN CONCAT('Less time ', 9 - HOUR(TIMEDIFF(MAX(CASE WHEN presence_status = 'LEAVE' THEN timestamp END), MIN(CASE WHEN presence_status IN ('ONTIME', 'LATE') THEN timestamp END))), ' hours')
+                        ELSE 'Standard Time'
+                    END AS notes,
+                    d.image AS image_path  -- Include image path here
+                FROM 
+                    dashboard_personnel_entries AS d
+                JOIN 
+                    dashboard_personnels AS p ON p.id = d.personnel_id
+                WHERE 
+                    DATE(d.timestamp) = %s
+                GROUP BY 
+                    p.id
             '''
+
 
             with connection.cursor() as cursor:
                 cursor.execute(query, [today])
                 entries = cursor.fetchall()
 
             # Prepare context for rendering in the template
-            context = {
-                'entries': entries,
-                'today': today  # Pass the selected or default date
-            }
+            # Prepare presence data
+            presence_data = []
+            for entry in entries:
+                # Format timestamps for attended and leaving times
+                attended_time = entry[2].strftime('%H:%M:%S') if entry[2] else '-'
+                leaving_time = entry[3].strftime('%H:%M:%S') if entry[3] else '-'
+
+                # Calculate work hours if both attended and leaving times are available
+                if entry[2] and entry[3]:
+                    # Convert to datetime objects if they aren't already
+                    attended_dt = entry[2]
+                    leaving_dt = entry[3]
+                    
+                    # Calculate the time difference
+                    work_duration = leaving_dt - attended_dt
+
+                    # Format the work hours as hours and minutes
+                    hours_worked = work_duration.seconds // 3600  # Total hours
+                    minutes_worked = (work_duration.seconds % 3600) // 60  # Total minutes
+                    work_hours = f"{hours_worked} hours, {minutes_worked} minutes"
+                else:
+                
+                    work_hours = 'Still Working'
+
+                presence_data.append({
+                    'id': entry[0],
+                    'name': entry[1],
+                    'attended': attended_time,
+                    'leave': leaving_time,
+                    'status': entry[4],
+                    'work_hours': work_hours,
+                    'notes': entry[6] or 'No notes',
+                    'image_path': entry[7] or 'No image'
+                })
+
+            print(presence_data)
 
             # Render the presence data in the template
-            return render(request, 'presence.html', context)
+            return render(request, 'presence.html', {'presence_data': presence_data, 'today': today, 'Page': "Presence"})
 
         except Exception as e:
             return JsonResponse({'status': 'error', 'message': str(e)})

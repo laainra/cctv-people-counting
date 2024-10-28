@@ -1,238 +1,381 @@
-<<<<<<< HEAD
-{% extends 'base.html' %}
+{% extends 'base.html' %} 
+{% block title %} Presence {% endblock %} 
+{% block content %} 
 
-{% block title %}
-Presence
-{% endblock %}
-Presence
-{% block page_title %}
-{% endblock %}
-
-{% block content %} {% csrf_token %}
+{% csrf_token %} 
 <!-- insert content -->
 
 <script>
-  if (localStorage.getItem('darkMode') == 'enabled') {
-      document.body.classList.add("dark-mode")
-      document.getElementById("accordionSidebar").classList.add("dark-mode")
-      document.getElementById("toggler-button").classList.add("dark-mode")
-  }else {
-      document.body.classList.add("light-mode")
-      document.getElementById("accordionSidebar").classList.add("light-mode")
-      document.getElementById("toggler-button").classList.add("light-mode")
+  function submitForm() {
+    const selectedDate = document.getElementById('date-picker').value;
+    console.log('Selected Date:', selectedDate);
+
+    if (selectedDate) {
+      document.getElementById('date').value = selectedDate;
+      console.log('Submitting form with date:', selectedDate);
+      document.getElementById('date-form').submit();
+    } else {
+      console.error('No date selected!');
+    }
+  }
+
+  if (localStorage.getItem("darkMode") == "enabled") {
+    document.body.classList.add("dark-mode");
+    document.getElementById("accordionSidebar").classList.add("dark-mode");
+    document.getElementById("toggler-button").classList.add("dark-mode");
+  } else {
+    document.body.classList.add("light-mode");
+    document.getElementById("accordionSidebar").classList.add("light-mode");
+    document.getElementById("toggler-button").classList.add("light-mode");
   }
 </script>
 
-<section class="my-modal personnel hidden">
-  <div class="card align-items-center effected pl-5 pr-5 pt-4 pb-4 align-self-center" style="border-radius: 25px; width: fit-content;">
-    <span id="form-title" class="mb-4 effected" style="font-weight: 600; font-size: 30px;">Edit Personnel</span>
-    <form id="personnel-form" action="{% url 'edit_personnel' %}" method="POST" class="d-flex flex-column w-100 justify-content-center align-items-center mb-1">
-      <div class="form-group">
-        {% csrf_token %} 
-        <p class="mb-3" style="display: flex; flex-direction: column; justify-content: center; align-items: start; width: 100%;">
-          <label for="name" class="mb-1 effected">Personnel Name:</label>
-          <input name="name" type="text" class="effected" style="width:320px;" maxlength="20" placeholder="Insert Personnel Name" required>
-        </p>
-        <p class="mb-3" style="display: flex; flex-direction: column; justify-content: center; align-items: start; width: 100%;">
-          <label for="gender" class="mb-1 effected">Personnel Gender:</label>
-          <select name="gender" id="id_gender" class="effected" style="padding: 8px 10px; border: 2px solid transparent; border-right: 15px solid transparent; cursor: pointer; width: 100%;">
-            <option value="M">Male</option>
-            <option value="F">Female</option>
-          </select>
-        </p>
-        <p class="mb-3" style="display: flex; flex-direction: column; justify-content: center; align-items: start; width: 100%;">
-          <label for="employment_status" class="mb-1 effected">Personnel Employment Status:</label>
-          <select name="employment_status" id="id_employment_status" class="effected" style="padding: 8px 10px; border: 2px solid transparent; border-right: 15px solid transparent; cursor: pointer; width: 100%;">
-            <option value="S">Staff</option>
-            <option value="I">Intern</option>
-          </select>
-        </p>
-        <div class="d-flex justify-content-between align-items-center mt-4 gap-2" style="width: 320px;">
-          <button 
-            type="button" 
-            class="btn btn-danger btn-user btn-block m-0" 
-            style="border-radius: 8px; padding-left: 2%; padding-right: 2%;"
-            onclick="closeModal()">
-            Cancel
-          </button>
-          <button 
-          type="submit" 
-          class="btn btn-success btn-user btn-block m-0" 
-          style="border-radius: 8px; padding-left: 2%; padding-right: 2%;">
-          Save
-          </button>
-          <button type="submit" class="btn btn-primary btn-user btn-block m-0" style="display: none; border-radius: 8px; padding-left: 2%; padding-right: 2%; width: 320px;">
-            Add Personnel
-          </button>
-        </div>
-      </div>
-    </form>
-    <button
-      class="btn btn-danger btn-block align-self-center text-center delete-button effected"
-      onclick="deletePersonnel()">
-      Delete Personnel
-    </button>
-  </div>
-</section>
+<!-- Card Header -->
+<div class="card d-flex w-36 justify-content-between align-items-center mb-1 py-3 responsive responsive-card effected shadow-black shadow-lg">
+  <div class="pl-4 d-flex justify-content-between align-items-center w-100">
+    <a class="d-flex nav-link text-dark align-items-center gap-2 effected bg-transparent">
+      <i class="fa-solid fa-swatchbook text-center" style="font-size: 20px"></i>
+      <span style="font-size: 20px; font-weight: 700">Presence</span>
+    </a>
 
-<div class="card d-flex w-36 justify-content-between align-items-start mb-1 py-3 responsive responsive-card effected shadow-black shadow-lg">
-    <div class="pl-4">
-      <a class="d-flex nav-link text-dark align-items-center gap-2 effected bg-transparent">
-        <i class="fa-solid fa-swatchbook text-center" style="font-size: 20px"></i>
-        <span style="font-size: 20px; font-weight: 700;">Presence</span>
-      </a>
+    <div class="ml-auto mr-5">
+      <input id="date-picker" type="date" class="date-picker effected" 
+      style="width: 170px; cursor: pointer; min-height: 38px" 
+      onchange="submitForm()" value="{{ today }}" />
     </div>
+    <form id="date-form" method="GET" action="">
+      <input type="hidden" id="date" name="date" value="{{ today }}" />
+    </form>
+  </div>
 </div>
 
-<div id="updating-personnel-loader" class="loader" style="display: none; position: fixed; top: 0; bottom: 0; right: 0; left: 0; margin: auto auto auto auto;"></div>
+<!-- Loader -->
+<div id="updating-personnel-loader" class="loader" style="display: none; position: fixed; top: 0; bottom: 0; right: 0; left: 0; margin: auto;"></div>
 
-<div style="margin-top: 10px;">
-    <div class="responsive-card responsive effected" style="background-color: transparent;">
-        <ul class="nav mt-4" style="background-color: transparent;gap: 0.6rem">
-          <li class="nav-item">
-            <a onclick="addActive" class="nav-link nav-item-card p-2" style="background-color: white; border-top-left-radius: 10px; border-top-right-radius: 10px; color: #11468F;">
-                <p></p>
-                <p>All</p>
-            </a>
-          </li>
-          <li class="nav-item">
-            <a onclick="addActive" class="nav-link nav-item-card p-2" style="background-color: #11468F; border-top-left-radius: 10px; border-top-right-radius: 10px; color: white">
-                <p></p>
-                <p>On Time</p>
-            </a>
-          </li>
-          <li class="nav-item">
-            <a onclick="addActive" class="nav-link nav-item-card p-2" style="background-color: #11468F; border-top-left-radius: 10px; border-top-right-radius: 10px; color: white">
-                <p></p>
-                <p>Late</p>
-            </a>
-          </li>
-        </ul>
+<div style="margin-top: 10px">
+  <div class="responsive-card responsive effected" style="background-color: transparent">
+    <ul class="nav mt-4" style="background-color: transparent; gap: 0.6rem">
+      <li class="nav-item">
+        <a class="nav-link nav-item-card p-2" id="all-tab" style="background-color: white; border-top-left-radius: 10px; border-top-right-radius: 10px; color: #11468f; cursor: pointer;">
+          <p id="all-count" style="font-weight: bold;"></p>
+          <p>All</p>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link nav-item-card p-2" id="on-time-tab" style="background-color: #11468f; border-top-left-radius: 10px; border-top-right-radius: 10px; color: white; cursor: pointer;">
+          <p id="on-time-count" style="font-weight: bold;"></p>
+          <p>On Time</p>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link nav-item-card p-2" id="late-tab" style="background-color: #11468f; border-top-left-radius: 10px; border-top-right-radius: 10px; color: white; cursor: pointer;">
+          <p id="late-count" style="font-weight: bold;"></p>
+          <p>Late</p>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link nav-item-card p-2" id="left-tab" style="background-color: #11468f; border-top-left-radius: 10px; border-top-right-radius: 10px; color: white; cursor: pointer;">
+          <p id="left-count" style="font-weight: bold;"></p>
+          <p>Left</p>
+        </a>
+      </li>
+
+      <div class="ml-auto" style="position: relative;">
+        <input id="search" type="text" class="form-control effected" style="width: 200px; min-height: 38px; border-radius: 5px; padding-right: 30px;" placeholder="Search by Name or ID" onkeyup="filterTable()" />
+        {% comment %} <i class="fas fa-search mb-6" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%);margin-bottom: 10px;"></i> {% endcomment %}
+      </div>
+    </ul>
+  </div>
+
+  <div class="card mb-5 gap-4 responsive responsive-card effected flex" style="border-top-left-radius: 0%; border-top-right-radius: 0%">
+    <table id="presence-table">
+      <thead id="presence-table-head">
+        <tr class="presence-table-row">
+          <th onclick="sortTable('id')">ID <span id="arrow-up-id">▲</span><span id="arrow-down-id" style="display: none;">▼</span></th>
+          <th onclick="sortTable('name')">Name <span id="arrow-up-name">▲</span><span id="arrow-down-name" style="display: none;">▼</span></th>
+          <th onclick="sortTable('attended')">Time Attended <span id="arrow-up-attended">▲</span><span id="arrow-down-attended" style="display: none;">▼</span></th>
+          <th onclick="sortTable('leave')">Time Leaving <span id="arrow-up-leave">▲</span><span id="arrow-down-leave" style="display: none;">▼</span></th>
+          <th onclick="sortTable('status')">Status <span id="arrow-up-status">▲</span><span id="arrow-down-status" style="display: none;">▼</span></th>
+          <th onclick="sortTable('work_hours')">Work Hours <span id="arrow-up-work_hours">▲</span><span id="arrow-down-work_hours" style="display: none;">▼</span></th>
+          <th onclick="sortTable('notes')">Notes <span id="arrow-up-notes">▲</span><span id="arrow-down-notes" style="display: none;">▼</span></th>
+          <th onclick="sortTable('image')">Image <span id="arrow-up-image">▲</span><span id="arrow-down-image" style="display: none;">▼</span></th>
+        </tr>
+        <tr>
+          <td colspan="5"><hr class="table-hr" /></td>
+        </tr>
+      </thead>
+      <tbody id="presence-table-body">
+        {% for entry in presence_data %}
+        <tr class="presence-table-row-body">
+          <td>{{ entry.id }}</td>
+          <td>{{ entry.name }}</td>
+          <td>{{ entry.attended|default:"-" }}</td>
+          <td>{{ entry.leave|default:"-" }}</td>
+          <td>{{ entry.status }}</td>
+          <td>{{ entry.work_hours|default:"-" }}</td>
+          <td>{{ entry.notes|default:"No notes" }}</td>
+          <td><img src="${entry.image}" alt="No image" width="50" height="50"></td>
+        </tr>
+        <tr><td colspan="7"><hr class="table-hr"></td></tr>
+        {% empty %}
+        <tr>
+          <td colspan="7" style="text-align: center;">No presence data available for the selected date.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <div id="pagination-container" class="d-flex justify-content-center mb-5">
+      <button id="prev" class="btn btn-primary" onclick="changePage(-1)">Previous</button>
+      <span id="page-info" class="mx-2 mt-2" style="text-align: center;"></span> <!-- Centered text for entry count -->
+      <button id="next" class="btn btn-primary" onclick="changePage(1)">Next</button>
     </div>
-    <div class="card mb-5 gap-4 responsive responsive-card effected flex" style="border-top-left-radius: 0%; border-top-right-radius: 0%;">
-        <table id="presence-table">
-          <thead id="presence-table-head">
-            <tr class="presence-table-row">
-              <th>Nama</th>
-              <th>ID Number</th>
-              <th>Attended</th>
-              <th>Status</th>
-              <th>Leave</th>
-              <th>Work Hour</th>
-            </tr>
-            <tr>
-              <td colspan="6">
-                <hr class="table-hr">
-              </td>
-            </tr>
-          </thead>
-          <tbody id="presence-table-body">
-          </tbody>
-        </table>
-    </div>
+    
+  </div>
+
 </div>
 
 <script>
-  elements = document.getElementsByClassName("effected")
+  const presenceData = [
+    {% for entry in presence_data %}
+      {
+        id: {{ entry.id }},
+        name: "{{ entry.name|escapejs }}",
+        attended: "{{ entry.attended|default:'-' }}",
+        leave: "{{ entry.leave|default:'-' }}",
+        status: "{{ entry.status }}",
+        work_hours: "{{ entry.work_hours|default:'-' }}",
+        notes: "{{ entry.notes|default:'No notes' }}"
+        image: "{{ entry.image|default:'No image' }}"
+      }{% if not forloop.last %},{% endif %}
+    {% endfor %}
+  ];
 
-  for (var i = 0; i<elements.length; i++){
-    if (localStorage.getItem('darkMode') == 'enabled') {
-        elements[i].classList.add("dark-mode")
-    }else {
-        elements[i].classList.add("light-mode")
-    }
+  console.log("Presence Data:", presenceData);
+
+  function calculateCounts() {
+    const allCount = presenceData.length;
+    const onTimeCount = presenceData.filter(entry => entry.status.toUpperCase() === "ONTIME").length;
+    const lateCount = presenceData.filter(entry => entry.status.toUpperCase() === "LATE").length;
+    const leftCount = presenceData.filter(entry => entry.status.toUpperCase() === "LEAVE").length;
+
+    document.getElementById("all-count").innerText = allCount;
+    document.getElementById("on-time-count").innerText = onTimeCount;
+    document.getElementById("late-count").innerText = lateCount;
+    document.getElementById("left-count").innerText = leftCount;
   }
 
-  let dummyData = '{ "Attendance": ['+
-  '{"Name":"Adhyaksa Waruna Putro", "ID Number":"10044441", "Attended":"08.50", "Status":"Late", "Leave":"17.50", "Work Hour":"8 Jam"},'+
-  '{"Name":"Adhyaksa Waruna Putro", "ID Number":"10044441", "Attended":"08.50", "Status":"Late", "Leave":"17.50", "Work Hour":"8 Jam"},'+
-  '{"Name":"Adhyaksa Waruna Putro", "ID Number":"10044441", "Attended":"07.50", "Status":"On Time", "Leave":"17.50", "Work Hour":"8 Jam"},'+
-  '{"Name":"Adhyaksa Waruna Putro", "ID Number":"10044441", "Attended":"07.59", "Status":"On Time", "Leave":"17.00", "Work Hour":"8 Jam"}]}'
+  let sortOrder = {
+    id: true,
+    name: true,
+    attended: true,
+    leave: true,
+    status: true,
+    work_hours: true,
+    notes: true
+  };
 
-  let parsedData = JSON.parse(dummyData);
+ function sortTable(column) {
+    const arrowUp = document.getElementById(`arrow-up-${column}`);
+    const arrowDown = document.getElementById(`arrow-down-${column}`);
 
-  // Function to highlight whether All, On Time, or Late is being highlighted
-  function addActive() {
-    const navLinks = document.querySelectorAll('.nav-item-card');
-    const currentDiv = document.getElementById("presence-table-body");
+    presenceData.sort((a, b) => {
+        let comparison = 0;
 
-    // Function to render the table based on the filter condition
-    function renderTable(statusFilter) {
-      let dataOutput = "";
-
-      parsedData.Attendance.forEach(entry => {
-        let presenceStatus = entry.Status === "Late" ? "presence-status-late-container" : "presence-status-ontime-container";
-        let presenceAttended = entry.Attended >= "08.00" ? "presence-attended-late-container" : "presence-attended-ontime-container";
-
-        if (!statusFilter || entry.Status === statusFilter) {
-          dataOutput += `
-            <tr class="presence-table-row-body" class="presence-table-row">
-                <td class="presence-name">
-                  ${entry.Name}
-                </td>
-                <td class="presence-idnumber">${entry["ID Number"]}</td>
-                <td class="presence-attended">
-                  <div class="${presenceAttended}">
-                    ${entry.Attended}
-                  </div>
-                </td>
-                <td class="presence-status">
-                  <div class="${presenceStatus}">
-                    ${entry.Status}
-                  </div>
-                </td>
-                <td class="presence-leave">${entry.Leave}</td>
-                <td class="presence-workhour">${entry["Work Hour"]}</td>
-            </tr>
-            <tr>
-              <td colspan="6">
-                <hr class="table-hr">
-              </td>
-            </tr>
-          `;
+        if (column === 'attended' || column === 'leave') {
+            // Convert the time strings to Date objects for comparison
+            const timeA = a[column] !== '-' ? new Date(`1970-01-01T${a[column]}Z`) : null;
+            const timeB = b[column] !== '-' ? new Date(`1970-01-01T${b[column]}Z`) : null;
+            comparison = (timeA - timeB);
+        } else if (column === 'id') {
+            // Compare IDs as numbers
+            comparison = a[column] - b[column];
+        } else {
+            comparison = a[column].localeCompare(b[column]);
         }
-      });
 
-      currentDiv.innerHTML = dataOutput;
-    }
+        return sortOrder[column] ? comparison : -comparison;
+    });
+
+    sortOrder[column] = !sortOrder[column]; // Toggle sort order
+
+    // Update arrows
+    arrowUp.style.display = sortOrder[column] ? 'inline' : 'none';
+    arrowDown.style.display = sortOrder[column] ? 'none' : 'inline';
 
     renderTable();
+  }
+
+  const rowsPerPage = 10;
+  let currentPage = 1;
+  let filteredData = [];
+  let attendanceData = presenceData;
+
+  function filterTable() {
+    const searchValue = document.getElementById("search").value.toLowerCase();
+    filteredData = attendanceData.filter(entry =>
+      entry.name.toLowerCase().includes(searchValue) ||
+      entry.id.toString().includes(searchValue)
+    );
+    currentPage = 1;
+    renderTable();
+  }
+
+  function renderTable(statusFilter = null) {
+    const currentDiv = document.getElementById("presence-table-body");
+    let dataToRender = filteredData.length > 0 ? filteredData : attendanceData;
+
+    // Apply filtering based on the status
+    if (statusFilter) {
+      dataToRender = dataToRender.filter(entry => entry.status.toUpperCase() === statusFilter);
+    }
+
+    // Pagination logic
+    const start = (currentPage - 1) * rowsPerPage;
+    const end = start + rowsPerPage;
+    const dataToShow = dataToRender.slice(start, end);
+
+    // Build the table rows
+    let dataOutput = "";
+    dataToShow.forEach(entry => {
+      const presenceStatusClass = entry.status.toUpperCase() === "LATE" ? "presence-status-late-container" : 
+                                  entry.status.toUpperCase() === "ONTIME" ? "presence-status-ontime-container" : 
+                                  "presence-status-left-container";
+
+      dataOutput += `
+        <tr class="presence-table-row-body">
+          <td>${entry.id}</td>
+          <td>${entry.name}</td>
+          <td>${entry.attended}</td>
+          <td>${entry.leave}</td>
+          <td>${entry.status}</td>
+          <td>${entry.work_hours}</td>
+          <td>${entry.notes}</td>
+          <td>${entry.image}</td>
+        </tr>
+        <tr><td colspan="7"><hr class="table-hr"></td></tr>
+      `;
+    });
+
+    currentDiv.innerHTML = dataOutput;
+    updatePaginationButtons(dataToRender.length);
+
+    document.getElementById("page-info").innerText = `${start + 1} - ${Math.min(end, dataToRender.length)} / ${dataToRender.length}`;
+  }
+  function updateTable(presenceData) {
+    const currentDiv = document.getElementById("presence-table-body");
+    currentDiv.innerHTML = ""; // Clear the current table body
+
+    presenceData.forEach(entry => {
+      const row = `
+        <tr class="presence-table-row-body">
+          <td>${entry.id}</td>
+          <td>${entry.name}</td>
+          <td>${entry.attended || '-'}</td>
+          <td>${entry.leave || '-'}</td>
+          <td>${entry.status}</td>
+          <td>${entry.work_hours || '-'}</td>
+          <td>${entry.notes || 'No notes'}</td>
+          <td>${entry.image || 'No image'}</td>
+        </tr>
+        <tr><td colspan="7"><hr class="table-hr"></td></tr>
+      `;
+      currentDiv.innerHTML += row;
+    });
+
+    calculateCounts(); // Recalculate counts for the updated data
+  }
+
+  function updatePaginationButtons(totalItems) {
+    const totalPages = Math.ceil(totalItems / rowsPerPage);
+    document.getElementById("prev").disabled = currentPage === 1;
+    document.getElementById("next").disabled = currentPage === totalPages;
+  }
+
+  function changePage(direction) {
+    currentPage += direction;
+    renderTable(); 
+  }
+
+  // Event listener for tab clicks
+  function addActive() {
+    const navLinks = document.querySelectorAll('.nav-item-card');
 
     navLinks.forEach((link, index) => {
-      const pElement = link.querySelector('p:first-child');
-
-      if (index === 0) pElement.innerHTML = parsedData.Attendance.length;
-      else if (index === 1) pElement.innerHTML = parsedData.Attendance.filter(entry => entry.Status === "On Time").length;
-      else if (index === 2) pElement.innerHTML = parsedData.Attendance.filter(entry => entry.Status === "Late").length;
-
       link.addEventListener('click', function () {
         navLinks.forEach(nav => {
           nav.style.backgroundColor = '#11468F';
           nav.style.color = 'white';
         });
+
         this.style.backgroundColor = 'white';
         this.style.color = '#11468F';
 
+        // Render data based on the clicked tab
         if (index === 0) {
-          renderTable(); 
+          renderTable(); // All data
         } else if (index === 1) {
-          renderTable("On Time"); 
+          renderTable("ONTIME"); // On Time data
         } else if (index === 2) {
-          renderTable("Late"); 
+          renderTable("LATE"); // Late data
+        } else if (index === 3) {
+          renderTable("LEAVE"); // Left data
         }
       });
     });
+
+    calculateCounts();
   }
 
+  function fetchPresenceData(date) {
+    fetch(`/presence?date=${date}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': '{{ csrf_token }}' // Include CSRF token
+      }
+    })
+    .then(response => response.json())
+    .then(data => {
+      // Check if data retrieval was successful
+      if (data.status === 'success') {
+        updateTable(data.presence_data); // Update the table with new data
+      } else {
+        console.error('Error fetching data:', data.message);
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+    });
+  }
+  document.addEventListener('DOMContentLoaded', function() {
+    fetchPresenceData("{{ today }}"); // Fetch today's data on load
+  });
   addActive();
-
+  renderTable(); 
 </script>
 
-<!-- Gegara style.css error, pake ini sementara -->
+<!-- Temporary style fixes -->
 <style>
-  .nav-item-card{
-    width: 150px; 
+  .presence-status-late-container {
+    background-color: #f8d7da; /* Light red for late */
+    color: #721c24; /* Dark red text */
+  }
+  
+  .presence-status-ontime-container {
+    background-color: #d4edda; /* Light green for on-time */
+    color: #155724; /* Dark green text */
+  }
+  
+  .presence-status-left-container {
+    background-color: #d1ecf1; /* Light blue for left */
+    color: #0c5460; /* Dark blue text */
+  }
+  
+
+  .nav-item-card {
+    width: 150px;
     height: 100px;
+    cursor: pointer; /* Show pointer on hover */
   }
 
   #presence-table {
@@ -246,10 +389,11 @@ Presence
   #presence-table-head > .presence-table-row > th {
     color: #858383;
     padding: 20px 0 20px 0;
-  } 
+    cursor: pointer; /* Cursor changes to pointer when hovering over headers */
+  }
 
   .presence-table-row-body {
-    background-color: #F5F5F5;
+    background-color: #f5f5f5;
     text-align: center;
     height: 70px;
   }
@@ -269,14 +413,12 @@ Presence
     margin: 8px 1vw 8px 1vw;
   }
 
-  .presence-attended,
-  .presence-status {
-
-  }
-
-  .presence-idnumber, .presence-leave, .presence-workhour {
+  .presence-idnumber,
+  .presence-leave,
+  .presence-workhour {
     color: #858383;
   }
+
 
   .presence-status-late-container, .presence-attended-late-container {
     background-color: #F8E6E6;
@@ -292,91 +434,44 @@ Presence
     margin-right: 25%;
   }
 
-  @media screen and (max-width: 793px){
-    .table-headers{
+  .date-picker {
+    width: 170px; /* Set the width of the date picker */
+    cursor: pointer; /* Change cursor to pointer when hovering */
+    min-height: 38px; /* Minimum height for the input field */
+    padding: 10px; /* Padding inside the input */
+    border: 1px solid #ccc; /* Border color */
+    border-radius: 5px; /* Rounded corners */
+    background-color: #f9f9f9; /* Light background color */
+    transition: border-color 0.3s, box-shadow 0.3s; /* Smooth transitions */
+}
+
+.date-picker:focus {
+  border-color: #007bff; /* Border color on focus */
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.5); /* Box shadow on focus */
+  outline: none; /* Remove default outline */
+} 
+
+  @media screen and (max-width: 793px) {
+    .table-headers {
       padding-left: 4rem;
       padding-right: 4rem;
     }
   }
 
-  @media screen and (max-width: 500px){
-    .nav-item-card{
+  @media screen and (max-width: 500px) {
+    .date-picker {
+      width: 100%; /* Full width on smaller screens */
+  }
+    .nav-item-card {
       width: 100px;
     }
 
-    .table-headers{
+    .table-headers {
       padding-left: 1rem;
       padding-right: 1rem;
       font-size: small;
     }
   }
 </style>
-{% endblock %}
-=======
-{% extends 'base.html' %} {% block content %}
-
-<h1>Presence Report for {{ today }}</h1>
-
-<!-- Form for selecting a date -->
-<form method="GET" action="" id="date-form">
-  <label for="date">Select Date: </label>
-  <input
-    type="date"
-    id="date"
-    name="date"
-    value="{{ today }}"
-    onchange="submitForm()"
-  />
-</form>
-<table style="border-collapse: collapse; width: 100%">
-  <thead>
-    <tr>
-      <th style="border: 1px solid black; padding: 8px">Personnel ID</th>
-      <th style="border: 1px solid black; padding: 8px">Date</th>
-      <th style="border: 1px solid black; padding: 8px">Time Attended</th>
-      <th style="border: 1px solid black; padding: 8px">Time Leaving</th>
-      <th style="border: 1px solid black; padding: 8px">Work Hours</th>
-      <th style="border: 1px solid black; padding: 8px">Presence Status</th>
-      <th style="border: 1px solid black; padding: 8px">Notes</th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for entry in entries %}
-    <tr>
-      <td style="border: 1px solid black; padding: 8px">{{ entry.0 }}</td>
-      <td style="border: 1px solid black; padding: 8px">
-        {{ entry.1|date:"Y-m-d" }}
-      </td>
-      <td style="border: 1px solid black; padding: 8px">
-        {{ entry.2|default:"-" }}
-      </td>
-      <td style="border: 1px solid black; padding: 8px">
-        {{ entry.3|default:"-" }}
-      </td>
-      <td style="border: 1px solid black; padding: 8px">
-        {% if entry.4 %} {{ entry.4|time:"H" }} hours {% else %} Still Working
-        {% endif %}
-      </td>
-      <td style="border: 1px solid black; padding: 8px">{{ entry.5 }}</td>
-      <td style="border: 1px solid black; padding: 8px">
-        {{ entry.6|default:"No notes" }}
-      </td>
-    </tr>
-    {% empty %}
-    <tr>
-      <td colspan="7" style="text-align: center; padding: 8px">
-        No presence data available for the selected date.
-      </td>
-    </tr>
-    {% endfor %}
-  </tbody>
-</table>
-
-<script>
-  function submitForm() {
-    document.getElementById("date-form").submit();
-  }
-</script>
 
 {% endblock %}
->>>>>>> d044ef22bda34e91079cb43e3dfa5893ca8d4293

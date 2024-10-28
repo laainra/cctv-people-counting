@@ -88,3 +88,4 @@ class Personnel_Entries(models.Model):
     presence_status = models.CharField(
         max_length=10, choices=status_choices, default="UNKNOWN")
     personnel = models.ForeignKey(Personnels, on_delete=models.CASCADE)
+    image=models.CharField(max_length=255, null=True)

@@ -201,57 +201,58 @@ Personnels
       
     </div>
 
-    <div style="display: flex;justify-content: end; padding-right: 10vw;">
+    <div style="display: flex;justify-content: end;">
 
-      <!-- Style error handling sementara -->
-      <style>
-        input[type="date"] {
-            border: 2px solid #E2E2E2;
-            border-radius: 7px;
-            color: #858383;
-            padding: 5px;
-            background: transparent;
-            cursor: pointer;
-        }
-
-        /* Hide the default calendar icon */
-        input[type="date"]::-webkit-calendar-picker-indicator {
-            display: none;
-        }
-
-        /* Custom styles for the input field */
-        input[type="date"]:focus {
-            border-color: #6c757d; /* Change border color on focus */
-            outline: none; /* Remove default outline */
-        }
-
-        /* Style for the dropdown itself (limited) */
-        input[type="date"]::-webkit-inner-spin-button,
-        input[type="date"]::-webkit-outer-spin-button {
-            -webkit-appearance: none;
-            margin: 0; /* Remove the margin */
-        }
-      </style>
-
-      <input type="date" class="bg-transparent text-center date-picker" style="border: 2px solid #E2E2E2;border-radius: 7px; color: #858383;" >
-      <hr style="width: 2vw; border-top: 3px solid; margin-left: 1vw; margin-right: 1vw;">
-      <input type="date" class="bg-transparent text-center date-picker" style="border: 2px solid #E2E2E2;border-radius: 7px; color: #858383;">
+  
+        <input id="date-picker-1" type="date" class="date-picker effected" 
+            style="width: 170px; cursor: pointer; min-height: 38px;" 
+            onchange="submitForm()" value="{{ today }}" />
+        <hr style="width: 2vw; border-top: 3px solid; margin-left: 1vw; margin-right: 1vw;">
+        <input id="date-picker-2" type="date" class="date-picker effected" 
+            style="width: 170px; cursor: pointer; min-height: 38px;" 
+            onchange="submitForm()" value="{{ today }}" />
+ 
+ 
     </div>
 
-    <div style="width: 100%; height: 240px; display:flex; column-gap: 10px;">
+    <div style="width: 100%; height: 240px; display: flex; column-gap: 10px;">
       <div id="image-container" class="card p-3 effected" style="width: 70%; height: 100%;">
         <a class="d-flex nav-link text-dark align-items-center gap-2 effected">
           <i class="fa-solid fa-chart-pie text-center" style="font-size: 20px"></i>
-          <span id="folder-title" >Data Entries</span>
+          <span id="folder-title">Data Entries</span>
         </a>
+        <div class="d-flex flex-row">
+          <div class="w-100 gap-4 justify-content-center align-items-center mb-2" style="text-align: right;">
+            <div class="d-flex flex-column align-items-center justify-content-center">
+              <b id="late-count" class="text-center" style="font-size: 35px; color: #49b2e7; width: 110px;">5</b>
+              <span class="text-center" style="font-size: 15px; color: #49b2e7;">Late</span>
+            </div>
+            <div class="d-flex flex-column align-items-center justify-content-center">
+              <b id="ontime-count" class="text-center" style="font-size: 35px; color: #f97070; width: 110px;">11</b>
+              <span class="text-center" style="font-size: 15px; color: #f97070;">On Time</span>
+            </div>
+          </div>
+          <div id="pie-chart-dummy" class="text-center w-100">
+            <canvas id="pieChart" style="width: 100%; height: 100%;"></canvas>
+
+          </div>
+        </div>
       </div>
       <div id="image-container" class="card p-3 effected" style="width: 30%; height: 100%;">
-        <a class="d-flex nav-link text-dark align-items-center gap-2 effected">
-          <i class="fa-solid fa-chart-bar text-center" style="font-size: 20px"></i>
-          <span id="folder-title">Total</span>
+        <a class="d-flex flex-column nav-link text-dark gap-2 effected">
+            <div class="d-flex align-items-center">
+                <i class="fa-solid fa-chart-bar" style="font-size: 20px"></i>
+                <span id="folder-title" class="ms-2">Total</span>
+            </div>
+            <div class="d-flex flex-column justify-content-center align-items-center mt-4" style="flex-grow: 1; text-align: center; height: 100%;">
+                <b id="total-personnel-presence" class="text-center" style="font-size: 40px; color: black;">16</b>
+                <span class="text-center" style="font-size: 20px; color: black;">Presence</span>
+            </div>
         </a>
-      </div>
     </div>
+    
+    </div>
+    
   </div>
 </div>
 
@@ -265,6 +266,35 @@ Personnels
         elements[i].classList.add("light-mode")
     }
   }
+  const ctx = document.getElementById('pieChart').getContext('2d');
+  const pieChart = new Chart(ctx, {
+      type: 'pie',
+      data: {
+          labels: ['On Time', 'Late'],
+          datasets: [{
+              data: [11, 5], // Values for On Time and Late
+              backgroundColor: ['#49b2e7', '#f97070'], // Colors: On Time (Green), Late (Red)
+              hoverOffset: 4
+          }]
+      },
+      options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+              legend: {
+                  position: 'top',
+              },
+              tooltip: {
+                  callbacks: {
+                      label: function(tooltipItem) {
+                          return tooltipItem.label + ': ' + tooltipItem.raw;
+                      }
+                  }
+              }
+          }
+      }
+  });
+
 </script>
 
 <script>
@@ -675,5 +705,56 @@ Personnels
     })
   }
 </script>
+
+<style>
+  .date-picker-container {
+
+    flex-direction: column;
+    align-items: center;
+    gap: 10px; /* Space between date pickers */
+}
+
+.date-picker {
+    border: 1px solid #007bff; /* Border color */
+    border-radius: 5px; /* Rounded corners */
+    padding: 5px; /* Padding for a better look */
+    font-size: 16px; /* Font size */
+    background-color: #f8f9fa; /* Light background */
+    transition: border-color 0.3s ease; /* Smooth border color transition */
+}
+
+.date-picker:focus {
+    border-color: #0056b3; /* Darker border on focus */
+    outline: none; /* Remove default outline */
+
+    input[type="date"] {
+      border: 2px solid #E2E2E2;
+      border-radius: 7px;
+      color: #858383;
+      padding: 5px;
+      background: transparent;
+      cursor: pointer;
+  }
+
+  /* Hide the default calendar icon */
+  input[type="date"]::-webkit-calendar-picker-indicator {
+      display: none;
+  }
+
+  /* Custom styles for the input field */
+  input[type="date"]:focus {
+      border-color: #6c757d; /* Change border color on focus */
+      outline: none; /* Remove default outline */
+  }
+
+  /* Style for the dropdown itself (limited) */
+  input[type="date"]::-webkit-inner-spin-button,
+  input[type="date"]::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+      margin: 0; /* Remove the margin */
+  }
+}
+
+</style>
 
 {% endblock %}

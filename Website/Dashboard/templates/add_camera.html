@@ -1,54 +1,61 @@
 {% extends 'base.html' %} {% block content %}
 <!-- insert content -->
+
+<div class="card d-flex w-36 justify-content-between align-items-start mb-3 py-3 responsive responsive-card effected shadow-black shadow-lg">
+  <div class="pl-4">
+    <a class="d-flex nav-link text-dark align-items-center gap-2 effected bg-transparent">
+      <i class="fa-solid fa-camera text-center" style="font-size: 20px"></i>
+      {% if Active_Cam == None %}
+      <span class="effected" style="font-weight: 600; font-size: 20px"
+        >Add Camera</span
+      >
+      {% else %}
+      <span class="ffected" style="font-weight: 600; font-size: 20px"
+        >Camera Settings</span
+      >
+      {% endif %}
+    </a>
+  </div>
+</div>
 <div
-  class="card ml-5 mr-5 align-items-center effected p-5 align-self-center"
-  style="border-radius: 25px; width: fit-content"
+  class=" card d-flex w-36 justify-content-between align-items-start  mx-5 mb-20 py-3 px-4 responsive responsive-card effected shadow-black shadow-lg"
+  style="border-radius: 25px;"
 >
-  {% if Active_Cam == None %}
-  <span class="mb-4 effected" style="font-weight: 600; font-size: 30px"
-    >Add Camera</span
-  >
-  {% else %}
-  <span class="mb-4 effected" style="font-weight: 600; font-size: 30px"
-    >Camera Settings</span
-  >
-  {% endif %}
   <form
     id="camera_form"
     action="#"
     method="POST"
-    class="d-flex flex-column justify-content-center align-items-center mb-3"
-    style="width: fit-content"
+    class="d-flex flex-column justify-content-center align-items-center mb-3 w-100"
   >
     {% csrf_token %}
-    <p style="align-items: start; width: fit-content">
+    <p style="align-items: start; width: 100%">
       <span class="effected">Camera Name:</span>
       <br />
       <input
         name="cam_name"
         type="text"
         class="effected edit-text"
-        style="width: 320px"
+        style="width: 100%"
         maxlength="21"
         value="{{Active_Cam.cam_name}}"
         placeholder="Insert Camera Name"
         required
       />
     </p>
-    <p style="align-items: start; width: fit-content">
+    <p style="align-items: start; width: 100%">
       <span class="effected">RTSP Link:</span>
       <br />
       <input
         name="feed_src"
         type="text"
         class="effected edit-text"
-        style="width: 320px"
+        style="width: 100%"
         value="{{Active_Cam.feed_src}}"
         placeholder="Insert RTSP Link"
         required
       />
     </p>
-    <div class="d-flex justify-content-between mb-3" style="width: 320px">
+    <div class="d-flex justify-content-between mb-3" style="width: 100%">
       <a>
         <span class="effected">AI Start At:</span><br />
         <input
@@ -60,11 +67,11 @@
           class="effected time-input"
           value="{{ Active_Cam.cam_start|default:'08:00:00' }}"
           onchange="checkValidTimeRange()"
-          style="cursor: pointer"
+          style="cursor: pointer;width: 35vw;"
           required
         />
       </a>
-      <span class="d-flex align-items-center effected">to</span>
+      <span class="mt-3 d-flex align-items-center effected">to</span>
       <a>
         <span class="effected">AI Stop At:</span><br />
         <input
@@ -76,13 +83,13 @@
           class="effected time-input"
           value="{{ Active_Cam.cam_stop|default:'17:00:00' }}"
           onchange="checkValidTimeRange()"
-          style="cursor: pointer"
+          style="cursor: pointer; width: 35vw;"
           required
         />
       </a>
     </div>
 
-    <div class="d-flex justify-content-between mb-3" style="width: 320px">
+    <div class="d-flex justify-content-between mb-3" style="width: 100%">
       <a>
         <span class="effected">Attendance Start:</span><br />
         <input
@@ -94,11 +101,11 @@
           class="effected time-input"
           value="{{ Active_Cam.attendance_time_start|default:'08:00:00' }}"
           onchange="checkValidTimeRange()"
-          style="cursor: pointer"
+          style="cursor: pointer; width: 35vw;"
           required
         />
       </a>
-      <span class="d-flex align-items-center effected">to</span>
+      <span class="mt-3 d-flex align-items-center effected">to</span>
       <a>
         <span class="effected">Attendance Stop:</span><br />
         <input
@@ -110,12 +117,12 @@
           class="effected time-input"
           value="{{ Active_Cam.attendance_time_end|default:'17:00:00' }}"
           onchange="checkValidTimeRange()"
-          style="cursor: pointer"
+          style="cursor: pointer; width: 35vw;"
           required
         />
       </a>
     </div>
-    <div class="d-flex justify-content-between mb-3" style="width: 320px">
+    <div class="d-flex justify-content-between mb-3" style="width: 100%">
       <a>
         <span class="effected">Leaving Start:</span><br />
         <input
@@ -127,11 +134,11 @@
           class="effected time-input"
           value="{{ Active_Cam.leaving_time_start|default:'08:00:00' }}"
           onchange="checkValidTimeRange()"
-          style="cursor: pointer"
+          style="cursor: pointer; width: 35vw;"
           required
         />
       </a>
-      <span class="d-flex align-items-center effected">to</span>
+      <span class="mt-3 d-flex align-items-center effected">to</span>
       <a>
         <span class="effected">Leaving Stop:</span><br />
         <input
@@ -143,15 +150,12 @@
           class="effected time-input"
           value="{{ Active_Cam.leaving_time_end|default:'17:00:00' }}"
           onchange="checkValidTimeRange()"
-          style="cursor: pointer"
+          style="cursor: pointer; width: 35vw;"
           required
         />
       </a>
     </div>
-    <p
-      class="d-flex flex-column justify-content-between align-items-start"
-      style="width: 320px"
-    >
+    <p class="d-flex flex-column justify-content-between align-items-start" style="width: 100%">
       <span class="d-flex align-items-center effected">Used AI Detection:</span>
       <a class="d-flex ml-1 align-items-center" style="text-decoration: none">
         {% if Active_Cam == None %}
@@ -212,7 +216,7 @@
 
     <div
       class="d-flex justify-content-between align-items-center gap-2"
-      style="width: 320px"
+      style="width: 100%"
     >
       <button
         type="button"
