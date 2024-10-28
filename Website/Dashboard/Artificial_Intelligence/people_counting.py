@@ -305,22 +305,22 @@ class PeopleCounting:
             self.GV.occupancy = 0
 
         # Print total count
-        # cv2.putText(img, "Latest Update", (20, frame.shape[0] - 300), self.font, self.font_size, (255, 255, 255), self.font_thickness)
+        cv2.putText(img, "Latest Update", (20, frame.shape[0] - 300), self.font, self.font_size, (255, 255, 255), self.font_thickness)
+        cv2.putText(img, "Undetected", (20, frame.shape[0] - 260), self.font, self.font_size, (255, 255, 255), self.font_thickness)
+        cv2.putText(img, "Female Enter", (20, frame.shape[0] - 220), self.font, self.font_size, (255, 255, 255), self.font_thickness)
+        cv2.putText(img, "Male Enter", (20, frame.shape[0] - 180), self.font, self.font_size, (255, 255, 255), self.font_thickness)
+        cv2.putText(img, "Occupancy", (20, frame.shape[0] - 140), self.font, self.font_size, (255, 255, 255), self.font_thickness)
+        cv2.putText(img, "Enter", (20, frame.shape[0] - 100), self.font, self.font_size, (255, 255, 255), self.font_thickness)
+        cv2.putText(img, "Exit", (20, frame.shape[0] - 60), self.font, self.font_size, (255, 255, 255), self.font_thickness)
         cv2.putText(img, "Detect Speed", (20, frame.shape[0] - 20), self.font, self.font_size, (255, 255, 255), self.font_thickness)
-        # cv2.putText(img, "Undetected", (20, frame.shape[0] - 220), self.font, self.font_size, (255, 255, 255), self.font_thickness)
-        # cv2.putText(img, "Female Enter", (20, frame.shape[0] - 180), self.font, self.font_size, (255, 255, 255), self.font_thickness)
-        # cv2.putText(img, "Male Enter", (20, frame.shape[0] - 140), self.font, self.font_size, (255, 255, 255), self.font_thickness)
-        # cv2.putText(img, "Occupancy", (20, frame.shape[0] - 100), self.font, self.font_size, (255, 255, 255), self.font_thickness)
-        # cv2.putText(img, "Enter", (20, frame.shape[0] - 60), self.font, self.font_size, (255, 255, 255), self.font_thickness)
-        # cv2.putText(img, "Exit", (20, frame.shape[0] - 20), self.font, self.font_size, (255, 255, 255), self.font_thickness)
 
-        # cv2.putText(img, ": " + str(self.GV.names[0]) + " enters at " + str(self.GV.names[1]), (250, frame.shape[0] - 300), self.font, self.font_size, (255, 255, 255), self.font_thickness)
+        cv2.putText(img, ": " + str(self.GV.names[0]) + " enters at " + str(self.GV.names[1]), (250, frame.shape[0] - 300), self.font, self.font_size, (255, 255, 255), self.font_thickness)
+        cv2.putText(img, ": " + str(self.GV.unknown_enter), (250, frame.shape[0] - 260), self.font, self.font_size, (255, 255, 255), self.font_thickness)
+        cv2.putText(img, ": " + str(self.GV.female_enter), (250, frame.shape[0] - 220), self.font, self.font_size, (255, 255, 255), self.font_thickness)
+        cv2.putText(img, ": " + str(self.GV.male_enter), (250, frame.shape[0] - 180), self.font, self.font_size, (255, 255, 255), self.font_thickness)
+        cv2.putText(img, ": " + str(self.GV.occupancy), (250, frame.shape[0] - 140), self.font, self.font_size, (255, 255, 255), self.font_thickness)
+        cv2.putText(img, ": " + str((self.GV.female_enter + self.GV.male_enter + self.GV.unknown_enter)), (250, frame.shape[0] - 100), self.font, self.font_size, (255, 255, 255), self.font_thickness)
+        cv2.putText(img, ": " + str(self.GV.exit), (250, frame.shape[0] - 60), self.font, self.font_size, (255, 255, 255), self.font_thickness)
         cv2.putText(img, ": " + str("{:.2f}".format(self.detectSpeed)) + 's', (250, frame.shape[0] - 20), self.font, self.font_size, (255, 255, 255), self.font_thickness)
-        # cv2.putText(img, ": " + str(self.GV.unknown_enter), (250, frame.shape[0] - 220), self.font, self.font_size, (255, 255, 255), self.font_thickness)
-        # cv2.putText(img, ": " + str(self.GV.female_enter), (250, frame.shape[0] - 180), self.font, self.font_size, (255, 255, 255), self.font_thickness)
-        # cv2.putText(img, ": " + str(self.GV.male_enter), (250, frame.shape[0] - 140), self.font, self.font_size, (255, 255, 255), self.font_thickness)
-        # cv2.putText(img, ": " + str(self.GV.occupancy), (250, frame.shape[0] - 100), self.font, self.font_size, (255, 255, 255), self.font_thickness)
-        # cv2.putText(img, ": " + str((self.GV.female_enter + self.GV.male_enter + self.GV.unknown_enter)), (250, frame.shape[0] - 60), self.font, self.font_size, (255, 255, 255), self.font_thickness)
-        # cv2.putText(img, ": " + str(self.GV.exit), (250, frame.shape[0] - 20), self.font, self.font_size, (255, 255, 255), self.font_thickness)
 
         return img
