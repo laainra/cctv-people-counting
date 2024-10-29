@@ -30,7 +30,7 @@ urlpatterns = [
 
 
     path('download', home.download, name="download"),
-    path('generate_data', home.generate_data, name="generate_data"),
+    # path('generate_data', home.generate_data, name="generate_data"),
 
 
 ]
