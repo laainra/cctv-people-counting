@@ -21,6 +21,10 @@ WORKDIR /app
 
 # Copy requirements and install dependencies
 COPY requirements.txt /app/
+COPY .env /app/
+RUN pip install --upgrade pip
+RUN pip install django==5.0.3
+RUN pip install -r requirements.txt
 
 # Copy the project files
 COPY . /app/
