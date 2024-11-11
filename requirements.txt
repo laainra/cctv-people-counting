@@ -18,6 +18,7 @@ cookiecutter==2.6.0
 cron-descriptor==1.4.3
 cycler==0.12.1
 Cython==3.0.10
+deepface==0.0.93
 dj-database-url==2.3.0
 Django==5.0.3
 django-browser-reload==1.15.0
