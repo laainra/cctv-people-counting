@@ -15,3 +15,5 @@ Website/Dashboard/static/*.xlsx
 
 # Ignore Python cache folders
 __pycache__/
+
+.env
