@@ -117,13 +117,15 @@ class PeopleCounting:
             fy = 1/(self.resized_img_size[0]/self.ori_img_size[0])
             fx = 1/(self.resized_img_size[1]/self.ori_img_size[1])
 
-            bbox[0] = bbox[0] * fx
-            bbox[1] = bbox[1] * fy
-            bbox[2] = bbox[2] * fx
-            bbox[3] = bbox[3] * fy
+            bbox[0] = bbox[0] * fx  # x1
+            bbox[1] = bbox[1] * fy  # y1
+            bbox[2] = bbox[2] * fx  # x2
+            bbox[3] = bbox[3] * fy  # y2
 
-            bbox_x2 = bbox[2]
-            bbox_y2 = bbox[3]
+            # Count center of bounding box
+            bbox_x_center = bbox[0] + (bbox[2] - bbox[0]) / 2  # center x
+            bbox_y_bottom = bbox[3]  # bottom y
+            
             bbox_id = str(bbox[4])
 
             try:
@@ -164,9 +166,9 @@ class PeopleCounting:
                                         os.mkdir(os.path.join(RV.root_path, 'Unknown'))
 
                                     # random_id = "".join(random.choices(string.ascii_uppercase + string.digits, k=10))
-                                    filename = datetime.now().strftime('%Y-%m-%d_%H-%M-%S.jpg')
-                                    while os.path.exists(os.path.join(RV.root_path, 'Unknown/' + filename)):
-                                        filename = datetime.now().strftime('%Y-%m-%d_%H-%M-') +  "{:02d}".format(int(datetime.now().strftime('%S')) + 1) + '.jpg'
+                                    # filename = datetime.now().strftime('%Y-%m-%d_%H-%M-%S.jpg')
+                                    # while os.path.exists(os.path.join(RV.root_path, 'Unknown/' + filename)):
+                                    #     filename = datetime.now().strftime('%Y-%m-%d_%H-%M-') +  "{:02d}".format(int(datetime.now().strftime('%S')) + 1) + '.jpg'
 
                                     x_expand = int(w/4)
                                     y_expand = int(h/4)
@@ -185,7 +187,7 @@ class PeopleCounting:
                                     
                                     detected_feats, _= RV.get_feature(cropped_img)
                                     if len(detected_feats) != 0:
-                                        cv2.imwrite(os.path.join(RV.root_path, 'Unknown/' + filename), cropped_img)
+                                        # cv2.imwrite(os.path.join(RV.root_path, 'Unknown/' + filename), cropped_img)
 
                                         try:
                                             RV.known_features['Unknown'].append(feat)
@@ -219,13 +221,13 @@ class PeopleCounting:
                 x1, x2, x3, x4, x5, x6, x7, x8 = poly_coordinates[:,0]
                 y1, y2, y3, y4, y5, y6, y7, y8 = poly_coordinates[:,1]
                 
-                distG1 = self.distance(x1, y1, x2, y2, bbox_x2, bbox_y2)
-                distG2 = self.distance(x2, y2, x3, y3, bbox_x2, bbox_y2)
-                distG3 = self.distance(x3, y3, x4, y4, bbox_x2, bbox_y2)
+                distG1 = self.distance(x1, y1, x2, y2, bbox_x_center, bbox_y_bottom)
+                distG2 = self.distance(x2, y2, x3, y3, bbox_x_center, bbox_y_bottom)
+                distG3 = self.distance(x3, y3, x4, y4, bbox_x_center, bbox_y_bottom)
 
-                distR1 = self.distance(x5, y5, x6, y6, bbox_x2, bbox_y2)
-                distR2 = self.distance(x6, y6, x7, y7, bbox_x2, bbox_y2)
-                distR3 = self.distance(x7, y7, x8, y8, bbox_x2, bbox_y2)
+                distR1 = self.distance(x5, y5, x6, y6, bbox_x_center, bbox_y_bottom)
+                distR2 = self.distance(x6, y6, x7, y7, bbox_x_center, bbox_y_bottom)
+                distR3 = self.distance(x7, y7, x8, y8, bbox_x_center, bbox_y_bottom)
 
                 distGreen = min(distG1, distG2, distG3)
                 distRed = min(distR1, distR2, distR3)
@@ -233,12 +235,12 @@ class PeopleCounting:
                 x1, x2, x3, x4 = poly_coordinates[:,0]
                 y1, y2, y3, y4 = poly_coordinates[:,1]
 
-                distGreen = self.distance(x1, y1, x2, y2, bbox_x2, bbox_y2)
-                distRed = self.distance(x3, y3, x4, y4, bbox_x2, bbox_y2)
+                distGreen = self.distance(x1, y1, x2, y2, bbox_x_center, bbox_y_bottom)
+                distRed = self.distance(x3, y3, x4, y4, bbox_x_center, bbox_y_bottom)
 
             # For polygon calculation | to detect whether the point is inside the polygon or not
             polygon = Polygon(poly_coordinates)
-            point = Point(bbox_x2, bbox_y2)
+            point = Point(bbox_x_center, bbox_y_bottom)
 
             # If point is inside polygon
             if polygon.contains(point):
@@ -255,16 +257,16 @@ class PeopleCounting:
             else:
                 if bbox_id in self.red:
                     if distRed > distGreen:
-                        # enter = list(self.enter)
-                        # enter.append([self.id[bbox_id]['name'], datetime.now().strftime("%H:%M:%S"), self.id[bbox_id]['gender']])
-                        # self.enter = np.array(enter)
-                        
                         if self.id[bbox_id]['name'] != 'Unknown':
                             cam = models.Camera_Settings.objects.get(id=cam_id)
+                            personnel = models.Personnels.objects.get(name=self.id[bbox_id]['name'])
 
-                            models.Personnel_Entries.objects.create(name=self.id[bbox_id]['name'],
-                                                                    timestamp=datetime.now().strftime('%D-%H:%M:%S'),
-                                                                    camera=cam)
+                            models.Personnel_Entries.objects.create(
+                                personnel=personnel,
+                                camera=cam,
+                                timestamp=datetime.now(),
+                                presence_status= ''  
+                            )
                         
                         if self.id[bbox_id]['gender'] == "Male":
                             self.GV.male_enter += 1
@@ -276,9 +278,6 @@ class PeopleCounting:
                     self.red = np.delete(self.red, self.red==bbox_id)
                 if bbox_id in self.green:
                     if distGreen > distRed:
-                        # out = list(self.out)
-                        # out.append([self.id[bbox_id]['name'], datetime.now().strftime("%H:%M:%S"), self.id[bbox_id]['gender']])
-                        # self.out = np.array(out)
                         self.GV.exit += 1
 
                     self.green = np.delete(self.green, self.green==bbox_id)
@@ -305,22 +304,23 @@ class PeopleCounting:
             self.GV.occupancy = 0
 
         # Print total count
-        cv2.putText(img, "Latest Update", (20, frame.shape[0] - 300), self.font, self.font_size, (255, 255, 255), self.font_thickness)
-        cv2.putText(img, "Undetected", (20, frame.shape[0] - 260), self.font, self.font_size, (255, 255, 255), self.font_thickness)
-        cv2.putText(img, "Female Enter", (20, frame.shape[0] - 220), self.font, self.font_size, (255, 255, 255), self.font_thickness)
-        cv2.putText(img, "Male Enter", (20, frame.shape[0] - 180), self.font, self.font_size, (255, 255, 255), self.font_thickness)
-        cv2.putText(img, "Occupancy", (20, frame.shape[0] - 140), self.font, self.font_size, (255, 255, 255), self.font_thickness)
-        cv2.putText(img, "Enter", (20, frame.shape[0] - 100), self.font, self.font_size, (255, 255, 255), self.font_thickness)
-        cv2.putText(img, "Exit", (20, frame.shape[0] - 60), self.font, self.font_size, (255, 255, 255), self.font_thickness)
+        # cv2.putText(img, "Latest Update", (20, frame.shape[0] - 300), self.font, self.font_size, (255, 255, 255), self.font_thickness)
+        # cv2.putText(img, "Undetected", (20, frame.shape[0] - 260), self.font, self.font_size, (255, 255, 255), self.font_thickness)
+        # cv2.putText(img, "Female Enter", (20, frame.shape[0] - 220), self.font, self.font_size, (255, 255, 255), self.font_thickness)
+        # cv2.putText(img, "Male Enter", (20, frame.shape[0] - 180), self.font, self.font_size, (255, 255, 255), self.font_thickness)
+        # cv2.putText(img, "Occupancy", (20, frame.shape[0] - 140), self.font, self.font_size, (255, 255, 255), self.font_thickness)
+        # cv2.putText(img, "Enter", (20, frame.shape[0] - 100), self.font, self.font_size, (255, 255, 255), self.font_thickness)
+        # cv2.putText(img, "Exit", (20, frame.shape[0] - 60), self.font, self.font_size, (255, 255, 255), self.font_thickness)
         cv2.putText(img, "Detect Speed", (20, frame.shape[0] - 20), self.font, self.font_size, (255, 255, 255), self.font_thickness)
 
-        cv2.putText(img, ": " + str(self.GV.names[0]) + " enters at " + str(self.GV.names[1]), (250, frame.shape[0] - 300), self.font, self.font_size, (255, 255, 255), self.font_thickness)
-        cv2.putText(img, ": " + str(self.GV.unknown_enter), (250, frame.shape[0] - 260), self.font, self.font_size, (255, 255, 255), self.font_thickness)
-        cv2.putText(img, ": " + str(self.GV.female_enter), (250, frame.shape[0] - 220), self.font, self.font_size, (255, 255, 255), self.font_thickness)
-        cv2.putText(img, ": " + str(self.GV.male_enter), (250, frame.shape[0] - 180), self.font, self.font_size, (255, 255, 255), self.font_thickness)
-        cv2.putText(img, ": " + str(self.GV.occupancy), (250, frame.shape[0] - 140), self.font, self.font_size, (255, 255, 255), self.font_thickness)
-        cv2.putText(img, ": " + str((self.GV.female_enter + self.GV.male_enter + self.GV.unknown_enter)), (250, frame.shape[0] - 100), self.font, self.font_size, (255, 255, 255), self.font_thickness)
-        cv2.putText(img, ": " + str(self.GV.exit), (250, frame.shape[0] - 60), self.font, self.font_size, (255, 255, 255), self.font_thickness)
+        # cv2.putText(img, ": " + str(self.GV.names[0]) + " enters at " + str(self.GV.names[1]), (250, frame.shape[0] - 300), self.font, self.font_size, (255, 255, 255), self.font_thickness)
+        # cv2.putText(img, ": " + str(self.GV.unknown_enter), (250, frame.shape[0] - 260), self.font, self.font_size, (255, 255, 255), self.font_thickness)
+        # cv2.putText(img, ": " + str(self.GV.female_enter), (250, frame.shape[0] - 220), self.font, self.font_size, (255, 255, 255), self.font_thickness)
+        # cv2.putText(img, ": " + str(self.GV.male_enter), (250, frame.shape[0] - 180), self.font, self.font_size, (255, 255, 255), self.font_thickness)
+        # cv2.putText(img, ": " + str(self.GV.occupancy), (250, frame.shape[0] - 140), self.font, self.font_size, (255, 255, 255), self.font_thickness)
+        # cv2.putText(img, ": " + str((self.GV.female_enter + self.GV.male_enter + self.GV.unknown_enter)), (250, frame.shape[0] - 100), self.font, self.font_size, (255, 255, 255), self.font_thickness)
+        # cv2.putText(img, ": " + str(self.GV.exit), (250, frame.shape[0] - 60), self.font, self.font_size, (255, 255, 255), self.font_thickness)
         cv2.putText(img, ": " + str("{:.2f}".format(self.detectSpeed)) + 's', (250, frame.shape[0] - 20), self.font, self.font_size, (255, 255, 255), self.font_thickness)
 
         return img
+

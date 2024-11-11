@@ -23,8 +23,8 @@ class CameraStream:
         model_yolo.to(self.device)
 
         # Import CNN model
-        model_gender = torch.load(os.path.join(os.path.dirname(__file__), 'models/gender.pt'), map_location=torch.device('cpu'))
-        model_gender.to(self.device)
+        model_gender = torch.load(os.path.join(os.path.dirname(__file__), 'models/gender.pt'), map_location=self.device)
+        model_gender.eval()  # Set model ke mode evaluasi
 
         # Set classes
         self.GV = GlobalVariable()
@@ -41,7 +41,6 @@ class CameraStream:
         self.camera = camera
 
         # Processed frame
-        
         self.frame = []
 
         # Predicted frame
@@ -57,6 +56,11 @@ class CameraStream:
         self.ID = ID
 
         self.max_width = 2500
+
+        # Tambahkan folder untuk menyimpan wajah yang diekstrak
+        self.face_folder = os.path.join(os.path.dirname(__file__), '..', 'extracted_faces', 'raw')
+        if not os.path.exists(self.face_folder):
+            os.makedirs(self.face_folder)
 
     def check_time_range(self, time_range):
         time_start = int(time_range[0].replace(':', ''))
@@ -76,47 +80,45 @@ class CameraStream:
 
                 start = time.time()
 
-                # Run gender and face recognition model by threading
-                # Start thread
+                # Run gender and face recognition model
                 if self.gd_active:
-                    t1=threading.Thread(target=self.GD.extract_genders, args=(img,))
-                    t1.start()
+                    self.GD.extract_genders(img)
                 
                 if self.fr_active:
-                    t2=threading.Thread(target=self.FR.extract_features, args=(img,))
-                    t2.start()
-
-                # Wait for thread to finish
-                if self.gd_active:
-                    t1.join()
-
-                if self.fr_active:
-                    t2.join()
+                    self.FR.extract_features(img)
 
                 # Run people counting model
                 self.PC.extract_bboxes(img)
 
-                # print(time.time() - start)
                 self.PC.detectSpeed = time.time() - start
 
                 if not self.gd_active:
-                    self.GD.genders.clear()
-                    for data in self.FR.feats:
-                        self.GD.genders.append(['Unknown', 0])
+                    self.GD.genders = [['Unknown', 0] for _ in self.FR.feats]
                 
                 if not self.fr_active:
-                    self.FR.feats.clear()
-                    for data in self.GD.genders:
-                        self.FR.feats.append(['Unknown', 1, []])
+                    self.FR.feats = [['Unknown', 1, []] for _ in self.GD.genders]
 
                 # Store recieved variables to global variable
-                self.GV.person_bboxes, self.GV.feats, self.GV.genders = self.PC.person_bboxes, self.FR.feats, self.GD.genders
-
+                self.GV.person_bboxes = self.PC.person_bboxes
+                self.GV.feats = self.FR.feats
+                self.GV.genders = self.GD.genders
 
                 if self.fr_active:
                     self.GV.face_coordinates = self.FR.face_coordinates
                 else:
                     self.GV.face_coordinates = self.GD.face_coordinates
+
+                # Ekstrak dan simpan wajah
+                self.extract_and_save_faces(img)
+
+    def extract_and_save_faces(self, img):
+        for idx, ((x1, y1, x2, y2, w, h), _, _) in enumerate(self.GV.face_coordinates):
+            face = img[y1:y2, x1:x2]
+            if face.size > 0:  # Pastikan wajah tidak kosong
+                timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+                filename = f"face_{timestamp}_{idx}_cam{self.ID}.jpg"
+                filepath = os.path.join(self.face_folder, filename)
+                cv2.imwrite(filepath, face)
 
     # Function to read camera footage
     def start_stream(self):
@@ -130,6 +132,8 @@ class CameraStream:
         # Open camera
         cap = cv2.VideoCapture(self.camera)
         cap.set(cv2.CAP_PROP_FPS, 30)
+        # cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
+        # cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
 
         # Wrap it
         self.fresh = FreshestFrame(cap)
@@ -240,8 +244,8 @@ class CameraStream:
                         self.pred_frame = cv2.resize(frame, None, fx=1, fy=1)
 
                     self.stream_paused = True
-            except:
-                print('ERROR')
+            except Exception as e:
+                print('ERROR: ', e)
                 pass
 
     # Function to stop streaming  
