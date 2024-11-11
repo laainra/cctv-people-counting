@@ -124,22 +124,11 @@ def process_attendance():
     database = load_database()
     if not database:
         print("Database kosong! Pastikan ada foto referensi di folder personnel_pics")
-        return
+        return []
     print(f"Database loaded with {len(database)} entries: {list(database.keys())}")
     
-    # Membuat atau membaca JSON
-    if not os.path.exists(JSON_PATH):
-        attendance_data = []
-        print("Membuat file JSON baru!")
-    else:
-        with open(JSON_PATH, 'r') as f:
-            content = f.read()
-            if content:  # Memastikan file tidak kosong
-                attendance_data = json.loads(content)
-                print(f"Membaca JSON yang ada: {len(attendance_data)} records!")
-            else:
-                attendance_data = []
-                print("File JSON kosong, membuat data baru!")
+    # variabeb u/ JSON absensi
+    attendance_data = []
     
     # Memproses setiap gambar di folder raw
     raw_images = [f for f in os.listdir(CAPTURED_IMG_DIR) if f.endswith(('.jpg', '.jpeg', '.png'))]
@@ -248,16 +237,8 @@ def process_attendance():
             print(f"File dipindahkan ke: {unknown_path}")
             continue
     
-    # Simpan JSON
-    with open(JSON_PATH, 'w') as f:
-        json.dump(attendance_data, f, indent=4)
-    
-    # Verifikasi folder raw
-    remaining_files = os.listdir(CAPTURED_IMG_DIR)
-    if remaining_files:
-        print(f"Peringatan: Masih ada {len(remaining_files)} file di folder raw")
-    else:
-        print("Semua file berhasil diproses dan dipindahkan")
+    # return JSON (data yang akan disimpan ke database)
+    return attendance_data
 
 class ImageHandler(FileSystemEventHandler):
     def on_created(self, event):
