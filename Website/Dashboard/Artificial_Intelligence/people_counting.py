@@ -161,38 +161,38 @@ class PeopleCounting:
                     if int(inter_area) == int(w*h) and center2 > by1:
                         if face_name != 'Unknown':
                             if face_name == None and self.id[bbox_id]['name'] == "Unknown":
-                                if w*h > 1000:
-                                    if not os.path.isdir(os.path.join(RV.root_path, 'Unknown')):
-                                        os.mkdir(os.path.join(RV.root_path, 'Unknown'))
+                                # if w*h > 1000:
+                                #     if not os.path.isdir(os.path.join(RV.root_path, 'Unknown')):
+                                #         os.mkdir(os.path.join(RV.root_path, 'Unknown'))
 
-                                    # random_id = "".join(random.choices(string.ascii_uppercase + string.digits, k=10))
-                                    # filename = datetime.now().strftime('%Y-%m-%d_%H-%M-%S.jpg')
-                                    # while os.path.exists(os.path.join(RV.root_path, 'Unknown/' + filename)):
-                                    #     filename = datetime.now().strftime('%Y-%m-%d_%H-%M-') +  "{:02d}".format(int(datetime.now().strftime('%S')) + 1) + '.jpg'
+                                #     # random_id = "".join(random.choices(string.ascii_uppercase + string.digits, k=10))
+                                #     # filename = datetime.now().strftime('%Y-%m-%d_%H-%M-%S.jpg')
+                                #     # while os.path.exists(os.path.join(RV.root_path, 'Unknown/' + filename)):
+                                #     #     filename = datetime.now().strftime('%Y-%m-%d_%H-%M-') +  "{:02d}".format(int(datetime.now().strftime('%S')) + 1) + '.jpg'
 
-                                    x_expand = int(w/4)
-                                    y_expand = int(h/4)
+                                #     x_expand = int(w/4)
+                                #     y_expand = int(h/4)
 
-                                    new_x1 = int(ax1 - x_expand)
-                                    new_y1 = int(ay1 - y_expand)
-                                    new_x2 = int(ax2 + x_expand)
-                                    new_y2 = int(ay2 + y_expand)
+                                #     new_x1 = int(ax1 - x_expand)
+                                #     new_y1 = int(ay1 - y_expand)
+                                #     new_x2 = int(ax2 + x_expand)
+                                #     new_y2 = int(ay2 + y_expand)
 
-                                    if new_x1 < 0: new_x1 = 0
-                                    if new_y1 < 0: new_y1 = 0
-                                    if new_x2 > img.shape[1]: new_x2 = img.shape[1]
-                                    if new_y2 > img.shape[0]: new_y2 = img.shape[0]
+                                #     if new_x1 < 0: new_x1 = 0
+                                #     if new_y1 < 0: new_y1 = 0
+                                #     if new_x2 > img.shape[1]: new_x2 = img.shape[1]
+                                #     if new_y2 > img.shape[0]: new_y2 = img.shape[0]
 
-                                    cropped_img = img_ori[new_y1:new_y2, new_x1:new_x2]
+                                #     cropped_img = img_ori[new_y1:new_y2, new_x1:new_x2]
                                     
-                                    detected_feats, _= RV.get_feature(cropped_img)
-                                    if len(detected_feats) != 0:
-                                        # cv2.imwrite(os.path.join(RV.root_path, 'Unknown/' + filename), cropped_img)
+                                #     detected_feats, _= RV.get_feature(cropped_img)
+                                #     if len(detected_feats) != 0:
+                                #         # cv2.imwrite(os.path.join(RV.root_path, 'Unknown/' + filename), cropped_img)
 
-                                        try:
-                                            RV.known_features['Unknown'].append(feat)
-                                        except:
-                                            RV.known_features['Unknown'] = [feat]
+                                #         try:
+                                #             RV.known_features['Unknown'].append(feat)
+                                #         except:
+                                #             RV.known_features['Unknown'] = [feat]
 
                                 self.GV.feats[idx][-3] = 'Unknown'
                                 face_name = 'Unknown'
