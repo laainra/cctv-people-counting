@@ -12,6 +12,7 @@ Website/Dashboard/static/*.xlsx
 # Ignore Personnel Pics
 /Website/Dashboard/static/img/personnel_pics/*/*.jpg
 /Website/Dashboard/static/img/personnel_pics/*/*.jpeg
+/Website/Dashboard/extracted_faces/personnel_pics/*
 
 # Ignore Python cache folders
 __pycache__/
