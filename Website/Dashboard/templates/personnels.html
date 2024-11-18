@@ -100,30 +100,36 @@ Personnels
     </div>
 
   
+    <!-- Check if personnel exist, if not display message -->
     <div id="folders" class="container scrollmenu vertical-scroll w-100 h-100 d-flex justify-content-center effected" style="padding-left: 0; padding-right: 0; display: -ms-grid;">
       <div class="row">
-      {% for personnel_data in Personnels %}
-        {% with 'img/personnel_pics/'|add:personnel_data.0|add:'/'|add:personnel_data.1 as profile_pic %}
-          <a 
-          {% if Selected.name == personnel_data.0 %}
-          id="selected-personnel" class="card col-md-auto mb-1 text-center effected active"
-          {% else %}  
-          class="card col-md-auto mb-1 text-center effected" 
-          {% endif %}
-          style="width: 200px; height: 200px; margin: 0 auto; border-radius: 20px; cursor: pointer;"
-          onclick="selectPersonnel('{{personnel_data.0}}')">
-            {% load static %}
-            {% if Selected.name == personnel_data.0 %}
-              <!-- <div class="camera-marker effected" style="padding: 0; border-radius: 0px 0px 8px 8px; position: absolute; height: 6px; width: 100px; top: 0; margin-left: auto; margin-right: auto; left: 0; right: 0;"></div> -->
-              <div class="camera-marker effected" style="padding: 0; border-radius: 0px 8px 8px 0px; position: absolute; height: 100px; width: 6px !important; top: 0; bottom: 0; margin-bottom: auto; margin-top: auto; left: 0;"></div>
-            {% endif %}
-            <div class="container d-flex flex-column justify-content-between align-items-center text-center" style="padding: 10px; width: 100%; height: 100%; padding-top: 30px; padding-bottom: 30px;">
-              <img {% if personnel_data.1 == None %} src="{% static 'img/user_default.png' %}" {% else %} src="{% static profile_pic %}" {% endif %} style="border-radius: 50%; width: 95px; height: 95px; object-fit: cover;"/>
-              <p class="m-0">{{personnel_data.0}}</p>
-            </div>  
-          </a> 
-        {% endwith %}
-      {% endfor %}
+        {% if Personnels|length == 0 %}
+          <div class="col-12 text-center">
+            <p>Add new personnel</p>
+          </div>
+        {% else %}
+          {% for personnel_data in Personnels %}
+            {% with 'img/personnel_pics/'|add:personnel_data.0|add:'/'|add:personnel_data.1 as profile_pic %}
+              <a 
+              {% if Selected.name == personnel_data.0 %}
+              id="selected-personnel" class="card col-md-auto mb-1 text-center effected active"
+              {% else %}  
+              class="card col-md-auto mb-1 text-center effected" 
+              {% endif %}
+              style="width: 200px; height: 200px; margin: 0 auto; border-radius: 20px; cursor: pointer;"
+              onclick="selectPersonnel('{{personnel_data.0}}')">
+                {% load static %}
+                {% if Selected.name == personnel_data.0 %}
+                  <div class="camera-marker effected" style="padding: 0; border-radius: 0px 8px 8px 0px; position: absolute; height: 100px; width: 6px !important; top: 0; bottom: 0; margin-bottom: auto; margin-top: auto; left: 0;"></div>
+                {% endif %}
+                <div class="container d-flex flex-column justify-content-between align-items-center text-center" style="padding: 10px; width: 100%; height: 100%; padding-top: 30px; padding-bottom: 30px;">
+                  <img {% if personnel_data.1 == None %} src="{% static 'img/user_default.png' %}" {% else %} src="{% static profile_pic %}" {% endif %} style="border-radius: 50%; width: 95px; height: 95px; object-fit: cover;"/>
+                  <p class="m-0">{{personnel_data.0}}</p>
+                </div>  
+              </a> 
+            {% endwith %}
+          {% endfor %}
+        {% endif %}
       </div>
     </div>
   </div>
@@ -141,19 +147,20 @@ Personnels
             <div class="d-flex flex-row align-items-center justify-content-start">
               <span id="personnel-name" class="effected">{{Selected.name}}</span>
               <i title="Edit Personnel" id="edit-name" class="d-flex text-center align-items-center fa-solid fa-pencil effected" style="margin-left: 10px; font-size: 10px; cursor: pointer;" onclick="openModal(); editPersonnel()"></i>
-              <!-- <a class="d-flex text-center align-items-start effected" href="{% url 'edit_personnel' %}" style="text-decoration: none; margin-left: 10px;">
-              </a> -->
             </div>
+        
             {% if Selected.gender == 'M' %}
               <span id="personnel-gender" class="effected" style="font-size: 12px;">Male</span>
-            {% else %}
+            {% elif Selected.gender == 'F' %}
               <span id="personnel-gender" class="effected" style="font-size: 12px;">Female</span>
+            {% else %}
+              <span id="personnel-gender" class="effected" style="font-size: 12px;">Unknown</span>
             {% endif %}
           </div>
-          {% else %}
+        {% else %}
           <span id="personnel-name" class="ml-1 w-100 effected">{{Selected.name}}</span>
-          {% endif %}
-
+        {% endif %}
+        
           {% if Selected.name != 'Unknown' %}
           <form id="add-image-form" class="post-form1 align-self-end mr-3 h-100" method="POST" enctype="multipart/form-data" style="justify-self: end; display: none;">
             {% csrf_token %}

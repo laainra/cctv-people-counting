@@ -91,7 +91,7 @@
     <table id="presence-table">
       <thead id="presence-table-head">
         <tr class="presence-table-row">
-          <th onclick="sortTable('id')">ID <span id="arrow-up-id">▲</span><span id="arrow-down-id" style="display: none;">▼</span></th>
+          <th onclick="sortTable('id')">ID <span id="arrow-up-id">▲</span><span id="arrow-down-id" style="display: none;">▼</span></th> 
           <th onclick="sortTable('name')">Name <span id="arrow-up-name">▲</span><span id="arrow-down-name" style="display: none;">▼</span></th>
           <th onclick="sortTable('attended')">Time Attended <span id="arrow-up-attended">▲</span><span id="arrow-down-attended" style="display: none;">▼</span></th>
           <th onclick="sortTable('leave')">Time Leaving <span id="arrow-up-leave">▲</span><span id="arrow-down-leave" style="display: none;">▼</span></th>
@@ -107,14 +107,15 @@
       <tbody id="presence-table-body">
         {% for entry in presence_data %}
         <tr class="presence-table-row-body">
-          <td>{{ entry.id }}</td>
+          <td>{{ entry.id }}</td> 
           <td>{{ entry.name }}</td>
           <td>{{ entry.attended|default:"-" }}</td>
           <td>{{ entry.leave|default:"-" }}</td>
           <td>{{ entry.status }}</td>
           <td>{{ entry.work_hours|default:"-" }}</td>
           <td>{{ entry.notes|default:"No notes" }}</td>
-          <td><img src="${entry.image}" alt="No image" width="50" height="50"></td>
+          {% load static %}
+          <td><img src="{% static entry.image_path %}" alt="No image" width="50" height="50"></td>
         </tr>
         <tr><td colspan="7"><hr class="table-hr"></td></tr>
         {% empty %}
@@ -138,14 +139,14 @@
   const presenceData = [
     {% for entry in presence_data %}
       {
-        id: {{ entry.id }},
+        {% comment %} id: {{ entry.id }}, {% endcomment %}
         name: "{{ entry.name|escapejs }}",
         attended: "{{ entry.attended|default:'-' }}",
         leave: "{{ entry.leave|default:'-' }}",
         status: "{{ entry.status }}",
         work_hours: "{{ entry.work_hours|default:'-' }}",
         notes: "{{ entry.notes|default:'No notes' }}"
-        image: "{{ entry.image|default:'No image' }}"
+        image: "{{ entry.image_path|default:'No image' }}"
       }{% if not forloop.last %},{% endif %}
     {% endfor %}
   ];
@@ -165,7 +166,7 @@
   }
 
   let sortOrder = {
-    id: true,
+     id: true,
     name: true,
     attended: true,
     leave: true,
@@ -250,7 +251,7 @@
           <td>${entry.status}</td>
           <td>${entry.work_hours}</td>
           <td>${entry.notes}</td>
-          <td>${entry.image}</td>
+          <td>${entry.image_path}</td>
         </tr>
         <tr><td colspan="7"><hr class="table-hr"></td></tr>
       `;
@@ -263,7 +264,7 @@
   }
   function updateTable(presenceData) {
     const currentDiv = document.getElementById("presence-table-body");
-    currentDiv.innerHTML = ""; // Clear the current table body
+    currentDiv.innerHTML = ""; 
 
     presenceData.forEach(entry => {
       const row = `
@@ -275,7 +276,7 @@
           <td>${entry.status}</td>
           <td>${entry.work_hours || '-'}</td>
           <td>${entry.notes || 'No notes'}</td>
-          <td>${entry.image || 'No image'}</td>
+          <td>${entry.image_path || 'No image'}</td>
         </tr>
         <tr><td colspan="7"><hr class="table-hr"></td></tr>
       `;
@@ -325,6 +326,7 @@
 
     calculateCounts();
   }
+  
 
   function fetchPresenceData(date) {
     fetch(`/presence?date=${date}`, {
@@ -352,6 +354,7 @@
   });
   addActive();
   renderTable(); 
+
 </script>
 
 <!-- Temporary style fixes -->

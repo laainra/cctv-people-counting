@@ -25,63 +25,51 @@ from ..Artificial_Intelligence.variables import RecognitionVariable as RV
 @login_required(login_url='login')
 def personnels(request):
     try:
-        request.session['selected_personnel']
-    except:
-        request.session['selected_personnel'] = 'Unknown'
-
-    try:
-        request.session['selected_image']
-    except:
-        request.session['selected_image'] = []
-
-    try:
-        request.session['selected_personnel']
+        selected_personnel_name = request.session['selected_personnel']
     except KeyError:
-        request.session['selected_personnel'] = 'Unknown'
+        selected_personnel_name = None
+
+    if not selected_personnel_name:
+        return render(request, 'personnels.html', {'message': "No Personnel Selected"})
 
     try:
         selected_personnel_instance = models.Personnels.objects.get(
-            name=request.session['selected_personnel']
+            name=selected_personnel_name
         )
         selected_personnel_id = selected_personnel_instance.id
     except models.Personnels.DoesNotExist:
-        # Handle case where the personnel does not exist
-        request.session['selected_personnel'] = 'Unknown'
-        selected_personnel_instance = models.Personnels.objects.get(
-            name='Unknown'
-        )
-        selected_personnel_id = selected_personnel_instance.id
+        return render(request, 'personnels.html', {'message': "Selected Personnel Not Found"})
 
+
+    # Fetch all personnels, excluding 'Unknown'
     data = models.Personnels.objects.all()
     data = [personnel.name for personnel in data if personnel.name != 'Unknown']
     data.sort()
-    data.insert(0, 'Unknown')
-    # personnel_path = os.path.(os.path.dirname(
-    #     __file__), '../static/img/personnel_pics')
+    # data.insert(0, 'Unknown')
 
     profile_list = []
 
+    # Generate profile list with pictures
     for personnel_name in data:
         profile_pic = None
         for file in os.listdir(os.path.join(var.personnel_path, personnel_name)):
-
             if file.endswith('.jpeg'):
                 profile_pic = file
         profile_list.append(profile_pic)
 
     data = list(map(list, zip(data, profile_list)))
 
-    selected = models.Personnels.objects.get(
-        name=request.session['selected_personnel'])
+    # Prepare the selected personnel data
+    selected = models.Personnels.objects.get(name=selected_personnel_name)
 
     img_list = [file for file in os.listdir(os.path.join(
-        var.personnel_path, request.session['selected_personnel'])) if not file.endswith('.txt')]
+        var.personnel_path, selected_personnel_name)) if not file.endswith('.txt')]
     img_list.reverse()
 
     if request.method == "POST":
         command = request.POST.get('command', None)
 
-        if command != None:
+        if command:
             if request.POST['command'] == "personnel":
                 request.session['selected_personnel'] = request.POST['name']
 
@@ -98,9 +86,8 @@ def personnels(request):
             elif request.POST['command'] == "delete_image":
                 for img_name in request.session['selected_image']:
                     os.remove(os.path.join(var.personnel_path,
-                              request.session['selected_personnel'], img_name))
-                RV.set_personnel_known_faces(
-                    request.session['selected_personnel'])
+                              selected_personnel_name, img_name))
+                RV.set_personnel_known_faces(selected_personnel_name)
 
                 request.session['status'] = 'image_deleted'
 
@@ -108,7 +95,7 @@ def personnels(request):
                 destination_folder = request.POST['name']
 
                 for img_name in request.session['selected_image']:
-                    shutil.move(os.path.join(var.personnel_path, request.session['selected_personnel'], img_name), os.path.join(
+                    shutil.move(os.path.join(var.personnel_path, selected_personnel_name, img_name), os.path.join(
                         var.personnel_path, destination_folder, str(img_name).replace('.jpeg', '.jpg')))
 
                 if len(os.listdir(os.path.join(var.personnel_path, destination_folder))) == len(request.session['selected_image']):
@@ -116,48 +103,46 @@ def personnels(request):
                         var.personnel_path, destination_folder, str(request.session['selected_image'][0]).replace('.jpg', '.jpeg')))
 
                 RV.set_personnel_known_faces(destination_folder)
-                RV.set_personnel_known_faces(
-                    request.session['selected_personnel'])
+                RV.set_personnel_known_faces(selected_personnel_name)
 
                 request.session['status'] = 'image_moved'
 
-            elif request.POST['command'] == 'clear_unknown':
-                for filename in os.listdir(os.path.join(var.personnel_path, 'Unknown')):
-                    file_path = os.path.join(
-                        var.personnel_path, 'Unknown', filename)
-                    if not filename.endswith('.txt'):
-                        try:
-                            if os.path.isfile(file_path) or os.path.islink(file_path):
-                                os.unlink(file_path)
-                            elif os.path.isdir(file_path):
-                                shutil.rmtree(file_path)
-                        except Exception as e:
-                            print('Failed to delete %s. Reason: %s' %
-                                  (file_path, e))
-                RV.set_personnel_known_faces('Unknown')
+            # elif request.POST['command'] == 'clear_unknown':
+            #     for filename in os.listdir(os.path.join(var.personnel_path, 'Unknown')):
+            #         file_path = os.path.join(
+            #             var.personnel_path, 'Unknown', filename)
+            #         if not filename.endswith('.txt'):
+            #             try:
+            #                 if os.path.isfile(file_path) or os.path.islink(file_path):
+            #                     os.unlink(file_path)
+            #                 elif os.path.isdir(file_path):
+            #                     shutil.rmtree(file_path)
+            #             except Exception as e:
+            #                 print('Failed to delete %s. Reason: %s' %
+            #                       (file_path, e))
+            #     RV.set_personnel_known_faces('Unknown')
 
-                request.session['status'] = 'unknown_cleared'
+            #     request.session['status'] = 'unknown_cleared'
 
             elif request.POST['command'] == 'delete_personnel':
-
                 models.Personnels.objects.get(
-                    name=request.session['selected_personnel']).delete()
+                    name=selected_personnel_name).delete()
 
                 shutil.rmtree(os.path.join(var.personnel_path,
-                              request.session['selected_personnel']))
+                              selected_personnel_name))
 
                 request.session['selected_personnel'] = 'Unknown'
 
                 request.session['status'] = 'personnel_deleted'
 
             elif request.POST['command'] == 'set_profile_pic':
-                for file in os.listdir(os.path.join(var.personnel_path, request.session['selected_personnel'])):
+                for file in os.listdir(os.path.join(var.personnel_path, selected_personnel_name)):
                     if file.endswith('.jpeg'):
-                        os.rename(os.path.join(var.personnel_path, request.session['selected_personnel'], file), os.path.join(
-                            var.personnel_path, request.session['selected_personnel'], str(file).replace('.jpeg', '.jpg')))
+                        os.rename(os.path.join(var.personnel_path, selected_personnel_name, file), os.path.join(
+                            var.personnel_path, selected_personnel_name, str(file).replace('.jpeg', '.jpg')))
 
-                os.rename(os.path.join(var.personnel_path, request.session['selected_personnel'], request.session['selected_image'][0]), os.path.join(
-                    var.personnel_path, request.session['selected_personnel'], str(request.session['selected_image'][0]).replace('.jpg', '.jpeg')))
+                os.rename(os.path.join(var.personnel_path, selected_personnel_name, request.session['selected_image'][0]), os.path.join(
+                    var.personnel_path, selected_personnel_name, str(request.session['selected_image'][0]).replace('.jpg', '.jpeg')))
 
                 request.session['status'] = 'profile_updated'
 
@@ -201,14 +186,12 @@ def personnels(request):
                 x = 0
                 files = form.cleaned_data["image_file"]
 
-                # Ensure 'selected_personnel' exists in session
                 selected_personnel = request.session.get('selected_personnel')
 
                 if not selected_personnel:
-                    # Handle the case where 'selected_personnel' is not set in the session
+                    # Handle the case where 'selected_personnel' is not set
                     request.session['status'] = 'img_adding_error_no_personnel'
-                    # Redirect to an appropriate page
-                    # return redirect('some_error_page')
+                    return redirect('some_error_page')
 
                 request.session['status'] = 'img_adding_success'
 
@@ -233,27 +216,22 @@ def personnels(request):
                     # Save the path and personnel ID in the database
                     models.Personnel_Images.objects.create(
                         personnel_id=selected_personnel_id,  # Save personnel ID
-                        # Save the image path
                         image_path=os.path.join(personnel_folder, filename)
                     )
 
                     img = cv2.imread(os.path.join(personnel_folder, filename))
 
-                    # Get face features
                     feats, _ = RV.get_feature(img)
 
-                    # Set known faces if not already set
                     if len(RV.known_features) == 0:
                         RV.set_all_known_faces()
 
                     if len(feats) == 1:
-                        # Append features to known_features for selected_personnel
                         if selected_personnel not in RV.known_features:
                             RV.known_features[selected_personnel] = []
 
                         RV.known_features[selected_personnel].append(feats[0])
                     else:
-                        # Remove the file if no face is detected
                         os.remove(os.path.join(personnel_folder, filename))
                         request.session['status'] = 'img_adding_error1'
                         no_face_count += 1
@@ -353,6 +331,7 @@ def delete_personnel(request, id):
     shutil.rmtree(os.path.join(var.personnel_path, data.name))
     data.delete()
     return redirect('personnels')
+
 
 @login_required(login_url='login')
 def personnel_reports(request, id):
