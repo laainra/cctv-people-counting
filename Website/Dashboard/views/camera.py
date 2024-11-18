@@ -338,3 +338,20 @@ def save_coordinates(request):
     MC.set_polygon(cam.id, poly)
 
     return HttpResponse("Success")
+
+
+def get_current_active_cam(request):
+    # Get the camera ID from the session
+    cam_id = request.session.get('cam_id', None)
+    
+    if cam_id is not None:
+        try:
+            # Check if the camera is active
+            camera = models.Camera_Settings.objects.get(id=cam_id)
+            if camera.cam_is_active:
+                return cam_id
+        except models.Camera_Settings.DoesNotExist:
+            # If the camera does not exist, return None
+            pass
+
+    return None

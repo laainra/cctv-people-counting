@@ -58,7 +58,7 @@ class CameraStream:
         self.max_width = 2500
 
         # Tambahkan folder untuk menyimpan wajah yang diekstrak
-        self.face_folder = os.path.join(os.path.dirname(__file__), '..', 'extracted_faces', 'raw')
+        self.face_folder = os.path.join(os.path.dirname(__file__), '..', 'static', 'img', 'extracted_faces', 'raw')
         if not os.path.exists(self.face_folder):
             os.makedirs(self.face_folder)
 

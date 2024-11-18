@@ -11,10 +11,6 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
 from pathlib import Path
-import dj_database_url
-import os
-from dotenv import load_dotenv
-
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -24,10 +20,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.getenv("SECRET_KEY")
+SECRET_KEY = 'django-insecure-x6)r*_5q%u&!qihu*k$h3*-(y&(9=^%lp935e*0^%p8&b_fxqg'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.getenv("DEBUG")
+DEBUG = True
 
 CSRF_TRUSTED_ORIGINS = ['https://obim.tmp.stechoq.com',
                         'http://obim.tmp.stechoq.com']
@@ -89,22 +85,16 @@ WSGI_APPLICATION = 'Website.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.mysql',
-#         'NAME': 'cctv_db',
-#         'USER': 'user',
-#         'PASSWORD': 'password',
-#         'HOST': 'db',
-#         'PORT': '3306',
-#     }
-# }
-
 DATABASES = {
-    'default': dj_database_url.config(default=os.getenv("DATABASE_URL"))
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'cctv_db',
+        'USER': 'root',
+        'PASSWORD': '',
+        'HOST': '127.0.0.1',
+        'PORT': '3306',
+    }
 }
-
-
 
 
 # Password validation

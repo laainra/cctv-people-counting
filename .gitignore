@@ -13,6 +13,12 @@ Website/Dashboard/static/*.xlsx
 /Website/Dashboard/static/img/personnel_pics/*/*.jpg
 /Website/Dashboard/static/img/personnel_pics/*/*.jpeg
 
+# Ignore Extracted Faces
+/Website/Dashboard/static/img/extracted_faces/*/*.jpg
+/Website/Dashboard/static/img/extracted_faces/*/*.jpeg
+/Website/Dashboard/static/img/extracted_faces/*/*/*.jpg
+/Website/Dashboard/static/img/extracted_faces/*/*/*.jpeg
+
 # Ignore Python cache folders
 __pycache__/
 
