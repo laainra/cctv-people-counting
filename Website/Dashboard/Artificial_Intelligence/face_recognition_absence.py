@@ -115,89 +115,6 @@ def predict_face(img_path, database):
             
     return predicted_person, max_similarity
 
-# def process_attendance():
-#     print("="*50)
-#     print("Memulai proses attendance...")
-#     print(f"Checking directory: {CAPTURED_IMG_DIR}")
-    
-#     database = load_database()
-#     if not database:
-#         print("Database kosong! Pastikan ada foto referensi di folder personnel_pics")
-#         return []
-#     print(f"Database loaded with {len(database)} entries: {list(database.keys())}")
-    
-#     attendance_data = []
-#     raw_images = [f for f in os.listdir(CAPTURED_IMG_DIR) if f.endswith(('.jpg', '.jpeg', '.png'))]
-#     print(f"Ditemukan {len(raw_images)} gambar di folder raw!")
-
-#     for img_file in raw_images:
-#         print(f"\nMemproses gambar: {img_file}")
-#         img_path = os.path.join(CAPTURED_IMG_DIR, img_file)
-        
-#         try:
-#             detection_time = extract_datetime_from_filename(img_file)
-#             if detection_time is None:
-#                 print(f"Format nama file tidak valid: {img_file}")
-#                 attendance_data.append({
-#                     'rec_status': 'unknown',
-#                     'name': 'Unknown',
-#                     'confidence': 0.0,
-#                     'datetime': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
-#                     'image_path': img_path,
-#                     'new_filename': f"unknown_{datetime.now().strftime('%Y%m%d_%H%M%S')}.jpg"
-#                 })
-#                 continue
-
-#             embedding = get_embedding(img_path)
-#             if embedding is None:
-#                 print(f"Tidak ada wajah terdeteksi dalam {img_file}")
-#                 attendance_data.append({
-#                     'rec_status': 'unknown',
-#                     'name': 'Unknown',
-#                     'confidence': 0.0,
-#                     'datetime': detection_time.strftime('%Y-%m-%d %H:%M:%S'),
-#                     'image_path': img_path,
-#                     'new_filename': f"unknown_{detection_time.strftime('%Y%m%d_%H%M%S')}.jpg"
-#                 })
-#                 continue
-
-#             predicted_name, confidence = predict_face(img_path, database)
-#             if confidence >= 0.70:
-#                 new_record = {
-#                     'rec_status': 'recognized',
-#                     'name': predicted_name,
-#                     'confidence': float(confidence),
-#                     'datetime': detection_time.strftime('%Y-%m-%d %H:%M:%S'),
-#                     'image_path': img_path,
-#                     'new_filename': f"{predicted_name}_{detection_time.strftime('%Y%m%d_%H%M%S')}.jpg"
-#                 }
-#                 attendance_data.append(new_record)
-#                 print(f"Absensi berhasil: {predicted_name} ({confidence:.2f})")
-#             else:
-#                 attendance_data.append({
-#                     'rec_status': 'unknown',
-#                     'name': 'Unknown',
-#                     'confidence': 0.0,
-#                     'datetime': detection_time.strftime('%Y-%m-%d %H:%M:%S'),
-#                     'image_path': img_path,
-#                     'new_filename': f"unknown_{detection_time.strftime('%Y%m%d_%H%M%S')}.jpg"
-#                 })
-#                 print(f"Wajah tidak dikenali (confidence: {confidence:.2f})")
-
-#         except Exception as e:
-#             print(f"Error memproses {img_file}: {str(e)}")
-#             attendance_data.append({
-#                 'rec_status': 'error',
-#                 'name': 'Error',
-#                 'confidence': 0.0,
-#                 'datetime': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
-#                 'image_path': img_path,
-#                 'new_filename': f"error_{datetime.now().strftime('%Y%m%d_%H%M%S')}.jpg"
-#             })
-
-#     print("Attendance data:", attendance_data)
-#     return attendance_data
-
 
 def process_attendance():
     print("="*50)
@@ -270,38 +187,38 @@ def process_attendance():
                                 if datetime.strptime(record['datetime'], '%Y-%m-%d %H:%M:%S').date().strftime('%Y-%m-%d') == current_date_str]
                 person_today = [record for record in today_records if record['name'] == predicted_name]
                 
-                if not person_today:
+                # if not person_today:
                     # Buat folder berdasarkan tanggal di absence
-                    date_folder = os.path.join(PREDICTED_ABSENCE_DIR, detection_time.strftime('%Y%m%d'))
-                    if not os.path.exists(date_folder):
-                        os.makedirs(date_folder)
+                date_folder = os.path.join(PREDICTED_ABSENCE_DIR, detection_time.strftime('%Y%m%d'))
+                if not os.path.exists(date_folder):
+                    os.makedirs(date_folder)
+                
+                # Format nama file baru: nama_YYYYMMDD_HHMMSS.jpg
+                new_filename = f"{predicted_name}_{detection_time.strftime('%Y%m%d_%H%M%S')}.jpg"
+                new_path = os.path.join(date_folder, new_filename)
+                
+                new_record = {
+                    'name': predicted_name,
+                    'datetime': detection_time.strftime('%Y-%m-%d %H:%M:%S'),
+                    'confidence': float(confidence),
+                    'image_path': os.path.relpath(new_path, BASE_DIR).replace("\\", "/")
+                }
+                attendance_data.append(new_record)
+                shutil.move(img_path, new_path)
+                print(f"Absensi berhasil: {predicted_name} ({confidence:.2f})")
+                print(f"File dipindahkan ke: {new_path}")
+                # else:
+                #     # Jika sudah ada data untuk hari yang sama
+                #     print(f"Sudah absen hari ini: {predicted_name}")
+                #     # Simpan file di not_saved
+                #     date_folder = os.path.join(PREDICTED_NOT_SAVED_DIR, detection_time.strftime('%Y%m%d'))
+                #     if not os.path.exists(date_folder):
+                #         os.makedirs(date_folder)
                     
-                    # Format nama file baru: nama_YYYYMMDD_HHMMSS.jpg
-                    new_filename = f"{predicted_name}_{detection_time.strftime('%Y%m%d_%H%M%S')}.jpg"
-                    new_path = os.path.join(date_folder, new_filename)
-                    
-                    new_record = {
-                        'name': predicted_name,
-                        'datetime': detection_time.strftime('%Y-%m-%d %H:%M:%S'),
-                        'confidence': float(confidence),
-                        'image_path': os.path.relpath(new_path, BASE_DIR).replace("\\", "/")
-                    }
-                    attendance_data.append(new_record)
-                    shutil.move(img_path, new_path)
-                    print(f"Absensi berhasil: {predicted_name} ({confidence:.2f})")
-                    print(f"File dipindahkan ke: {new_path}")
-                else:
-                    # Jika sudah ada data untuk hari yang sama
-                    print(f"Sudah absen hari ini: {predicted_name}")
-                    # Simpan file di not_saved
-                    date_folder = os.path.join(PREDICTED_NOT_SAVED_DIR, detection_time.strftime('%Y%m%d'))
-                    if not os.path.exists(date_folder):
-                        os.makedirs(date_folder)
-                    
-                    new_filename = f"{predicted_name}_{detection_time.strftime('%Y%m%d_%H%M%S')}.jpg"
-                    new_path = os.path.join(date_folder, new_filename)
-                    shutil.move(img_path, new_path)
-                    print(f"File dipindahkan ke: {new_path}")
+                #     new_filename = f"{predicted_name}_{detection_time.strftime('%Y%m%d_%H%M%S')}.jpg"
+                #     new_path = os.path.join(date_folder, new_filename)
+                #     shutil.move(img_path, new_path)
+                #     print(f"File dipindahkan ke: {new_path}")
             else:
                 # Confidence rendah, simpan sebagai unknown
                 new_filename = f"unknown_{detection_time.strftime('%Y%m%d_%H%M%S')}.jpg"
