@@ -1,45 +1,45 @@
 [
     {
-        "name": "Akhdan",
-        "datetime": "2024-09-27 08:38:40",
-        "confidence": 1.0,
-        "image_path": "static/img/extracted_faces/predicted_faces/absence/20240927/Akhdan_20240927_083840.jpg"
-    },
-    {
-        "name": "Akhdan",
-        "datetime": "2024-11-05 11:16:05",
-        "confidence": 0.8251224756240845,
-        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241105/Akhdan_20241105_111605.jpg"
-    },
-    {
-        "name": "Akhdan",
-        "datetime": "2024-11-11 10:10:11",
-        "confidence": 0.7750231027603149,
-        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241111/Akhdan_20241111_101011.jpg"
-    },
-    {
-        "name": "Hikam",
-        "datetime": "2024-11-05 11:13:56",
-        "confidence": 0.7822293639183044,
-        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241105/Hikam_20241105_111356.jpg"
-    },
-    {
-        "name": "Hikam",
-        "datetime": "2024-11-18 10:45:43",
-        "confidence": 0.7535713911056519,
-        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241118/Hikam_20241118_104543.jpg"
+        "name": "Laila",
+        "datetime": "2024-11-19 07:51:21",
+        "confidence": 0.7445976138114929,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241119/Laila_20241119_075121.jpg"
     },
     {
         "name": "Laila",
-        "datetime": "2024-11-18 10:51:21",
-        "confidence": 0.7442041635513306,
-        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241118/Laila_20241118_105121.jpg"
+        "datetime": "2024-11-19 08:51:21",
+        "confidence": 0.7445976138114929,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241119/Laila_20241119_085121.jpg"
     },
     {
-        "name": "Fadhli",
-        "datetime": "2024-11-18 13:28:31",
-        "confidence": 0.7701576352119446,
-        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241118/Fadhli_20241118_132831.jpg"
+        "name": "Laila",
+        "datetime": "2024-11-19 17:51:21",
+        "confidence": 0.7445976138114929,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241119/Laila_20241119_175121.jpg"
+    },
+    {
+        "name": "Laila",
+        "datetime": "2024-11-19 17:51:21",
+        "confidence": 0.7445976138114929,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241119/Laila_20241119_175121.jpg"
+    },
+    {
+        "name": "Hikam",
+        "datetime": "2024-11-19 08:53:56",
+        "confidence": 0.8585920929908752,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241119/Hikam_20241119_085356.jpg"
+    },
+    {
+        "name": "Laila",
+        "datetime": "2024-11-19 17:51:21",
+        "confidence": 0.7445976138114929,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241119/Laila_20241119_175121.jpg"
+    },
+    {
+        "name": "Hikam",
+        "datetime": "2024-11-19 17:53:56",
+        "confidence": 0.8585920929908752,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241119/Hikam_20241119_175356.jpg"
     },
     {
         "name": "Krisi",

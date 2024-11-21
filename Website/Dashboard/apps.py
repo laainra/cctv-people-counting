@@ -1,10 +1,80 @@
-from django.apps import AppConfig
-
-
-class DashboardConfig(AppConfig):
-    default_auto_field = 'django.db.models.BigAutoField'
-    name = 'Dashboard'
-
-    def ready(self):
-        from .views.presence import run_watchdog  
-        run_watchdog()
+[
+    {
+        "name": "Akhdan",
+        "datetime": "2024-09-27 08:38:40",
+        "confidence": 1.0,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20240927/Akhdan_20240927_083840.jpg"
+    },
+},    {
+{        "name": "Akhdan",
+    "n        "datetime": "2024-11-05 11:16:05",
+        "confidence": 0.8251224756240845,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241105/Akhdan_20241105_111605.jpg"
+    },
+    {
+        "name": "Akhdan",
+        "datetime": "2024-11-11 10:10:11",
+        "confidence": 0.7750231027603149,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241111/Akhdan_20241111_101011.jpg"
+    },
+    {
+        "name": "Hikam",
+        "datetime": "2024-11-05 11:13:56",
+        "confidence": 0.7822293639183044,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241105/Hikam_20241105_111356.jpg"
+    },
+    {
+        "name": "Hikam",
+        "datetime": "2024-11-18 10:45:43",
+        "confidence": 0.7535713911056519,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241118/Hikam_20241118_104543.jpg"
+    },
+    {
+        "name": "Laila",
+        "datetime": "2024-11-18 10:51:21",
+        "confidence": 0.7442041635513306,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241118/Laila_20241118_105121.jpg"
+    },
+    {
+        "name": "Fadhli",
+        "datetime": "2024-11-18 13:28:31",
+        "confidence": 0.7701576352119446,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241118/Fadhli_20241118_132831.jpg"
+    },
+    {
+        "name": "Krisi",
+        "datetime": "2024-11-18 13:35:42",
+        "confidence": 0.7145108580589294,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241118/Krisi_20241118_133542.jpg"
+    },
+    {
+        "name": "Annur",
+        "datetime": "2024-11-18 13:56:55",
+        "confidence": 0.7506073713302612,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241118/Annur_20241118_135655.jpg"
+    },
+    {
+        "name": "Akhdan",
+        "datetime": "2024-11-18 14:00:40",
+        "confidence": 0.7834323048591614,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241118/Akhdan_20241118_140040.jpg"
+    },
+    {
+        "name": "David",
+        "datetime": "2024-11-18 14:20:10",
+        "confidence": 0.7228776812553406,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241118/David_20241118_142010.jpg"
+    },
+    {
+        "name": "Yogi",
+        "datetime": "2024-11-18 14:23:57",
+        "confidence": 0.7468554377555847,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241118/Yogi_20241118_142357.jpg"
+    },
+    {
+        "name": "Rico",
+        "datetime": "2024-11-18 15:27:39",
+        "confidence": 0.7325204014778137,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241118/Rico_20241118_152739.jpg"
+    }
+]
