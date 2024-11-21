@@ -40,5 +40,41 @@
         "datetime": "2024-11-18 13:28:31",
         "confidence": 0.7701576352119446,
         "image_path": "static/img/extracted_faces/predicted_faces/absence/20241118/Fadhli_20241118_132831.jpg"
+    },
+    {
+        "name": "Krisi",
+        "datetime": "2024-11-18 13:35:42",
+        "confidence": 0.7145108580589294,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241118/Krisi_20241118_133542.jpg"
+    },
+    {
+        "name": "Annur",
+        "datetime": "2024-11-18 13:56:55",
+        "confidence": 0.7506073713302612,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241118/Annur_20241118_135655.jpg"
+    },
+    {
+        "name": "Akhdan",
+        "datetime": "2024-11-18 14:00:40",
+        "confidence": 0.7834323048591614,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241118/Akhdan_20241118_140040.jpg"
+    },
+    {
+        "name": "David",
+        "datetime": "2024-11-18 14:20:10",
+        "confidence": 0.7228776812553406,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241118/David_20241118_142010.jpg"
+    },
+    {
+        "name": "Yogi",
+        "datetime": "2024-11-18 14:23:57",
+        "confidence": 0.7468554377555847,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241118/Yogi_20241118_142357.jpg"
+    },
+    {
+        "name": "Rico",
+        "datetime": "2024-11-18 15:27:39",
+        "confidence": 0.7325204014778137,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241118/Rico_20241118_152739.jpg"
     }
 ]
