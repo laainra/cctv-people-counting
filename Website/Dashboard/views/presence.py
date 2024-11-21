@@ -57,8 +57,7 @@ def presence(request):
 
         if personnel_id is None:
             print("Personnel not found; skipping database insertion.")
-            new_filename = f"unknown_{
-                detected_time.strftime('%Y%m%d_%H%M%S')}.jpg"
+            new_filename = f"unknown_{detected_time.strftime('%Y%m%d_%H%M%S')}.jpg"
             new_path = os.path.join(PREDICTED_UNKNOWN_DIR, new_filename)
             shutil.move(image_path, new_path)
             print(f"file berhasil dipindahkan ke {new_path} ")
@@ -86,22 +85,19 @@ def presence(request):
                 if not os.path.exists(date_folder):
                     os.makedirs(date_folder)
 
-                new_filename = f"{predicted_name}_{
-                    detected_time.strftime('%Y%m%d_%H%M%S')}.jpg"
+                new_filename = f"{predicted_name}_{detected_time.strftime('%Y%m%d_%H%M%S')}.jpg"
                 new_path = os.path.join(date_folder, new_filename)
                 shutil.move(image_path, new_path)
                 print(f"file berhasil dipindahkan ke {new_path} ")
             else:
                 # If no matching record today, save as unknown
-                new_filename = f"unknown_{
-                    detected_time.strftime('%Y%m%d_%H%M%S')}.jpg"
+                new_filename = f"unknown_{detected_time.strftime('%Y%m%d_%H%M%S')}.jpg"
                 new_path = os.path.join(PREDICTED_UNKNOWN_DIR, new_filename)
                 shutil.move(image_path, new_path)
                 print(f"file berhasil dipindahkan ke {new_path} ")
         else:
             # If status is "Unknown", save as unknown
-            new_filename = f"unknown_{
-                detected_time.strftime('%Y%m%d_%H%M%S')}.jpg"
+            new_filename = f"unknown_{detected_time.strftime('%Y%m%d_%H%M%S')}.jpg"
             new_path = os.path.join(PREDICTED_UNKNOWN_DIR, new_filename)
             shutil.move(image_path, new_path)
             print(f"file berhasil dipindahkan ke {new_path} ")
@@ -312,8 +308,7 @@ def presence(request):
                     hours_worked = work_duration.seconds // 3600  # Total hours
                     minutes_worked = (work_duration.seconds %
                                       3600) // 60  # Total minutes
-                    work_hours = f"{hours_worked} hours, {
-                        minutes_worked} minutes"
+                    work_hours = f"{hours_worked} hours, {minutes_worked} minutes"
                 else:
 
                     work_hours = 'Still Working'
