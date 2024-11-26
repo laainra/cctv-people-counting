@@ -80,7 +80,7 @@ tqdm==4.66.2
 types-python-dateutil==2.9.0.20240906
 typing_extensions==4.10.0
 tzdata==2024.1
-ultralytics==8.1.35
+ultralytics==8.3.32
 urllib3==2.2.1
 vine==5.1.0
 wcwidth==0.2.13
@@ -89,3 +89,6 @@ XlsxWriter==3.2.0
 cryptography
 watchdog==6.0.0
 tf_keras==2.17.0
+# pip install tensorrt
+# onnxslim==0.1.41
+# onnxruntime-gpu==1.20.1

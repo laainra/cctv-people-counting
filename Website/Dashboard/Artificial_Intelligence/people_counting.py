@@ -9,6 +9,7 @@ from datetime import datetime
 from shapely.geometry import Point
 from shapely.geometry.polygon import Polygon
 from ..Artificial_Intelligence.variables import RecognitionVariable as RV
+import torch
 
 class PeopleCounting:
     def __init__(self, model, GV):
@@ -35,6 +36,13 @@ class PeopleCounting:
 
         self.detectSpeed = 0
         
+        self.tracker_config = {
+        'track_thresh': 0.5,
+        'track_buffer': 30,
+        'match_thresh': 0.8,
+        'min_box_area': 100,
+        'frame_rate': 30
+    }
     # Function to get distance between line and point
     def distance(self, x1, y1, x2, y2, x, y):
         A = x - x1
@@ -82,13 +90,37 @@ class PeopleCounting:
     # Function to get persons bounding box 
     def extract_bboxes(self, img):
         self.ori_img_size = img.shape
-
+        
+        # Resize image
         img_resized = cv2.resize(img, (360, 180))
-
+        
+        # Ensure the image is in uint8 format (0-255)
+        if img_resized.dtype != np.uint8:
+            img_resized = (img_resized * 255).astype(np.uint8)
+        
         self.resized_img_size = img_resized.shape
 
-        for result in self.model.track(img_resized, persist=True, verbose=False, classes=0, stream_buffer=True, stream=True):
-            self.person_bboxes = result.boxes.data.tolist()
+        # Batch processing with the right settings
+        try:
+            for result in self.model.track(
+                source=img_resized,
+                persist=True,
+                verbose=False,
+                classes=[0],
+                stream=True,
+                device=0 if torch.cuda.is_available() else 'cpu',
+                half=False,  # Use FP32
+                tracker="bytetrack.yaml",  # Use ByteTracker with default configuration
+                conf=0.3,  # Confidence threshold
+                iou=0.5,   # NMS IOU threshold
+            ):
+                if result.boxes is not None:
+                    self.person_bboxes = result.boxes.data.tolist()
+                else:
+                    self.person_bboxes = []
+        except Exception as e:
+            print(f"Error in tracking: {e}")
+            self.person_bboxes = []
 
     # Function to count people with recieved datas
     def people_count(self, frame, bboxes, face_coordinates, feats, genders, poly_coordinates, cam_id):
@@ -102,6 +134,9 @@ class PeopleCounting:
 
         if len(bboxes) == 0:
             self.id.clear()
+
+        # Save current time once
+        current_time = datetime.now()
 
         # Loop through all bounding box
         for person_bbox in bboxes:
@@ -128,16 +163,16 @@ class PeopleCounting:
             
             bbox_id = str(bbox[4])
 
-            try:
-                self.id[bbox_id]
-            except:
-                self.id[bbox_id] = {}
-                self.id[bbox_id]['name'] = 'Unknown'
-                self.id[bbox_id]['gender'] = 'Unknown'
-                self.id[bbox_id]['gender_score'] = 0
-                self.id[bbox_id]['prev_distRed'] = 0
-                self.id[bbox_id]['prev_distGreen'] = 0
-                self.id[bbox_id]['score'] = 0
+            # Using dict.get() for checking
+            person_data = self.id.get(bbox_id, {
+                'name': 'Unknown',
+                'gender': 'Unknown',
+                'gender_score': 0,
+                'prev_distRed': 0,
+                'prev_distGreen': 0,
+                'score': 0
+            })
+            self.id[bbox_id] = person_data
 
             # Check which face belongs to which person bounding box
             for idx, (((ax1, ay1, ax2, ay2, w, h), center1, center2), (face_name, score, feat), (gender, gender_score)) in enumerate(zip(face_coordinates, feats, genders)):

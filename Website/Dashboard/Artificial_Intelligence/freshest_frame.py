@@ -42,19 +42,21 @@ class FreshestFrame(threading.Thread):
             try:
                 # block for fresh frame
                 (rv, img) = self.capture.read()
-                assert rv
+                if not rv:
+                    continue  # Skip if frame is not valid
+
                 counter += 1
 
                 # publish the frame
-                with self.cond: # lock the condition for this operation
-                    self.frame = img if rv else None
+                with self.cond:  # lock the condition for this operation
+                    self.frame = img
                     self.latestnum = counter
                     self.cond.notify_all()
 
                 if self.callback:
                     self.callback(img)
-            except:
-                pass
+            except Exception as e:
+                print(f"Error in FreshestFrame: {e}")  # Add logging for errors
 
     def read(self, wait=True, seqnumber=None, timeout=None):
         # with no arguments (wait=True), it always blocks for a fresh frame

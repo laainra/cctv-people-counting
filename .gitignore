@@ -24,3 +24,6 @@ Website/Dashboard/static/*.xlsx
 __pycache__/
 
 .env
+*.jpg
+*.jpeg
+*.png

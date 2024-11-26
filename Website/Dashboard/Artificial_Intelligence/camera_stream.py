@@ -19,18 +19,49 @@ class CameraStream:
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
         # Import yolo model
-        model_yolo = YOLO(os.path.join(os.path.dirname(__file__), 'models/yolov8n.pt'), task='detect')
-        model_yolo.to(self.device)
+        model_path = os.path.join(os.path.dirname(__file__), 'models/yolo11n.pt')
+        model_yolo = YOLO(model_path)
+        
+        # Optimize model untuk GPU
+        if torch.cuda.is_available():
+            # Konversi ke FP32 dulu sebelum optimasi
+            model_yolo = model_yolo.to(self.device).float()
+            
+            # Export ke format engine dengan pengaturan yang tepat
+            engine_path = model_path.replace('.pt', '.engine')
+            if not os.path.exists(engine_path):
+                model_yolo.export(
+                    format="engine",
+                    device=0,  # GPU device id
+                    half=False,  # Gunakan FP32 untuk menghindari masalah kompatibilitas
+                    simplify=True,
+                    workspace=4,  # Workspace dalam GB
+                    verbose=False
+                )
+            
+            # Load engine model
+            model_yolo = YOLO(engine_path)
+        
+        self.model = model_yolo
 
-        # Import CNN model
-        model_gender = torch.load(os.path.join(os.path.dirname(__file__), 'models/gender.pt'), map_location=self.device)
-        model_gender.eval()  # Set model ke mode evaluasi
+        # Import dan optimasi model gender
+        model_gender = torch.load(
+            os.path.join(os.path.dirname(__file__), 'models/gender.pt'),
+            map_location=self.device
+        )
+        model_gender = model_gender.float().eval()  # Gunakan FP32
+        
+        if torch.cuda.is_available():
+            model_gender = torch.jit.trace(model_gender, torch.randn(1, 3, 224, 224).to(self.device))
+            model_gender = torch.jit.freeze(model_gender)
+        
+        self.model_gender = model_gender
 
         # Set classes
         self.GV = GlobalVariable()
         self.FR = FaceRecognition()
-        self.GD = GenderDetection(model_gender)
-        self.PC = PeopleCounting(model_yolo, self.GV)
+        self.GD = GenderDetection(self.model_gender)
+        self.PC = PeopleCounting(self.model, self.GV)
 
         self.streaming = False
 
@@ -80,15 +111,17 @@ class CameraStream:
 
                 start = time.time()
 
-                # Run gender and face recognition model
-                if self.gd_active:
-                    self.GD.extract_genders(img)
-                
-                if self.fr_active:
-                    self.FR.extract_features(img)
+                # Gunakan torch.no_grad() untuk menghemat memori
+                with torch.no_grad():
+                    # Run gender and face recognition model
+                    if self.gd_active:
+                        self.GD.extract_genders(img)
+                    
+                    if self.fr_active:
+                        self.FR.extract_features(img)
 
-                # Run people counting model
-                self.PC.extract_bboxes(img)
+                    # Run people counting model
+                    self.PC.extract_bboxes(img)
 
                 self.PC.detectSpeed = time.time() - start
 
@@ -98,7 +131,7 @@ class CameraStream:
                 if not self.fr_active:
                     self.FR.feats = [['Unknown', 1, []] for _ in self.GD.genders]
 
-                # Store recieved variables to global variable
+                # Store received variables to global variable
                 self.GV.person_bboxes = self.PC.person_bboxes
                 self.GV.feats = self.FR.feats
                 self.GV.genders = self.GD.genders
@@ -116,9 +149,10 @@ class CameraStream:
             face = img[y1:y2, x1:x2]
             if face.size > 0:  # Pastikan wajah tidak kosong
                 timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-                filename = f"face_{timestamp}_{idx}_cam{self.ID}.jpg"
+                filename = f"face_{timestamp}_{idx}_cam{self.ID}.png"
                 filepath = os.path.join(self.face_folder, filename)
-                cv2.imwrite(filepath, face)
+                
+                cv2.imwrite(filepath, face, [cv2.IMWRITE_PNG_COMPRESSION, 0])
 
     # Function to read camera footage
     def start_stream(self):
@@ -132,6 +166,7 @@ class CameraStream:
         # Open camera
         cap = cv2.VideoCapture(self.camera)
         cap.set(cv2.CAP_PROP_FPS, 30)
+        cap.set(cv2.CAP_PROP_BUFFERSIZE, 1)
         # cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
         # cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
 
@@ -180,6 +215,10 @@ class CameraStream:
         while self.streaming:
             try:
                 ret, frame = self.fresh.read()
+
+                # Process only the latest frame
+                if not ret:
+                    continue
 
                 if self.check_time_range(self.time_range):
                     self.stream_paused = False
