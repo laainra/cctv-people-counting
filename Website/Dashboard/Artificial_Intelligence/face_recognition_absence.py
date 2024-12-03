@@ -5,12 +5,12 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 warnings.filterwarnings('ignore')
 import cv2
 import numpy as np
-import pandas as pd
+# import pandas as pd
 from datetime import datetime
 import shutil
-from deepface import DeepFace
+# from deepface import DeepFace
 import torch
-from facenet_pytorch import MTCNN, InceptionResnetV1
+from facenet_pytorch import InceptionResnetV1
 import glob
 import time
 from watchdog.observers import Observer
@@ -33,7 +33,6 @@ for dir_path in [PREDICTED_ABSENCE_DIR, PREDICTED_NOT_SAVED_DIR, PREDICTED_UNKNO
 
 # Inisialisasi model FaceNet
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-mtcnn = MTCNN(device=device)
 resnet = InceptionResnetV1(pretrained='vggface2').eval().to(device)
 
 def extract_datetime_from_filename(filename):
@@ -65,19 +64,22 @@ def extract_datetime_from_filename(filename):
         return None
 
 def get_embedding(img_path):
+    # Baca dan resize gambar ke ukuran yang diharapkan oleh InceptionResnetV1 (160x160)
     img = cv2.imread(img_path)
     img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+    img = cv2.resize(img, (160, 160))
     
-    # Deteksi wajah menggunakan MTCNN
-    face = mtcnn(img)
-    if face is None:
-        return None
+    # Konversi ke tensor dan normalisasi
+    img = torch.from_numpy(img.transpose((2, 0, 1))).float()
+    img = img.unsqueeze(0)  # Tambahkan dimensi batch
+    img = img / 255.0  # Normalisasi ke range [0,1]
     
-    # Pindahkan face tensor ke device yang sama dengan model
-    face = face.to(device)
+    # Pindahkan ke device yang sama dengan model
+    img = img.to(device)
     
-    # Mendapatkan embedding menggunakan FaceNet
-    embedding = resnet(face.unsqueeze(0)).detach().cpu().numpy()
+    # Dapatkan embedding
+    with torch.no_grad():
+        embedding = resnet(img).detach().cpu().numpy()
     return embedding[0]
 
 def load_database():
