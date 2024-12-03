@@ -131,7 +131,7 @@ def start_stream(request):
         MC.set_polygon(cam.id, poly)
 
         # Set activated model
-        MC.set_model(cam.id, cam.face_detection, cam.gender_detection)
+        MC.set_model(cam.id, cam.face_detection, cam.gender_detection, cam.face_capture)
 
         # Set AI time range
         MC.set_time_range(cam.id, cam.cam_start, cam.cam_stop)
