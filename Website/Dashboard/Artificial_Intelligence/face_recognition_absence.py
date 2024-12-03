@@ -36,7 +36,6 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 resnet = InceptionResnetV1(pretrained='vggface2').eval().to(device)
 
 def extract_datetime_from_filename(filename):
-
     try:
         # Hapus ekstensi file
         filename = os.path.splitext(filename)[0]
@@ -44,19 +43,19 @@ def extract_datetime_from_filename(filename):
         # Memisahkan string berdasarkan underscore
         parts = filename.split('_')
         
-        # Cari bagian yang sesuai dengan format tanggal (8 digit) dan waktu (6 digit)
-        date_str = None
-        time_str = None
+        # Ambil dua bagian terakhir dari nama file
+        if len(parts) < 2:
+            return None
         
-        for part in parts:
-            if len(part) == 8 and part.isdigit():  # YYYYMMDD
-                date_str = part
-            elif len(part) == 6 and part.isdigit():  # HHMMSS
-                time_str = part
+        # Ambil bagian terakhir dan kedua terakhir
+        date_str = parts[-2]
+        time_str = parts[-1]
         
-        if date_str and time_str:
+        # Periksa apakah bagian terakhir adalah format tanggal (YYYYMMDD) dan waktu (HHMMSS)
+        if len(date_str) == 8 and date_str.isdigit() and len(time_str) == 6 and time_str.isdigit():
             datetime_str = f"{date_str}_{time_str}"
             return datetime.strptime(datetime_str, '%Y%m%d_%H%M%S')
+        
         return None
         
     except Exception as e:
@@ -131,15 +130,15 @@ def process_attendance():
     print(f"Database loaded with {len(database)} entries: {list(database.keys())}")
     
     # Membuat direktori untuk file JSON jika belum ada
-    if not os.path.exists(os.path.dirname(JSON_PATH)):
-        os.makedirs(os.path.dirname(JSON_PATH))
+    attendance_date = datetime.now().date()
+    daily_json_path = os.path.join(BASE_DIR, 'static', 'attendance', f'{attendance_date}.json')
 
-    # Membuat atau membaca JSON
-    if not os.path.exists(JSON_PATH):
+    # Membuat atau membaca JSON untuk hari ini
+    if not os.path.exists(daily_json_path):
         attendance_data = []
-        print("Membuat file JSON baru!")
+        print(f"Membuat file JSON baru untuk {attendance_date}!")
     else:
-        with open(JSON_PATH, 'r') as f:
+        with open(daily_json_path, 'r') as f:
             content = f.read()
             if content:  # Memastikan file tidak kosong
                 attendance_data = json.loads(content)
@@ -237,8 +236,8 @@ def process_attendance():
             print(f"File dipindahkan ke: {unknown_path}")
             continue
     
-    # Simpan JSON
-    with open(JSON_PATH, 'w') as f:
+    # Simpan JSON harian
+    with open(daily_json_path, 'w') as f:
         json.dump(attendance_data, f, indent=4)
     
     # Verifikasi folder raw

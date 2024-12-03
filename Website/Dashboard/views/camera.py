@@ -232,6 +232,7 @@ def edit_camera(request, id):
             active_cam.cam_name = form.cleaned_data['cam_name']
             active_cam.gender_detection = form.cleaned_data['gender_detection']
             active_cam.face_detection = form.cleaned_data['face_detection']
+            active_cam.face_capture = form.cleaned_data['face_capture']
             active_cam.cam_start = form.cleaned_data['cam_start']
             active_cam.cam_stop = form.cleaned_data['cam_stop']
             active_cam.attendance_time_start = form.cleaned_data['attendance_time_start']
@@ -243,7 +244,7 @@ def edit_camera(request, id):
             try:
                 # edit it when MC set time range change to attendance and leaving
                 MC.set_model(active_cam.id, bool(
-                    active_cam.face_detection), bool(active_cam.gender_detection))
+                    active_cam.face_detection), bool(active_cam.gender_detection), bool(active_cam.face_capture))
                 MC.set_time_range(
                     active_cam.id, active_cam.cam_start, active_cam.cam_stop)
             except:

@@ -44,6 +44,8 @@ class AddCameraForm(forms.ModelForm):
         widget=forms.widgets.CheckboxInput(), required=False)
     face_detection = forms.BooleanField(
         widget=forms.widgets.CheckboxInput(), required=False)
+    face_capture = forms.BooleanField(
+        widget=forms.widgets.CheckboxInput(), required=False)
     cam_start = forms.TimeField(
         widget=forms.widgets.TimeInput(), required=True)
     cam_stop = forms.TimeField(widget=forms.widgets.TimeInput(), required=True)
@@ -63,6 +65,7 @@ class AddCameraForm(forms.ModelForm):
             'feed_src',
             'gender_detection',
             'face_detection',
+            'face_capture',
             'cam_start',
             'cam_stop',
             'attendance_time_start',

@@ -283,7 +283,7 @@
       </a>
 
       <span
-        class="effected"
+        class="mb-2 effected"
         style="
           font-size: 13px;
           font-style: italic;
@@ -292,6 +292,28 @@
         "
         >Enable face recognition to recognize registered personnel when entering
         the area</span
+      >
+      
+      <a class="d-flex ml-1 align-items-center" style="text-decoration: none">
+        {% if Active_Cam == None %}
+        <input name="face_capture" type="checkbox" class="effected" checked />
+        {% else %} {% if Active_Cam.face_capture == True %}
+        <input name="face_capture" type="checkbox" class="effected" checked />
+        {% else %}
+        <input name="face_capture" type="checkbox" class="effected" />
+        {% endif %} {% endif %}
+        <span class="ml-2 effected">Face Capture</span>
+      </a>
+
+      <span
+        class="effected"
+        style="
+          font-size: 13px;
+          font-style: italic;
+          text-align: justify;
+          margin-left: 25px;
+        "
+        >Enable face capture for capturing and extracting image from cctv and save image to database</span
       >
     </p>
 

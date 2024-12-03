@@ -51,6 +51,7 @@ class Camera_Settings(models.Model):
     cam_is_active = models.BooleanField(default=False)
     gender_detection = models.BooleanField(default=False)
     face_detection = models.BooleanField(default=False)
+    face_capture = models.BooleanField(default=False)
     cam_start = models.CharField(max_length=200)
     cam_stop = models.CharField(max_length=200)
     attendance_time_start = models.CharField(max_length=200)
