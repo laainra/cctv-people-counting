@@ -1,0 +1,1388 @@
+[
+    {
+        "name": "Hikam",
+        "datetime": "2024-11-21 09:41:25",
+        "confidence": 0.8312163352966309,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241121/Hikam_20241121_094125.jpg"
+    },
+    {
+        "name": "Hikam",
+        "datetime": "2024-11-21 09:41:27",
+        "confidence": 0.7880924344062805,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241121/Hikam_20241121_094127.jpg"
+    },
+    {
+        "name": "Akhdan",
+        "datetime": "2024-11-21 09:43:05",
+        "confidence": 0.7661696672439575,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241121/Akhdan_20241121_094305.jpg"
+    },
+    {
+        "name": "Akhdan",
+        "datetime": "2024-11-21 09:43:06",
+        "confidence": 0.7490166425704956,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241121/Akhdan_20241121_094306.jpg"
+    },
+    {
+        "name": "Akhdan",
+        "datetime": "2024-11-21 09:43:07",
+        "confidence": 0.7508350610733032,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241121/Akhdan_20241121_094307.jpg"
+    },
+    {
+        "name": "Atma",
+        "datetime": "2024-11-21 09:43:08",
+        "confidence": 0.7374926209449768,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241121/Atma_20241121_094308.jpg"
+    },
+    {
+        "name": "Akhdan",
+        "datetime": "2024-11-21 09:43:09",
+        "confidence": 0.7594915628433228,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241121/Akhdan_20241121_094309.jpg"
+    },
+    {
+        "name": "Akhdan",
+        "datetime": "2024-11-21 09:43:10",
+        "confidence": 0.7035127878189087,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241121/Akhdan_20241121_094310.jpg"
+    },
+    {
+        "name": "Akhdan",
+        "datetime": "2024-11-21 09:43:11",
+        "confidence": 0.8239339590072632,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241121/Akhdan_20241121_094311.jpg"
+    },
+    {
+        "name": "David",
+        "datetime": "2024-11-21 09:49:51",
+        "confidence": 0.7619616389274597,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241121/David_20241121_094951.jpg"
+    },
+    {
+        "name": "Hikam",
+        "datetime": "2024-11-21 09:55:03",
+        "confidence": 0.7322875261306763,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241121/Hikam_20241121_095503.jpg"
+    },
+    {
+        "name": "Hikam",
+        "datetime": "2024-11-21 09:55:04",
+        "confidence": 0.8022506237030029,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241121/Hikam_20241121_095504.jpg"
+    },
+    {
+        "name": "Hikam",
+        "datetime": "2024-11-21 10:11:52",
+        "confidence": 0.7235049605369568,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241121/Hikam_20241121_101152.jpg"
+    },
+    {
+        "name": "David",
+        "datetime": "2024-11-21 10:11:53",
+        "confidence": 0.7211854457855225,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241121/David_20241121_101153.jpg"
+    },
+    {
+        "name": "Yogi",
+        "datetime": "2024-11-21 10:22:08",
+        "confidence": 0.7253742814064026,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241121/Yogi_20241121_102208.jpg"
+    },
+    {
+        "name": "Daris",
+        "datetime": "2024-11-21 10:31:30",
+        "confidence": 0.7120006680488586,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241121/Daris_20241121_103130.jpg"
+    },
+    {
+        "name": "Akhdan",
+        "datetime": "2024-11-21 10:34:12",
+        "confidence": 0.7327927350997925,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241121/Akhdan_20241121_103412.jpg"
+    },
+    {
+        "name": "Akhdan",
+        "datetime": "2024-11-21 10:34:13",
+        "confidence": 0.7446329593658447,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241121/Akhdan_20241121_103413.jpg"
+    },
+    {
+        "name": "Akhdan",
+        "datetime": "2024-11-21 10:34:14",
+        "confidence": 0.7168178558349609,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241121/Akhdan_20241121_103414.jpg"
+    },
+    {
+        "name": "Fadhli",
+        "datetime": "2024-11-21 10:53:07",
+        "confidence": 0.7695785760879517,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241121/Fadhli_20241121_105307.jpg"
+    },
+    {
+        "name": "Fadhli",
+        "datetime": "2024-11-21 10:53:08",
+        "confidence": 0.8317693471908569,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241121/Fadhli_20241121_105308.jpg"
+    },
+    {
+        "name": "David",
+        "datetime": "2024-11-21 11:14:23",
+        "confidence": 0.7199843525886536,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241121/David_20241121_111423.jpg"
+    },
+    {
+        "name": "Filla",
+        "datetime": "2024-11-21 11:41:05",
+        "confidence": 0.7134605646133423,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241121/Filla_20241121_114105.jpg"
+    },
+    {
+        "name": "Filla",
+        "datetime": "2024-11-21 11:41:06",
+        "confidence": 0.7194705605506897,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241121/Filla_20241121_114106.jpg"
+    },
+    {
+        "name": "Fadhli",
+        "datetime": "2024-11-21 11:46:59",
+        "confidence": 0.7435148358345032,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241121/Fadhli_20241121_114659.jpg"
+    },
+    {
+        "name": "Fadhli",
+        "datetime": "2024-11-21 11:47:01",
+        "confidence": 0.7380583882331848,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241121/Fadhli_20241121_114701.jpg"
+    },
+    {
+        "name": "Arjun",
+        "datetime": "2024-11-21 11:48:31",
+        "confidence": 0.7526224851608276,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241121/Arjun_20241121_114831.jpg"
+    },
+    {
+        "name": "Fadhli",
+        "datetime": "2024-11-21 11:48:41",
+        "confidence": 0.7579210996627808,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241121/Fadhli_20241121_114841.jpg"
+    },
+    {
+        "name": "Arjun",
+        "datetime": "2024-11-21 11:50:21",
+        "confidence": 0.7703874111175537,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241121/Arjun_20241121_115021.jpg"
+    },
+    {
+        "name": "Akhdan",
+        "datetime": "2024-11-21 11:50:22",
+        "confidence": 0.7859278917312622,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241121/Akhdan_20241121_115022.jpg"
+    },
+    {
+        "name": "Akhdan",
+        "datetime": "2024-11-21 11:50:23",
+        "confidence": 0.7572734355926514,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241121/Akhdan_20241121_115023.jpg"
+    },
+    {
+        "name": "Akhdan",
+        "datetime": "2024-11-21 11:50:24",
+        "confidence": 0.7570347189903259,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241121/Akhdan_20241121_115024.jpg"
+    },
+    {
+        "name": "Akhdan",
+        "datetime": "2024-11-21 11:50:25",
+        "confidence": 0.7227997779846191,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241121/Akhdan_20241121_115025.jpg"
+    },
+    {
+        "name": "Akhdan",
+        "datetime": "2024-11-21 11:50:26",
+        "confidence": 0.7811315059661865,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241121/Akhdan_20241121_115026.jpg"
+    },
+    {
+        "name": "Akhdan",
+        "datetime": "2024-11-21 11:50:33",
+        "confidence": 0.7172108292579651,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241121/Akhdan_20241121_115033.jpg"
+    },
+    {
+        "name": "Cantica",
+        "datetime": "2024-11-21 11:52:07",
+        "confidence": 0.7596032619476318,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241121/Cantica_20241121_115207.jpg"
+    },
+    {
+        "name": "Clariza",
+        "datetime": "2024-11-21 11:52:12",
+        "confidence": 0.7083786129951477,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241121/Clariza_20241121_115212.jpg"
+    },
+    {
+        "name": "Adhy",
+        "datetime": "2024-11-21 11:55:17",
+        "confidence": 0.710649311542511,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241121/Adhy_20241121_115517.jpg"
+    },
+    {
+        "name": "Rico",
+        "datetime": "2024-11-21 11:57:02",
+        "confidence": 0.703269898891449,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241121/Rico_20241121_115702.jpg"
+    },
+    {
+        "name": "Fadhli",
+        "datetime": "2024-11-21 12:03:04",
+        "confidence": 0.7813396453857422,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241121/Fadhli_20241121_120304.jpg"
+    },
+    {
+        "name": "Cantica",
+        "datetime": "2024-11-21 12:23:33",
+        "confidence": 0.7235626578330994,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241121/Cantica_20241121_122333.jpg"
+    },
+    {
+        "name": "Hikam",
+        "datetime": "2024-11-21 12:41:21",
+        "confidence": 0.7061636447906494,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241121/Hikam_20241121_124121.jpg"
+    },
+    {
+        "name": "Akhdan",
+        "datetime": "2024-11-21 13:06:27",
+        "confidence": 0.823813259601593,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241121/Akhdan_20241121_130627.jpg"
+    },
+    {
+        "name": "Akhdan",
+        "datetime": "2024-11-21 13:06:29",
+        "confidence": 0.7724124789237976,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241121/Akhdan_20241121_130629.jpg"
+    },
+    {
+        "name": "Dwiki",
+        "datetime": "2024-11-21 13:06:30",
+        "confidence": 0.7424635887145996,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241121/Dwiki_20241121_130630.jpg"
+    },
+    {
+        "name": "Fadhli",
+        "datetime": "2024-11-21 13:06:34",
+        "confidence": 0.7815127968788147,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241121/Fadhli_20241121_130634.jpg"
+    },
+    {
+        "name": "Akhdan",
+        "datetime": "2024-11-21 13:15:22",
+        "confidence": 0.7104859352111816,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241121/Akhdan_20241121_131522.jpg"
+    },
+    {
+        "name": "Cantica",
+        "datetime": "2024-11-21 14:11:59",
+        "confidence": 0.7307247519493103,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241121/Cantica_20241121_141159.jpg"
+    },
+    {
+        "name": "Krisi",
+        "datetime": "2024-11-21 15:05:07",
+        "confidence": 0.7608148455619812,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241121/Krisi_20241121_150507.jpg"
+    },
+    {
+        "name": "Krisi",
+        "datetime": "2024-11-21 15:05:08",
+        "confidence": 0.7490183115005493,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241121/Krisi_20241121_150508.jpg"
+    },
+    {
+        "name": "Krisi",
+        "datetime": "2024-11-21 15:05:09",
+        "confidence": 0.726875364780426,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241121/Krisi_20241121_150509.jpg"
+    },
+    {
+        "name": "Clariza",
+        "datetime": "2024-11-21 15:05:11",
+        "confidence": 0.7405813336372375,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241121/Clariza_20241121_150511.jpg"
+    },
+    {
+        "name": "Krisi",
+        "datetime": "2024-11-21 15:05:12",
+        "confidence": 0.7418417930603027,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241121/Krisi_20241121_150512.jpg"
+    },
+    {
+        "name": "Krisi",
+        "datetime": "2024-11-21 15:05:13",
+        "confidence": 0.7384828925132751,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241121/Krisi_20241121_150513.jpg"
+    },
+    {
+        "name": "Krisi",
+        "datetime": "2024-11-21 15:05:14",
+        "confidence": 0.7194262146949768,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241121/Krisi_20241121_150514.jpg"
+    },
+    {
+        "name": "Krisi",
+        "datetime": "2024-11-21 15:05:15",
+        "confidence": 0.7107526063919067,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241121/Krisi_20241121_150515.jpg"
+    },
+    {
+        "name": "Krisi",
+        "datetime": "2024-11-21 15:05:16",
+        "confidence": 0.7306621074676514,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241121/Krisi_20241121_150516.jpg"
+    },
+    {
+        "name": "Krisi",
+        "datetime": "2024-11-21 15:05:18",
+        "confidence": 0.7391743063926697,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241121/Krisi_20241121_150518.jpg"
+    },
+    {
+        "name": "Krisi",
+        "datetime": "2024-11-21 15:05:19",
+        "confidence": 0.7361764907836914,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241121/Krisi_20241121_150519.jpg"
+    },
+    {
+        "name": "David",
+        "datetime": "2024-11-21 15:19:48",
+        "confidence": 0.7559964656829834,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241121/David_20241121_151948.jpg"
+    },
+    {
+        "name": "Hikam",
+        "datetime": "2024-11-21 15:19:50",
+        "confidence": 0.7122783064842224,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241121/Hikam_20241121_151950.jpg"
+    },
+    {
+        "name": "David",
+        "datetime": "2024-11-21 15:20:56",
+        "confidence": 0.7440803647041321,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241121/David_20241121_152056.jpg"
+    },
+    {
+        "name": "Laila",
+        "datetime": "2024-11-21 15:22:55",
+        "confidence": 0.7327468395233154,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241121/Laila_20241121_152255.jpg"
+    },
+    {
+        "name": "Cantica",
+        "datetime": "2024-11-21 15:28:21",
+        "confidence": 0.8178848624229431,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241121/Cantica_20241121_152821.jpg"
+    },
+    {
+        "name": "Cantica",
+        "datetime": "2024-11-21 15:28:22",
+        "confidence": 0.7255772352218628,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241121/Cantica_20241121_152822.jpg"
+    },
+    {
+        "name": "Alfon",
+        "datetime": "2024-11-21 15:54:11",
+        "confidence": 0.7225106358528137,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241121/Alfon_20241121_155411.jpg"
+    },
+    {
+        "name": "Cantica",
+        "datetime": "2024-11-21 16:03:40",
+        "confidence": 0.7188742756843567,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241121/Cantica_20241121_160340.jpg"
+    },
+    {
+        "name": "Cantica",
+        "datetime": "2024-11-21 16:03:42",
+        "confidence": 0.7876945734024048,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241121/Cantica_20241121_160342.jpg"
+    },
+    {
+        "name": "David",
+        "datetime": "2024-11-21 16:27:12",
+        "confidence": 0.7632467746734619,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241121/David_20241121_162712.jpg"
+    },
+    {
+        "name": "Laila",
+        "datetime": "2024-11-21 16:27:19",
+        "confidence": 0.7049168348312378,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241121/Laila_20241121_162719.jpg"
+    },
+    {
+        "name": "Hikam",
+        "datetime": "2024-11-21 16:27:27",
+        "confidence": 0.8163411617279053,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241121/Hikam_20241121_162727.jpg"
+    },
+    {
+        "name": "Laila",
+        "datetime": "2024-11-21 16:35:19",
+        "confidence": 0.7292431592941284,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241121/Laila_20241121_163519.jpg"
+    },
+    {
+        "name": "Atma",
+        "datetime": "2024-11-21 16:38:46",
+        "confidence": 0.7427520751953125,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241121/Atma_20241121_163846.jpg"
+    },
+    {
+        "name": "Dwiki",
+        "datetime": "2024-11-21 16:38:48",
+        "confidence": 0.7325802445411682,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241121/Dwiki_20241121_163848.jpg"
+    },
+    {
+        "name": "Fadhli",
+        "datetime": "2024-11-21 16:39:02",
+        "confidence": 0.742408037185669,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241121/Fadhli_20241121_163902.jpg"
+    },
+    {
+        "name": "Dwiki",
+        "datetime": "2024-11-21 16:40:06",
+        "confidence": 0.7474634647369385,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241121/Dwiki_20241121_164006.jpg"
+    },
+    {
+        "name": "Dwiki",
+        "datetime": "2024-11-21 16:40:07",
+        "confidence": 0.7122195363044739,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241121/Dwiki_20241121_164007.jpg"
+    },
+    {
+        "name": "Daris",
+        "datetime": "2024-11-21 16:46:54",
+        "confidence": 0.7658112645149231,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241121/Daris_20241121_164654.jpg"
+    },
+    {
+        "name": "Daris",
+        "datetime": "2024-11-21 16:46:56",
+        "confidence": 0.725939154624939,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241121/Daris_20241121_164656.jpg"
+    },
+    {
+        "name": "David",
+        "datetime": "2024-11-21 16:49:47",
+        "confidence": 0.7774250507354736,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241121/David_20241121_164947.jpg"
+    },
+    {
+        "name": "Hikam",
+        "datetime": "2024-11-21 16:52:14",
+        "confidence": 0.7026545405387878,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241121/Hikam_20241121_165214.jpg"
+    },
+    {
+        "name": "Rico",
+        "datetime": "2024-11-19 10:13:05",
+        "confidence": 0.8712750673294067,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241119/Rico_20241119_101305.jpg"
+    },
+    {
+        "name": "Fadhli",
+        "datetime": "2024-11-25 11:51:15",
+        "confidence": 0.7312172055244446,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241125/Fadhli_20241125_115115.jpg"
+    },
+    {
+        "name": "Daris",
+        "datetime": "2024-11-25 11:51:28",
+        "confidence": 0.7041110992431641,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241125/Daris_20241125_115128.jpg"
+    },
+    {
+        "name": "Daris",
+        "datetime": "2024-11-25 11:51:29",
+        "confidence": 0.7349210977554321,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241125/Daris_20241125_115129.jpg"
+    },
+    {
+        "name": "Fadhli",
+        "datetime": "2024-11-25 11:59:36",
+        "confidence": 0.7083460092544556,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241125/Fadhli_20241125_115936.jpg"
+    },
+    {
+        "name": "Fadhli",
+        "datetime": "2024-11-25 12:01:02",
+        "confidence": 0.7783319354057312,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241125/Fadhli_20241125_120102.jpg"
+    },
+    {
+        "name": "Akhdan",
+        "datetime": "2024-11-25 12:08:43",
+        "confidence": 0.7181208729743958,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241125/Akhdan_20241125_120843.jpg"
+    },
+    {
+        "name": "Hikam",
+        "datetime": "2024-11-25 12:11:51",
+        "confidence": 0.7286874651908875,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241125/Hikam_20241125_121151.jpg"
+    },
+    {
+        "name": "Hikam",
+        "datetime": "2024-11-25 12:11:52",
+        "confidence": 0.7186907529830933,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241125/Hikam_20241125_121152.jpg"
+    },
+    {
+        "name": "Adhy",
+        "datetime": "2024-11-25 12:27:59",
+        "confidence": 0.7234729528427124,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241125/Adhy_20241125_122759.jpg"
+    },
+    {
+        "name": "Wahyu",
+        "datetime": "2024-11-25 12:39:13",
+        "confidence": 0.724128246307373,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241125/Wahyu_20241125_123913.jpg"
+    },
+    {
+        "name": "Yogi",
+        "datetime": "2024-11-25 12:46:22",
+        "confidence": 0.7334067225456238,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241125/Yogi_20241125_124622.jpg"
+    },
+    {
+        "name": "Yogi",
+        "datetime": "2024-11-25 12:46:23",
+        "confidence": 0.7158781886100769,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241125/Yogi_20241125_124623.jpg"
+    },
+    {
+        "name": "Akhdan",
+        "datetime": "2024-11-25 13:19:26",
+        "confidence": 0.7375710010528564,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241125/Akhdan_20241125_131926.jpg"
+    },
+    {
+        "name": "Bimo",
+        "datetime": "2024-11-25 13:19:29",
+        "confidence": 0.7362657785415649,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241125/Bimo_20241125_131929.jpg"
+    },
+    {
+        "name": "Atma",
+        "datetime": "2024-11-25 13:30:50",
+        "confidence": 0.7280254364013672,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241125/Atma_20241125_133050.jpg"
+    },
+    {
+        "name": "Admaja",
+        "datetime": "2024-11-25 13:30:51",
+        "confidence": 0.7576582431793213,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241125/Admaja_20241125_133051.jpg"
+    },
+    {
+        "name": "Fadhli",
+        "datetime": "2024-11-25 13:30:53",
+        "confidence": 0.7237930297851562,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241125/Fadhli_20241125_133053.jpg"
+    },
+    {
+        "name": "Hikam",
+        "datetime": "2024-11-25 13:30:55",
+        "confidence": 0.7070892453193665,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241125/Hikam_20241125_133055.jpg"
+    },
+    {
+        "name": "Hikam",
+        "datetime": "2024-11-25 13:30:55",
+        "confidence": 0.7639771103858948,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241125/Hikam_20241125_133055.jpg"
+    },
+    {
+        "name": "Clariza",
+        "datetime": "2024-11-25 14:17:47",
+        "confidence": 0.7609212398529053,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241125/Clariza_20241125_141747.jpg"
+    },
+    {
+        "name": "Greece",
+        "datetime": "2024-11-25 14:20:11",
+        "confidence": 0.7610965371131897,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241125/Greece_20241125_142011.jpg"
+    },
+    {
+        "name": "Greece",
+        "datetime": "2024-11-25 14:20:12",
+        "confidence": 0.7286853194236755,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241125/Greece_20241125_142012.jpg"
+    },
+    {
+        "name": "Greece",
+        "datetime": "2024-11-25 14:20:13",
+        "confidence": 0.7036635279655457,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241125/Greece_20241125_142013.jpg"
+    },
+    {
+        "name": "Filla",
+        "datetime": "2024-11-25 14:37:47",
+        "confidence": 0.8011072278022766,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241125/Filla_20241125_143747.jpg"
+    },
+    {
+        "name": "Filla",
+        "datetime": "2024-11-25 14:37:49",
+        "confidence": 0.7910839915275574,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241125/Filla_20241125_143749.jpg"
+    },
+    {
+        "name": "Maja",
+        "datetime": "2024-11-25 14:46:56",
+        "confidence": 0.8640739917755127,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241125/Maja_20241125_144656.jpg"
+    },
+    {
+        "name": "Maja",
+        "datetime": "2024-11-25 14:46:57",
+        "confidence": 0.7511200308799744,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241125/Maja_20241125_144657.jpg"
+    },
+    {
+        "name": "Greece",
+        "datetime": "2024-11-25 16:14:11",
+        "confidence": 0.7436983585357666,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241125/Greece_20241125_161411.jpg"
+    },
+    {
+        "name": "Atma",
+        "datetime": "2024-11-25 16:24:14",
+        "confidence": 0.7997105717658997,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241125/Atma_20241125_162414.jpg"
+    },
+    {
+        "name": "Fadhli",
+        "datetime": "2024-11-25 17:07:05",
+        "confidence": 0.7052100896835327,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241125/Fadhli_20241125_170705.jpg"
+    },
+    {
+        "name": "David",
+        "datetime": "2024-11-25 17:07:06",
+        "confidence": 0.7012190818786621,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241125/David_20241125_170706.jpg"
+    },
+    {
+        "name": "Fadhli",
+        "datetime": "2024-11-25 17:07:06",
+        "confidence": 0.7105658650398254,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241125/Fadhli_20241125_170706.jpg"
+    },
+    {
+        "name": "Dwiki",
+        "datetime": "2024-11-25 17:07:07",
+        "confidence": 0.7298296689987183,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241125/Dwiki_20241125_170707.jpg"
+    },
+    {
+        "name": "Fadhli",
+        "datetime": "2024-11-25 17:07:10",
+        "confidence": 0.7107972502708435,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241125/Fadhli_20241125_170710.jpg"
+    },
+    {
+        "name": "Fadhli",
+        "datetime": "2024-11-25 17:07:12",
+        "confidence": 0.7291167378425598,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241125/Fadhli_20241125_170712.jpg"
+    },
+    {
+        "name": "Fadhli",
+        "datetime": "2024-11-25 17:07:13",
+        "confidence": 0.7027921080589294,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241125/Fadhli_20241125_170713.jpg"
+    },
+    {
+        "name": "Dwiki",
+        "datetime": "2024-11-25 17:07:13",
+        "confidence": 0.7380781769752502,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241125/Dwiki_20241125_170713.jpg"
+    },
+    {
+        "name": "Fadhli",
+        "datetime": "2024-11-25 17:07:14",
+        "confidence": 0.7341302037239075,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241125/Fadhli_20241125_170714.jpg"
+    },
+    {
+        "name": "Dwiki",
+        "datetime": "2024-11-25 17:07:14",
+        "confidence": 0.7817248106002808,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241125/Dwiki_20241125_170714.jpg"
+    },
+    {
+        "name": "Dwiki",
+        "datetime": "2024-11-25 17:07:15",
+        "confidence": 0.7393314838409424,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241125/Dwiki_20241125_170715.jpg"
+    },
+    {
+        "name": "Dwiki",
+        "datetime": "2024-11-25 17:07:17",
+        "confidence": 0.7269529104232788,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241125/Dwiki_20241125_170717.jpg"
+    },
+    {
+        "name": "Dwiki",
+        "datetime": "2024-11-25 17:07:18",
+        "confidence": 0.7355694770812988,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241125/Dwiki_20241125_170718.jpg"
+    },
+    {
+        "name": "Fadhli",
+        "datetime": "2024-11-26 12:34:31",
+        "confidence": 0.7240403294563293,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241126/Fadhli_20241126_123431.jpg"
+    },
+    {
+        "name": "Khansa",
+        "datetime": "2024-11-26 12:35:15",
+        "confidence": 0.7527284622192383,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241126/Khansa_20241126_123515.jpg"
+    },
+    {
+        "name": "David",
+        "datetime": "2024-11-26 12:43:13",
+        "confidence": 0.7520413994789124,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241126/David_20241126_124313.jpg"
+    },
+    {
+        "name": "David",
+        "datetime": "2024-11-26 12:43:14",
+        "confidence": 0.7557641267776489,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241126/David_20241126_124314.jpg"
+    },
+    {
+        "name": "David",
+        "datetime": "2024-11-26 12:43:15",
+        "confidence": 0.7599921822547913,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241126/David_20241126_124315.jpg"
+    },
+    {
+        "name": "David",
+        "datetime": "2024-11-26 12:47:04",
+        "confidence": 0.7163681387901306,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241126/David_20241126_124704.jpg"
+    },
+    {
+        "name": "Adhy",
+        "datetime": "2024-11-26 12:56:20",
+        "confidence": 0.7404759526252747,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241126/Adhy_20241126_125620.jpg"
+    },
+    {
+        "name": "Rico",
+        "datetime": "2024-11-26 13:16:44",
+        "confidence": 0.7046645283699036,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241126/Rico_20241126_131644.jpg"
+    },
+    {
+        "name": "Rico",
+        "datetime": "2024-11-26 13:16:46",
+        "confidence": 0.7003908753395081,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241126/Rico_20241126_131646.jpg"
+    },
+    {
+        "name": "Hikam",
+        "datetime": "2024-11-26 13:17:22",
+        "confidence": 0.7377140522003174,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241126/Hikam_20241126_131722.jpg"
+    },
+    {
+        "name": "Filla",
+        "datetime": "2024-11-26 13:32:20",
+        "confidence": 0.8147507905960083,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241126/Filla_20241126_133220.jpg"
+    },
+    {
+        "name": "Filla",
+        "datetime": "2024-11-26 13:32:21",
+        "confidence": 0.8042673468589783,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241126/Filla_20241126_133221.jpg"
+    },
+    {
+        "name": "Filla",
+        "datetime": "2024-11-26 13:32:22",
+        "confidence": 0.7762333750724792,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241126/Filla_20241126_133222.jpg"
+    },
+    {
+        "name": "Filla",
+        "datetime": "2024-11-26 13:32:23",
+        "confidence": 0.7798844575881958,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241126/Filla_20241126_133223.jpg"
+    },
+    {
+        "name": "Fadhli",
+        "datetime": "2024-11-26 13:34:26",
+        "confidence": 0.7525420188903809,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241126/Fadhli_20241126_133426.jpg"
+    },
+    {
+        "name": "Daris",
+        "datetime": "2024-11-26 13:34:27",
+        "confidence": 0.7031813263893127,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241126/Daris_20241126_133427.jpg"
+    },
+    {
+        "name": "Dwiki",
+        "datetime": "2024-11-26 13:34:33",
+        "confidence": 0.7010749578475952,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241126/Dwiki_20241126_133433.jpg"
+    },
+    {
+        "name": "Arjun",
+        "datetime": "2024-11-26 13:42:31",
+        "confidence": 0.7311334609985352,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241126/Arjun_20241126_134231.jpg"
+    },
+    {
+        "name": "Krisi",
+        "datetime": "2024-11-26 14:02:24",
+        "confidence": 0.7303781509399414,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241126/Krisi_20241126_140224.jpg"
+    },
+    {
+        "name": "Krisi",
+        "datetime": "2024-11-26 14:02:25",
+        "confidence": 0.7693252563476562,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241126/Krisi_20241126_140225.jpg"
+    },
+    {
+        "name": "Krisi",
+        "datetime": "2024-11-26 14:02:26",
+        "confidence": 0.7515959143638611,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241126/Krisi_20241126_140226.jpg"
+    },
+    {
+        "name": "Bintang",
+        "datetime": "2024-11-26 14:02:38",
+        "confidence": 0.8206067681312561,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241126/Bintang_20241126_140238.jpg"
+    },
+    {
+        "name": "Bintang",
+        "datetime": "2024-11-26 14:02:39",
+        "confidence": 0.8052617311477661,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241126/Bintang_20241126_140239.jpg"
+    },
+    {
+        "name": "Bintang",
+        "datetime": "2024-11-26 14:02:40",
+        "confidence": 0.7219816446304321,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241126/Bintang_20241126_140240.jpg"
+    },
+    {
+        "name": "David",
+        "datetime": "2024-11-26 14:02:42",
+        "confidence": 0.738452672958374,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241126/David_20241126_140242.jpg"
+    },
+    {
+        "name": "David",
+        "datetime": "2024-11-26 14:02:43",
+        "confidence": 0.7783849239349365,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241126/David_20241126_140243.jpg"
+    },
+    {
+        "name": "Krisi",
+        "datetime": "2024-11-26 15:13:47",
+        "confidence": 0.7628682255744934,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241126/Krisi_20241126_151347.jpg"
+    },
+    {
+        "name": "Krisi",
+        "datetime": "2024-11-26 15:13:48",
+        "confidence": 0.789868175983429,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241126/Krisi_20241126_151348.jpg"
+    },
+    {
+        "name": "Krisi",
+        "datetime": "2024-11-26 15:13:49",
+        "confidence": 0.7794597744941711,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241126/Krisi_20241126_151349.jpg"
+    },
+    {
+        "name": "Rico",
+        "datetime": "2024-11-26 15:15:59",
+        "confidence": 0.7311242818832397,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241126/Rico_20241126_151559.jpg"
+    },
+    {
+        "name": "Krisi",
+        "datetime": "2024-11-26 15:35:46",
+        "confidence": 0.7631029486656189,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241126/Krisi_20241126_153546.jpg"
+    },
+    {
+        "name": "Krisi",
+        "datetime": "2024-11-26 15:35:47",
+        "confidence": 0.7507943511009216,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241126/Krisi_20241126_153547.jpg"
+    },
+    {
+        "name": "Krisi",
+        "datetime": "2024-11-26 15:35:48",
+        "confidence": 0.8030707240104675,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241126/Krisi_20241126_153548.jpg"
+    },
+    {
+        "name": "Krisi",
+        "datetime": "2024-11-26 15:35:49",
+        "confidence": 0.7623012661933899,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241126/Krisi_20241126_153549.jpg"
+    },
+    {
+        "name": "Arjun",
+        "datetime": "2024-11-26 15:39:52",
+        "confidence": 0.7213926315307617,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241126/Arjun_20241126_153952.jpg"
+    },
+    {
+        "name": "Arjun",
+        "datetime": "2024-11-26 15:44:07",
+        "confidence": 0.705029308795929,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241126/Arjun_20241126_154407.jpg"
+    },
+    {
+        "name": "David",
+        "datetime": "2024-11-26 15:55:15",
+        "confidence": 0.8030297756195068,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241126/David_20241126_155515.jpg"
+    },
+    {
+        "name": "David",
+        "datetime": "2024-11-26 15:55:16",
+        "confidence": 0.7677007913589478,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241126/David_20241126_155516.jpg"
+    },
+    {
+        "name": "David",
+        "datetime": "2024-11-26 15:55:17",
+        "confidence": 0.7070719003677368,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241126/David_20241126_155517.jpg"
+    },
+    {
+        "name": "Arjun",
+        "datetime": "2024-11-26 15:56:14",
+        "confidence": 0.7037379145622253,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241126/Arjun_20241126_155614.jpg"
+    },
+    {
+        "name": "Arjun",
+        "datetime": "2024-11-26 16:02:09",
+        "confidence": 0.7130174040794373,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241126/Arjun_20241126_160209.jpg"
+    },
+    {
+        "name": "Bintang",
+        "datetime": "2024-11-26 16:27:58",
+        "confidence": 0.8160001039505005,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241126/Bintang_20241126_162758.jpg"
+    },
+    {
+        "name": "Bintang",
+        "datetime": "2024-11-26 16:27:59",
+        "confidence": 0.7105165123939514,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241126/Bintang_20241126_162759.jpg"
+    },
+    {
+        "name": "Bintang",
+        "datetime": "2024-11-26 16:28:00",
+        "confidence": 0.7093090415000916,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241126/Bintang_20241126_162800.jpg"
+    },
+    {
+        "name": "Bimo",
+        "datetime": "2024-11-26 16:34:51",
+        "confidence": 0.715284526348114,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241126/Bimo_20241126_163451.jpg"
+    },
+    {
+        "name": "Bimo",
+        "datetime": "2024-11-26 16:34:52",
+        "confidence": 0.7154199481010437,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241126/Bimo_20241126_163452.jpg"
+    },
+    {
+        "name": "Krisi",
+        "datetime": "2024-11-26 16:48:39",
+        "confidence": 0.7367355227470398,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241126/Krisi_20241126_164839.jpg"
+    },
+    {
+        "name": "David",
+        "datetime": "2024-11-26 16:55:54",
+        "confidence": 0.7369207143783569,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241126/David_20241126_165554.jpg"
+    },
+    {
+        "name": "Annur",
+        "datetime": "2024-11-26 17:09:34",
+        "confidence": 0.736421525478363,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241126/Annur_20241126_170934.jpg"
+    },
+    {
+        "name": "Bintang",
+        "datetime": "2024-11-28 11:43:36",
+        "confidence": 0.7211140990257263,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241128/Bintang_20241128_114336.jpg"
+    },
+    {
+        "name": "Fadhli",
+        "datetime": "2024-11-28 11:51:06",
+        "confidence": 0.7098706364631653,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241128/Fadhli_20241128_115106.jpg"
+    },
+    {
+        "name": "Bintang",
+        "datetime": "2024-11-28 12:05:23",
+        "confidence": 0.7271776795387268,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241128/Bintang_20241128_120523.jpg"
+    },
+    {
+        "name": "Bintang",
+        "datetime": "2024-11-28 12:05:25",
+        "confidence": 0.7539371252059937,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241128/Bintang_20241128_120525.jpg"
+    },
+    {
+        "name": "David",
+        "datetime": "2024-11-28 12:05:46",
+        "confidence": 0.7185402512550354,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241128/David_20241128_120546.jpg"
+    },
+    {
+        "name": "David",
+        "datetime": "2024-11-28 12:05:47",
+        "confidence": 0.7662807703018188,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241128/David_20241128_120547.jpg"
+    },
+    {
+        "name": "David",
+        "datetime": "2024-11-28 12:05:48",
+        "confidence": 0.7464456558227539,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241128/David_20241128_120548.jpg"
+    },
+    {
+        "name": "David",
+        "datetime": "2024-11-28 12:05:49",
+        "confidence": 0.7056078314781189,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241128/David_20241128_120549.jpg"
+    },
+    {
+        "name": "Dwiki",
+        "datetime": "2024-11-28 12:14:35",
+        "confidence": 0.7087720036506653,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241128/Dwiki_20241128_121435.jpg"
+    },
+    {
+        "name": "David",
+        "datetime": "2024-11-28 12:25:47",
+        "confidence": 0.7937105298042297,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241128/David_20241128_122547.jpg"
+    },
+    {
+        "name": "Yogi",
+        "datetime": "2024-11-28 12:30:03",
+        "confidence": 0.7529599070549011,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241128/Yogi_20241128_123003.jpg"
+    },
+    {
+        "name": "Yogi",
+        "datetime": "2024-11-28 12:30:04",
+        "confidence": 0.7755147814750671,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241128/Yogi_20241128_123004.jpg"
+    },
+    {
+        "name": "Hikam",
+        "datetime": "2024-11-28 12:31:49",
+        "confidence": 0.7184492349624634,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241128/Hikam_20241128_123149.jpg"
+    },
+    {
+        "name": "Yogi",
+        "datetime": "2024-11-28 12:42:49",
+        "confidence": 0.7069904208183289,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241128/Yogi_20241128_124249.jpg"
+    },
+    {
+        "name": "Yogi",
+        "datetime": "2024-11-28 12:42:50",
+        "confidence": 0.7308904528617859,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241128/Yogi_20241128_124250.jpg"
+    },
+    {
+        "name": "David",
+        "datetime": "2024-11-28 12:43:24",
+        "confidence": 0.7497060298919678,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241128/David_20241128_124324.jpg"
+    },
+    {
+        "name": "David",
+        "datetime": "2024-11-28 12:43:25",
+        "confidence": 0.747982919216156,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241128/David_20241128_124325.jpg"
+    },
+    {
+        "name": "David",
+        "datetime": "2024-11-28 12:43:26",
+        "confidence": 0.800234317779541,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241128/David_20241128_124326.jpg"
+    },
+    {
+        "name": "Yogi",
+        "datetime": "2024-11-28 12:52:25",
+        "confidence": 0.7180437445640564,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241128/Yogi_20241128_125225.jpg"
+    },
+    {
+        "name": "Hikam",
+        "datetime": "2024-11-28 13:21:51",
+        "confidence": 0.7109752893447876,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241128/Hikam_20241128_132151.jpg"
+    },
+    {
+        "name": "Hikam",
+        "datetime": "2024-11-28 13:21:52",
+        "confidence": 0.7389463186264038,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241128/Hikam_20241128_132152.jpg"
+    },
+    {
+        "name": "Krisi",
+        "datetime": "2024-11-28 13:37:27",
+        "confidence": 0.7768363952636719,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241128/Krisi_20241128_133727.jpg"
+    },
+    {
+        "name": "David",
+        "datetime": "2024-11-28 13:39:59",
+        "confidence": 0.7932828664779663,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241128/David_20241128_133959.jpg"
+    },
+    {
+        "name": "David",
+        "datetime": "2024-11-28 13:40:00",
+        "confidence": 0.8203518986701965,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241128/David_20241128_134000.jpg"
+    },
+    {
+        "name": "David",
+        "datetime": "2024-11-28 13:40:01",
+        "confidence": 0.7747892141342163,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241128/David_20241128_134001.jpg"
+    },
+    {
+        "name": "David",
+        "datetime": "2024-11-28 13:40:02",
+        "confidence": 0.7120862007141113,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241128/David_20241128_134002.jpg"
+    },
+    {
+        "name": "Maja",
+        "datetime": "2024-11-28 13:40:23",
+        "confidence": 0.7581278681755066,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241128/Maja_20241128_134023.jpg"
+    },
+    {
+        "name": "Maja",
+        "datetime": "2024-11-28 13:40:24",
+        "confidence": 0.7488842606544495,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241128/Maja_20241128_134024.jpg"
+    },
+    {
+        "name": "Hikam",
+        "datetime": "2024-11-28 13:40:29",
+        "confidence": 0.7450039386749268,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241128/Hikam_20241128_134029.jpg"
+    },
+    {
+        "name": "Daris",
+        "datetime": "2024-11-28 13:40:29",
+        "confidence": 0.705562174320221,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241128/Daris_20241128_134029.jpg"
+    },
+    {
+        "name": "Annur",
+        "datetime": "2024-11-28 13:40:43",
+        "confidence": 0.715651273727417,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241128/Annur_20241128_134043.jpg"
+    },
+    {
+        "name": "Krisi",
+        "datetime": "2024-11-28 13:46:58",
+        "confidence": 0.7609561085700989,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241128/Krisi_20241128_134658.jpg"
+    },
+    {
+        "name": "Krisi",
+        "datetime": "2024-11-28 13:47:01",
+        "confidence": 0.765500545501709,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241128/Krisi_20241128_134701.jpg"
+    },
+    {
+        "name": "Krisi",
+        "datetime": "2024-11-28 13:47:02",
+        "confidence": 0.7680971026420593,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241128/Krisi_20241128_134702.jpg"
+    },
+    {
+        "name": "Arjun",
+        "datetime": "2024-11-28 13:47:20",
+        "confidence": 0.7077870965003967,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241128/Arjun_20241128_134720.jpg"
+    },
+    {
+        "name": "Bintang",
+        "datetime": "2024-11-28 13:50:14",
+        "confidence": 0.8099594116210938,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241128/Bintang_20241128_135014.jpg"
+    },
+    {
+        "name": "Bintang",
+        "datetime": "2024-11-28 13:50:15",
+        "confidence": 0.8208590745925903,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241128/Bintang_20241128_135015.jpg"
+    },
+    {
+        "name": "Bintang",
+        "datetime": "2024-11-28 13:50:16",
+        "confidence": 0.8239770531654358,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241128/Bintang_20241128_135016.jpg"
+    },
+    {
+        "name": "Bintang",
+        "datetime": "2024-11-28 13:50:17",
+        "confidence": 0.7450737953186035,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241128/Bintang_20241128_135017.jpg"
+    },
+    {
+        "name": "Bintang",
+        "datetime": "2024-11-28 13:50:18",
+        "confidence": 0.7523078918457031,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241128/Bintang_20241128_135018.jpg"
+    },
+    {
+        "name": "Krisi",
+        "datetime": "2024-11-28 14:00:42",
+        "confidence": 0.7448570728302002,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241128/Krisi_20241128_140042.jpg"
+    },
+    {
+        "name": "Krisi",
+        "datetime": "2024-11-28 14:00:43",
+        "confidence": 0.7648119330406189,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241128/Krisi_20241128_140043.jpg"
+    },
+    {
+        "name": "David",
+        "datetime": "2024-11-28 14:11:36",
+        "confidence": 0.7318760752677917,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241128/David_20241128_141136.jpg"
+    },
+    {
+        "name": "David",
+        "datetime": "2024-11-28 14:11:37",
+        "confidence": 0.7874873280525208,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241128/David_20241128_141137.jpg"
+    },
+    {
+        "name": "Krisi",
+        "datetime": "2024-11-28 14:17:40",
+        "confidence": 0.7100287079811096,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241128/Krisi_20241128_141740.jpg"
+    },
+    {
+        "name": "Krisi",
+        "datetime": "2024-11-28 14:17:41",
+        "confidence": 0.7283133864402771,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241128/Krisi_20241128_141741.jpg"
+    },
+    {
+        "name": "Krisi",
+        "datetime": "2024-11-28 14:17:43",
+        "confidence": 0.7353844046592712,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241128/Krisi_20241128_141743.jpg"
+    },
+    {
+        "name": "Krisi",
+        "datetime": "2024-11-28 14:19:09",
+        "confidence": 0.7170332074165344,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241128/Krisi_20241128_141909.jpg"
+    },
+    {
+        "name": "Krisi",
+        "datetime": "2024-11-28 14:19:10",
+        "confidence": 0.770516574382782,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241128/Krisi_20241128_141910.jpg"
+    },
+    {
+        "name": "David",
+        "datetime": "2024-11-28 15:11:57",
+        "confidence": 0.7640781998634338,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241128/David_20241128_151157.jpg"
+    },
+    {
+        "name": "David",
+        "datetime": "2024-11-28 15:11:58",
+        "confidence": 0.7537286281585693,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241128/David_20241128_151158.jpg"
+    },
+    {
+        "name": "David",
+        "datetime": "2024-11-28 15:48:15",
+        "confidence": 0.7597990036010742,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241128/David_20241128_154815.jpg"
+    },
+    {
+        "name": "David",
+        "datetime": "2024-11-28 15:49:35",
+        "confidence": 0.7325149178504944,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241128/David_20241128_154935.jpg"
+    },
+    {
+        "name": "Krisi",
+        "datetime": "2024-11-28 16:59:29",
+        "confidence": 0.772128164768219,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241128/Krisi_20241128_165929.jpg"
+    },
+    {
+        "name": "Krisi",
+        "datetime": "2024-11-28 16:59:31",
+        "confidence": 0.7659420967102051,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241128/Krisi_20241128_165931.jpg"
+    },
+    {
+        "name": "Filla",
+        "datetime": "2024-11-29 09:37:01",
+        "confidence": 0.8032064437866211,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241129/Filla_20241129_093701.jpg"
+    },
+    {
+        "name": "Filla",
+        "datetime": "2024-11-29 09:37:02",
+        "confidence": 0.7971873879432678,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241129/Filla_20241129_093702.jpg"
+    },
+    {
+        "name": "Maja",
+        "datetime": "2024-11-29 09:51:18",
+        "confidence": 0.7946527004241943,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241129/Maja_20241129_095118.jpg"
+    }
+]
