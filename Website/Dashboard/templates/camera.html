@@ -7,6 +7,8 @@
     width: 1em;
     height: 1em;
     border-radius: 100%;
+    z-index: 1003;
+    cursor: move;
   }
  
 </style>
@@ -207,7 +209,7 @@
           id="theSVG"
           width="{{Frame_X}}"
           height="{{Frame_Y}}"
-          style="position: absolute; border: 2px;">
+          style="position: absolute; border: 2px; z-index: 1002;">
           <polyline
             id="x"
             points="{{Active_Cam.x1}},{{Active_Cam.y1}} {{Active_Cam.x2}},{{Active_Cam.y2}} {{Active_Cam.x3}},{{Active_Cam.y3}} {{Active_Cam.x4}},{{Active_Cam.y4}}"
@@ -227,7 +229,7 @@
           />
           </svg>
         {% endif %}
-        <img id="img_stream" src="{% url 'video_feed' %}" style="width: 100%; border-radius: 10px; z-index:1001;" onclick="expandStream(this)"/>
+        <img id="img_stream" src="{% url 'video_feed' %}" style="width: 100%; border-radius: 10px; z-index: 1001; position: relative;" onclick="expandStream(this)"/>
     </div>
   </div>
   {% else %}
