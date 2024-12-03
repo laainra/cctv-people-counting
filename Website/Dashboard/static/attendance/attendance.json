@@ -76,5 +76,29 @@
         "datetime": "2024-11-18 15:27:39",
         "confidence": 0.7325204014778137,
         "image_path": "static/img/extracted_faces/predicted_faces/absence/20241118/Rico_20241118_152739.jpg"
+    },
+    {
+        "name": "Laila",
+        "datetime": "2024-11-29 12:16:34",
+        "confidence": 0.7398349642753601,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241129/Laila_20241129_121634.jpg"
+    },
+    {
+        "name": "Laila",
+        "datetime": "2024-12-02 10:03:19",
+        "confidence": 0.7150022983551025,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241202/Laila_20241202_100319.jpg"
+    },
+    {
+        "name": "Laila",
+        "datetime": "2024-12-02 10:03:23",
+        "confidence": 0.7674357295036316,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241202/Laila_20241202_100323.jpg"
+    },
+    {
+        "name": "Laila",
+        "datetime": "2024-12-02 10:03:26",
+        "confidence": 0.7674357295036316,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20241202/Laila_20241202_100326.jpg"
     }
 ]

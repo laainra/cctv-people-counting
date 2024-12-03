@@ -109,11 +109,12 @@ class MultiCamera:
 
         obj.poly = poly_coordinates
 
-    def set_model(cam_id, recognition_active, gender_active):
+    def set_model(cam_id, recognition_active, gender_active, capture_active):
         obj = MultiCamera.obj_list[str(cam_id)]['class']
 
         obj.fr_active = recognition_active
         obj.gd_active = gender_active
+        obj.fc_active = capture_active
 
     def set_time_range(cam_id, cam_start, cam_stop):
         obj = MultiCamera.obj_list[str(cam_id)]['class']

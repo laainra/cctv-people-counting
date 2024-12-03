@@ -56,25 +56,25 @@
   <div class="responsive-card responsive effected" style="background-color: transparent">
     <ul class="nav mt-4" style="background-color: transparent; gap: 0.6rem">
       <li class="nav-item">
-        <a class="nav-link nav-item-card p-2" id="all-tab" style="background-color: white; border-top-left-radius: 10px; border-top-right-radius: 10px; color: #11468f; cursor: pointer;">
+        <a class="nav-link nav-item-card p-2 tab-link" id="all-tab" style="background-color: white; border-top-left-radius: 10px; border-top-right-radius: 10px; color: #11468f; cursor: pointer;" onclick="showTab('all')">
           <p id="all-count" style="font-weight: bold;"></p>
           <p>All</p>
         </a>
       </li>
       <li class="nav-item">
-        <a class="nav-link nav-item-card p-2" id="on-time-tab" style="background-color: #11468f; border-top-left-radius: 10px; border-top-right-radius: 10px; color: white; cursor: pointer;">
+        <a class="nav-link nav-item-card p-2 tab-link" id="on-time-tab" style="background-color: #11468f; border-top-left-radius: 10px; border-top-right-radius: 10px; color: white; cursor: pointer;" onclick="showTab('on-time')">
           <p id="on-time-count" style="font-weight: bold;"></p>
           <p>On Time</p>
         </a>
       </li>
       <li class="nav-item">
-        <a class="nav-link nav-item-card p-2" id="late-tab" style="background-color: #11468f; border-top-left-radius: 10px; border-top-right-radius: 10px; color: white; cursor: pointer;">
+        <a class="nav-link nav-item-card p-2 tab-link" id="late-tab" style="background-color: #11468f; border-top-left-radius: 10px; border-top-right-radius: 10px; color: white; cursor: pointer;" onclick="showTab('late')">
           <p id="late-count" style="font-weight: bold;"></p>
           <p>Late</p>
         </a>
       </li>
       <li class="nav-item">
-        <a class="nav-link nav-item-card p-2" id="left-tab" style="background-color: #11468f; border-top-left-radius: 10px; border-top-right-radius: 10px; color: white; cursor: pointer;">
+        <a class="nav-link nav-item-card p-2 tab-link" id="left-tab" style="background-color: #11468f; border-top-left-radius: 10px; border-top-right-radius: 10px; color: white; cursor: pointer;" onclick="showTab('left')">
           <p id="left-count" style="font-weight: bold;"></p>
           <p>Left</p>
         </a>
@@ -82,16 +82,16 @@
 
       <div class="ml-auto" style="position: relative;">
         <input id="search" type="text" class="form-control effected" style="width: 200px; min-height: 38px; border-radius: 5px; padding-right: 30px;" placeholder="Search by Name or ID" onkeyup="filterTable()" />
-        {% comment %} <i class="fas fa-search mb-6" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%);margin-bottom: 10px;"></i> {% endcomment %}
       </div>
     </ul>
   </div>
+
 
   <div class="card mb-5 gap-4 responsive responsive-card effected flex" style="border-top-left-radius: 0%; border-top-right-radius: 0%">
     <table id="presence-table">
       <thead id="presence-table-head">
         <tr class="presence-table-row">
-          <th onclick="sortTable('id')">ID <span id="arrow-up-id">▲</span><span id="arrow-down-id" style="display: none;">▼</span></th> 
+          {% comment %} <th onclick="sortTable('id')">ID <span id="arrow-up-id">▲</span><span id="arrow-down-id" style="display: none;">▼</span></th>  {% endcomment %}
           <th onclick="sortTable('name')">Name <span id="arrow-up-name">▲</span><span id="arrow-down-name" style="display: none;">▼</span></th>
           <th onclick="sortTable('attended')">Time Attended <span id="arrow-up-attended">▲</span><span id="arrow-down-attended" style="display: none;">▼</span></th>
           <th onclick="sortTable('leave')">Time Leaving <span id="arrow-up-leave">▲</span><span id="arrow-down-leave" style="display: none;">▼</span></th>
@@ -107,12 +107,12 @@
       <tbody id="presence-table-body">
         {% for entry in presence_data %}
         <tr class="presence-table-row-body">
-          <td>{{ entry.id }}</td> 
+          {% comment %} <td>{{ entry.id }}</td>  {% endcomment %}
           <td>{{ entry.name }}</td>
           <td>{{ entry.attended|default:"-" }}</td>
           <td>{{ entry.leave|default:"-" }}</td>
           <td>{{ entry.status }}</td>
-          <td>{{ entry.work_hours|default:"-" }}</td>
+          <td>{{ entry.work_hours|default:"Still Working" }} hours</td>
           <td>{{ entry.notes|default:"No notes" }}</td>
           {% load static %}
           <td><img src="{% static entry.image_path %}" alt="No image" width="50" height="50"></td>
@@ -127,7 +127,7 @@
     </table>
     <div id="pagination-container" class="d-flex justify-content-center mb-5">
       <button id="prev" class="btn btn-primary" onclick="changePage(-1)">Previous</button>
-      <span id="page-info" class="mx-2 mt-2" style="text-align: center;"></span> <!-- Centered text for entry count -->
+      <span id="page-info" class="mx-2 mt-2" style="text-align: center;"></span>
       <button id="next" class="btn btn-primary" onclick="changePage(1)">Next</button>
     </div>
     
@@ -136,37 +136,149 @@
 </div>
 
 <script>
-  const presenceData = [
-    {% for entry in presence_data %}
-      {
-        {% comment %} id: {{ entry.id }}, {% endcomment %}
-        name: "{{ entry.name|escapejs }}",
-        attended: "{{ entry.attended|default:'-' }}",
-        leave: "{{ entry.leave|default:'-' }}",
-        status: "{{ entry.status }}",
-        work_hours: "{{ entry.work_hours|default:'-' }}",
-        notes: "{{ entry.notes|default:'No notes' }}"
-        image: "{{ entry.image_path|default:'No image' }}"
-      }{% if not forloop.last %},{% endif %}
-    {% endfor %}
-  ];
-
-  console.log("Presence Data:", presenceData);
+  let currentTab = 'all';
+  function getCurrentDate() {
+    const today = new Date();
+    const yyyy = today.getFullYear();
+    const mm = String(today.getMonth() + 1).padStart(2, '0');
+    const dd = String(today.getDate()).padStart(2, '0');
+    return `${yyyy}-${mm}-${dd}`;
+  }
+  
+  function updateTable(presenceData) {
+    const tableBody = document.querySelector("#presenceTable tbody");
+    tableBody.innerHTML = ""; // Clear previous rows
+  
+    presenceData.forEach(entry => {
+      const row = document.createElement("tr");
+      row.innerHTML = `
+        <td>${entry.id}</td>
+        <td>${entry.name}</td>
+        <td>${entry.attended}</td>
+        <td>${entry.leave}</td>
+        <td>${entry.status}</td>
+        <td>${entry.work_hours}</td>
+        <td>${entry.notes}</td>
+        <td><img src="${entry.image_path}" alt="Image" width="50"></td>
+      `;
+      tableBody.appendChild(row);
+    });
+  }
+  
+  function showTab(tabName) {
+    currentTab = tabName; // Track active tab
+  
+    // Update tab styles
+    document.querySelectorAll(".tab-link").forEach(tab => {
+      tab.style.backgroundColor = "#11468f";
+      tab.style.color = "white";
+    });
+  
+    const activeTab = document.getElementById(`${tabName}-tab`);
+    activeTab.style.backgroundColor = "white";
+    activeTab.style.color = "#11468f";
+  
+    const date = document.getElementById("date").value || getCurrentDate();
+  
+    const url = `/presence?date=${date}&status=${tabName === 'all' ? '' : tabName}`;
+    window.history.pushState({ path: url }, '', url);
+  
+    fetch(url)
+      .then(response => response.json())
+      .then(data => {
+        if (data.status === "success") {
+          updateTable(data.presence_data);
+        } else {
+          console.error(data.message);
+        }
+      })
+      .catch(error => console.error("Error fetching data:", error));
+  }
+  
 
   function calculateCounts() {
-    const allCount = presenceData.length;
-    const onTimeCount = presenceData.filter(entry => entry.status.toUpperCase() === "ONTIME").length;
-    const lateCount = presenceData.filter(entry => entry.status.toUpperCase() === "LATE").length;
-    const leftCount = presenceData.filter(entry => entry.status.toUpperCase() === "LEAVE").length;
+    const filteredData = filterDataByTab();
+    document.getElementById("all-count").innerText = filteredData.length;
+    document.getElementById("on-time-count").innerText = filteredData.filter(entry => entry.status.toUpperCase() === 'ONTIME').length;
+    document.getElementById("late-count").innerText = filteredData.filter(entry => entry.status.toUpperCase() === 'LATE').length;
+    document.getElementById("left-count").innerText = filteredData.filter(entry => entry.status.toUpperCase() === 'LEAVING').length;
+  }
 
-    document.getElementById("all-count").innerText = allCount;
-    document.getElementById("on-time-count").innerText = onTimeCount;
-    document.getElementById("late-count").innerText = lateCount;
-    document.getElementById("left-count").innerText = leftCount;
+  function filterTable() {
+    const query = document.getElementById("search").value.toLowerCase();
+    filteredData = presenceData.filter(entry =>
+      entry.name.toLowerCase().includes(query) || entry.id.toString().includes(query)
+    );
+    renderTable();
+    calculateCounts();
+  }
+  
+
+  let totalCounts = {
+    all: 0,
+    onTime: 0,
+    late: 0,
+    left: 0
+  };
+  
+  function initializeCounts() {
+    totalCounts.all = presenceData.length;
+    totalCounts.onTime = presenceData.filter(entry => entry.status.toUpperCase() === 'ONTIME').length;
+    totalCounts.late = presenceData.filter(entry => entry.status.toUpperCase() === 'LATE').length;
+    totalCounts.left = presenceData.filter(entry => entry.status.toUpperCase() === 'LEAVING').length;
+  
+    document.getElementById("all-count").innerText = totalCounts.all;
+    document.getElementById("on-time-count").innerText = totalCounts.onTime;
+    document.getElementById("late-count").innerText = totalCounts.late;
+    document.getElementById("left-count").innerText = totalCounts.left;
+  }
+  
+
+  function filterDataByTab() {
+    let filtered;
+    switch (currentTab) {
+      case 'all':
+        filtered = presenceData;
+        break;
+      case 'on-time':
+        filtered = presenceData.filter(entry => entry.status.toUpperCase() === 'ONTIME');
+        break;
+      case 'late':
+        filtered = presenceData.filter(entry => entry.status.toUpperCase() === 'LATE');
+        break;
+      case 'left':
+        filtered = presenceData.filter(entry => entry.status.toUpperCase() === 'LEAVE');
+        break;
+      default:
+        filtered = [];
+    }
+    return filtered;
+  }
+  
+
+  function renderTable() {
+    const filteredData = filterDataByTab();
+    const tableBody = document.getElementById('presence-table-body');
+    tableBody.innerHTML = '';
+    filteredData.forEach(entry => {
+      const row = document.createElement('tr');
+      row.classList.add('presence-table-row-body');
+      row.innerHTML = `
+        {% comment %} <td>${entry.id}</td> {% endcomment %}
+        <td>${entry.name}</td>
+        <td>${entry.attended || '-'}</td>
+        <td>${entry.leave || '-'}</td>
+        <td>${entry.status}</td>
+        <td>${entry.work_hours || 'Still Working'} hours</td>
+        <td>${entry.notes || 'No notes'}</td>
+        <td><img src="${entry.image_path}" alt="No image" width="50" height="50"></td>
+      `;
+      tableBody.appendChild(row);
+    });
   }
 
   let sortOrder = {
-     id: true,
+    id: true,
     name: true,
     attended: true,
     leave: true,
@@ -175,185 +287,38 @@
     notes: true
   };
 
- function sortTable(column) {
-    const arrowUp = document.getElementById(`arrow-up-${column}`);
-    const arrowDown = document.getElementById(`arrow-down-${column}`);
-
-    presenceData.sort((a, b) => {
-        let comparison = 0;
-
-        if (column === 'attended' || column === 'leave') {
-            // Convert the time strings to Date objects for comparison
-            const timeA = a[column] !== '-' ? new Date(`1970-01-01T${a[column]}Z`) : null;
-            const timeB = b[column] !== '-' ? new Date(`1970-01-01T${b[column]}Z`) : null;
-            comparison = (timeA - timeB);
-        } else if (column === 'id') {
-            // Compare IDs as numbers
-            comparison = a[column] - b[column];
-        } else {
-            comparison = a[column].localeCompare(b[column]);
-        }
-
-        return sortOrder[column] ? comparison : -comparison;
+  function sortTable(column) {
+    const sortedData = [...filteredData].sort((a, b) => {
+      if (a[column] < b[column]) return -1;
+      if (a[column] > b[column]) return 1;
+      return 0;
     });
-
-    sortOrder[column] = !sortOrder[column]; // Toggle sort order
-
-    // Update arrows
-    arrowUp.style.display = sortOrder[column] ? 'inline' : 'none';
-    arrowDown.style.display = sortOrder[column] ? 'none' : 'inline';
-
+    filteredData = sortedData;
     renderTable();
   }
 
-  const rowsPerPage = 10;
-  let currentPage = 1;
-  let filteredData = [];
-  let attendanceData = presenceData;
+  const presenceData = [
+    {% for entry in presence_data %}
+      {
+        
+        name: "{{ entry.name|escapejs }}",
+        attended: "{{ entry.attended|default:'-' }}",
+        leave: "{{ entry.leave|default:'-' }}",
+        status: "{{ entry.status }}",
+        work_hours: "{{ entry.work_hours|default:'Still Working' }}",
+        notes: "{{ entry.notes|default:'No notes' }}",
+        image_path: "{% static entry.image_path %}"
+      }{% if not forloop.last %},{% endif %}
+    {% endfor %}
+  ];
 
-  function filterTable() {
-    const searchValue = document.getElementById("search").value.toLowerCase();
-    filteredData = attendanceData.filter(entry =>
-      entry.name.toLowerCase().includes(searchValue) ||
-      entry.id.toString().includes(searchValue)
-    );
-    currentPage = 1;
+  document.getElementById('date-picker').addEventListener('change', submitForm);
+  window.onload = function () {
+    initializeCounts();
     renderTable();
-  }
-
-  function renderTable(statusFilter = null) {
-    const currentDiv = document.getElementById("presence-table-body");
-    let dataToRender = filteredData.length > 0 ? filteredData : attendanceData;
-
-    // Apply filtering based on the status
-    if (statusFilter) {
-      dataToRender = dataToRender.filter(entry => entry.status.toUpperCase() === statusFilter);
-    }
-
-    // Pagination logic
-    const start = (currentPage - 1) * rowsPerPage;
-    const end = start + rowsPerPage;
-    const dataToShow = dataToRender.slice(start, end);
-
-    // Build the table rows
-    let dataOutput = "";
-    dataToShow.forEach(entry => {
-      const presenceStatusClass = entry.status.toUpperCase() === "LATE" ? "presence-status-late-container" : 
-                                  entry.status.toUpperCase() === "ONTIME" ? "presence-status-ontime-container" : 
-                                  "presence-status-left-container";
-
-      dataOutput += `
-        <tr class="presence-table-row-body">
-          <td>${entry.id}</td>
-          <td>${entry.name}</td>
-          <td>${entry.attended}</td>
-          <td>${entry.leave}</td>
-          <td>${entry.status}</td>
-          <td>${entry.work_hours}</td>
-          <td>${entry.notes}</td>
-          <td>${entry.image_path}</td>
-        </tr>
-        <tr><td colspan="7"><hr class="table-hr"></td></tr>
-      `;
-    });
-
-    currentDiv.innerHTML = dataOutput;
-    updatePaginationButtons(dataToRender.length);
-
-    document.getElementById("page-info").innerText = `${start + 1} - ${Math.min(end, dataToRender.length)} / ${dataToRender.length}`;
-  }
-  function updateTable(presenceData) {
-    const currentDiv = document.getElementById("presence-table-body");
-    currentDiv.innerHTML = ""; 
-
-    presenceData.forEach(entry => {
-      const row = `
-        <tr class="presence-table-row-body">
-          <td>${entry.id}</td>
-          <td>${entry.name}</td>
-          <td>${entry.attended || '-'}</td>
-          <td>${entry.leave || '-'}</td>
-          <td>${entry.status}</td>
-          <td>${entry.work_hours || '-'}</td>
-          <td>${entry.notes || 'No notes'}</td>
-          <td>${entry.image_path || 'No image'}</td>
-        </tr>
-        <tr><td colspan="7"><hr class="table-hr"></td></tr>
-      `;
-      currentDiv.innerHTML += row;
-    });
-
-    calculateCounts(); // Recalculate counts for the updated data
-  }
-
-  function updatePaginationButtons(totalItems) {
-    const totalPages = Math.ceil(totalItems / rowsPerPage);
-    document.getElementById("prev").disabled = currentPage === 1;
-    document.getElementById("next").disabled = currentPage === totalPages;
-  }
-
-  function changePage(direction) {
-    currentPage += direction;
-    renderTable(); 
-  }
-
-  // Event listener for tab clicks
-  function addActive() {
-    const navLinks = document.querySelectorAll('.nav-item-card');
-
-    navLinks.forEach((link, index) => {
-      link.addEventListener('click', function () {
-        navLinks.forEach(nav => {
-          nav.style.backgroundColor = '#11468F';
-          nav.style.color = 'white';
-        });
-
-        this.style.backgroundColor = 'white';
-        this.style.color = '#11468F';
-
-        // Render data based on the clicked tab
-        if (index === 0) {
-          renderTable(); // All data
-        } else if (index === 1) {
-          renderTable("ONTIME"); // On Time data
-        } else if (index === 2) {
-          renderTable("LATE"); // Late data
-        } else if (index === 3) {
-          renderTable("LEAVE"); // Left data
-        }
-      });
-    });
-
     calculateCounts();
-  }
+  };
   
-
-  function fetchPresenceData(date) {
-    fetch(`/presence?date=${date}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-CSRFToken': '{{ csrf_token }}' // Include CSRF token
-      }
-    })
-    .then(response => response.json())
-    .then(data => {
-      // Check if data retrieval was successful
-      if (data.status === 'success') {
-        updateTable(data.presence_data); // Update the table with new data
-      } else {
-        console.error('Error fetching data:', data.message);
-      }
-    })
-    .catch(error => {
-      console.error('Error:', error);
-    });
-  }
-  document.addEventListener('DOMContentLoaded', function() {
-    fetchPresenceData("{{ today }}"); // Fetch today's data on load
-  });
-  addActive();
-  renderTable(); 
 
 </script>
 
