@@ -20,22 +20,22 @@ class CameraStream:
 
         # Import yolo model
         model_path = os.path.join(os.path.dirname(__file__), 'models/yolo11n.pt')
-        model_yolo = YOLO(model_path)
+        model_yolo = YOLO(model_path, verbose=False, task='detect')
         
         # Optimize model untuk GPU
         if torch.cuda.is_available():
-            # Konversi ke FP32 dulu sebelum optimasi
+            # Convert to FP32 first before optimization
             model_yolo = model_yolo.to(self.device).float()
             
-            # Export ke format engine dengan pengaturan yang tepat
+            # Export to format engine with the right settings
             engine_path = model_path.replace('.pt', '.engine')
             if not os.path.exists(engine_path):
                 model_yolo.export(
                     format="engine",
                     device=0,  # GPU device id
-                    half=False,  # Gunakan FP32 untuk menghindari masalah kompatibilitas
+                    half=True, 
                     simplify=True,
-                    workspace=4,  # Workspace dalam GB
+                    workspace=4,
                     verbose=False
                 )
             
@@ -44,7 +44,7 @@ class CameraStream:
         
         self.model = model_yolo
 
-        # Import dan optimasi model gender
+        # Import and optimize gender model
         model_gender = torch.load(
             os.path.join(os.path.dirname(__file__), 'models/gender.pt'),
             map_location=self.device
@@ -79,6 +79,7 @@ class CameraStream:
 
         self.fr_active = True
         self.gd_active = True
+        self.fc_active = False
 
         self.stream_paused = False
 
@@ -86,7 +87,7 @@ class CameraStream:
 
         self.ID = ID
 
-        self.max_width = 2500
+        self.max_width = 2000
 
         # Tambahkan folder untuk menyimpan wajah yang diekstrak
         self.face_folder = os.path.join(os.path.dirname(__file__), '..', 'static', 'img', 'extracted_faces', 'raw')
@@ -141,8 +142,8 @@ class CameraStream:
                 else:
                     self.GV.face_coordinates = self.GD.face_coordinates
 
-                # Ekstrak dan simpan wajah
-                self.extract_and_save_faces(img)
+                if self.fc_active:
+                    self.extract_and_save_faces(img)
 
     def extract_and_save_faces(self, img):
         for idx, ((x1, y1, x2, y2, w, h), _, _) in enumerate(self.GV.face_coordinates):
@@ -165,8 +166,8 @@ class CameraStream:
         
         # Open camera
         cap = cv2.VideoCapture(self.camera)
-        cap.set(cv2.CAP_PROP_FPS, 30)
-        cap.set(cv2.CAP_PROP_BUFFERSIZE, 1)
+        cap.set(cv2.CAP_PROP_FPS, 15)
+        cap.set(cv2.CAP_PROP_BUFFERSIZE, 2)
         # cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
         # cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
 
