@@ -43,19 +43,18 @@ def extract_datetime_from_filename(filename):
         # Memisahkan string berdasarkan underscore
         parts = filename.split('_')
         
-        # Ambil dua bagian terakhir dari nama file
-        if len(parts) < 2:
-            return None
-        
-        # Ambil bagian terakhir dan kedua terakhir
-        date_str = parts[-2]
-        time_str = parts[-1]
-        
-        # Periksa apakah bagian terakhir adalah format tanggal (YYYYMMDD) dan waktu (HHMMSS)
-        if len(date_str) == 8 and date_str.isdigit() and len(time_str) == 6 and time_str.isdigit():
+        date_str = None
+        time_str = None
+
+        for part in parts:
+            if len(part) == 8 and part.isdigit():  # YYYYMMDD
+                date_str = part
+            elif len(part) == 6 and part.isdigit():  # HHMMSS
+                time_str = part
+
+        if date_str and time_str:
             datetime_str = f"{date_str}_{time_str}"
             return datetime.strptime(datetime_str, '%Y%m%d_%H%M%S')
-        
         return None
         
     except Exception as e:
@@ -63,20 +62,20 @@ def extract_datetime_from_filename(filename):
         return None
 
 def get_embedding(img_path):
-    # Baca dan resize gambar ke ukuran yang diharapkan oleh InceptionResnetV1 (160x160)
+    # Read and resize image to the expected size by InceptionResnetV1 (160x160)
     img = cv2.imread(img_path)
     img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
     img = cv2.resize(img, (160, 160))
     
-    # Konversi ke tensor dan normalisasi
+    # Convert to tensor and normalize
     img = torch.from_numpy(img.transpose((2, 0, 1))).float()
     img = img.unsqueeze(0)  # Tambahkan dimensi batch
     img = img / 255.0  # Normalisasi ke range [0,1]
     
-    # Pindahkan ke device yang sama dengan model
+    # Move to the same device as the model
     img = img.to(device)
     
-    # Dapatkan embedding
+    # Get embedding
     with torch.no_grad():
         embedding = resnet(img).detach().cpu().numpy()
     return embedding[0]
