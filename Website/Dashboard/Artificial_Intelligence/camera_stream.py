@@ -20,14 +20,15 @@ class CameraStream:
 
         # Import yolo model
         model_path = os.path.join(os.path.dirname(__file__), 'models/yolo11n.pt')
+        # model_path = os.path.join(os.path.dirname(__file__), 'models/yolov8n.pt')
         model_yolo = YOLO(model_path, verbose=False, task='detect')
         
         # Optimize model untuk GPU
         if torch.cuda.is_available():
             # Convert to FP32 first before optimization
             model_yolo = model_yolo.to(self.device).float()
-            
-            # Export to format engine with the right settings
+             
+            # Export to format engine
             engine_path = model_path.replace('.pt', '.engine')
             if not os.path.exists(engine_path):
                 model_yolo.export(
@@ -39,6 +40,9 @@ class CameraStream:
                     verbose=False
                 )
             
+            # Logging
+            print(f"Model berhasil dikonversi ke TensorRT engine: {engine_path}")
+            
             # Load engine model
             model_yolo = YOLO(engine_path)
         
@@ -49,7 +53,7 @@ class CameraStream:
             os.path.join(os.path.dirname(__file__), 'models/gender.pt'),
             map_location=self.device
         )
-        model_gender = model_gender.float().eval()  # Gunakan FP32
+        model_gender = model_gender.float().eval()  # Use FP32
         
         if torch.cuda.is_available():
             model_gender = torch.jit.trace(model_gender, torch.randn(1, 3, 224, 224).to(self.device))
@@ -79,7 +83,7 @@ class CameraStream:
 
         self.fr_active = True
         self.gd_active = True
-        self.fc_active = False
+        self.fc_active = True
 
         self.stream_paused = False
 
@@ -89,7 +93,7 @@ class CameraStream:
 
         self.max_width = 2000
 
-        # Tambahkan folder untuk menyimpan wajah yang diekstrak
+        # Add folder for saving extracted faces
         self.face_folder = os.path.join(os.path.dirname(__file__), '..', 'static', 'img', 'extracted_faces', 'raw')
         if not os.path.exists(self.face_folder):
             os.makedirs(self.face_folder)
@@ -112,7 +116,7 @@ class CameraStream:
 
                 start = time.time()
 
-                # Gunakan torch.no_grad() untuk menghemat memori
+                # Use torch.no_grad() to save memory
                 with torch.no_grad():
                     # Run gender and face recognition model
                     if self.gd_active:
@@ -148,7 +152,7 @@ class CameraStream:
     def extract_and_save_faces(self, img):
         for idx, ((x1, y1, x2, y2, w, h), _, _) in enumerate(self.GV.face_coordinates):
             face = img[y1:y2, x1:x2]
-            if face.size > 0:  # Pastikan wajah tidak kosong
+            if face.size > 0:  # Ensure face is not empty
                 timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
                 filename = f"face_{timestamp}_{idx}_cam{self.ID}.png"
                 filepath = os.path.join(self.face_folder, filename)
@@ -166,7 +170,7 @@ class CameraStream:
         
         # Open camera
         cap = cv2.VideoCapture(self.camera)
-        cap.set(cv2.CAP_PROP_FPS, 15)
+        cap.set(cv2.CAP_PROP_FPS, 10)
         cap.set(cv2.CAP_PROP_BUFFERSIZE, 2)
         # cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
         # cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
