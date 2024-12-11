@@ -211,40 +211,44 @@ Personnels
     <div style="display: flex;justify-content: end;">
 
   
-        <input id="date-picker-1" type="date" class="date-picker effected" 
-            style="width: 170px; cursor: pointer; min-height: 38px;" 
-            onchange="submitForm()" value="{{ today }}" />
-        <hr style="width: 2vw; border-top: 3px solid; margin-left: 1vw; margin-right: 1vw;">
-        <input id="date-picker-2" type="date" class="date-picker effected" 
-            style="width: 170px; cursor: pointer; min-height: 38px;" 
-            onchange="submitForm()" value="{{ today }}" />
+      <input id="date-picker-1" type="date" class="date-picker effected mr-3" 
+        style="width: 170px; cursor: pointer; min-height: 38px;" 
+        value="{{ today }}" />
+
+    <input id="date-picker-2" type="date" class="date-picker effected" 
+          style="width: 170px; cursor: pointer; min-height: 38px;" 
+          value="{{ today }}" />
  
  
     </div>
 
     <div style="width: 100%; height: 240px; display: flex; column-gap: 10px;">
       <div id="image-container" class="card p-3 effected" style="width: 70%; height: 100%;">
-        <a class="d-flex nav-link text-dark align-items-center gap-2 effected">
-          <i class="fa-solid fa-chart-pie text-center" style="font-size: 20px"></i>
-          <span id="folder-title">Data Entries</span>
-        </a>
-        <div class="d-flex flex-row">
-          <div class="w-100 gap-4 justify-content-center align-items-center mb-2" style="text-align: right;">
-            <div class="d-flex flex-column align-items-center justify-content-center">
-              <b id="late-count" class="text-center" style="font-size: 35px; color: #49b2e7; width: 110px;">5</b>
-              <span class="text-center" style="font-size: 15px; color: #49b2e7;">Late</span>
-            </div>
-            <div class="d-flex flex-column align-items-center justify-content-center">
-              <b id="ontime-count" class="text-center" style="font-size: 35px; color: #f97070; width: 110px;">11</b>
-              <span class="text-center" style="font-size: 15px; color: #f97070;">On Time</span>
-            </div>
+          <a class="d-flex nav-link text-dark align-items-center gap-2 effected">
+              <i class="fa-solid fa-chart-pie text-center" style="font-size: 20px"></i>
+              <span id="folder-title">Data Entries</span>
+          </a>
+          <div class="d-flex flex-row">
+              <div class="w-100 gap-4 justify-content-center align-items-center mb-2" style="text-align: right;">
+                  <div class="d-flex flex-column align-items-center justify-content-center">
+                      <b id="late-count" class="text-center" style="font-size: 35px; color: #49b2e7; width: 110px;">
+                          {{ total_late }}
+                      </b>
+                      <span class="text-center" style="font-size: 15px; color: #49b2e7;">Late</span>
+                  </div>
+                  <div class="d-flex flex-column align-items-center justify-content-center">
+                      <b id="ontime-count" class="text-center" style="font-size: 35px; color: #f97070; width: 110px;">
+                          {{ total_ontime }}
+                      </b>
+                      <span class="text-center" style="font-size: 15px; color: #f97070;">On Time</span>
+                  </div>
+              </div>
+              <div id="pie-chart-dummy" class="text-center w-100">
+                  <canvas id="pieChart" style="width: 100%; height: 100%;"></canvas>
+              </div>
           </div>
-          <div id="pie-chart-dummy" class="text-center w-100">
-            <canvas id="pieChart" style="width: 100%; height: 100%;"></canvas>
-
-          </div>
-        </div>
       </div>
+ 
       <div id="image-container" class="card p-3 effected" style="width: 30%; height: 100%;">
         <a class="d-flex flex-column nav-link text-dark gap-2 effected">
             <div class="d-flex align-items-center">
@@ -252,11 +256,24 @@ Personnels
                 <span id="folder-title" class="ms-2">Total</span>
             </div>
             <div class="d-flex flex-column justify-content-center align-items-center mt-4" style="flex-grow: 1; text-align: center; height: 100%;">
-                <b id="total-personnel-presence" class="text-center" style="font-size: 40px; color: black;">16</b>
+                <b id="total-personnel-presence" class="text-center" style="font-size: 40px; color: black;">
+                    {{ total_presence }}
+                </b>
                 <span class="text-center" style="font-size: 20px; color: black;">Presence</span>
+
+                <button
+                id="excel-chart-btn"
+                class="btn btn-success d-flex align-items-center justify-content-center gap-2"
+                style="color: white; font-size: medium; min-height: 38px;">
+                Download Excel
+                <i class="d-flex fa-solid fa-table text-center align-items-center justify-content-center text-white" 
+                   style="font-size: 12px; margin-left: 2px; cursor: pointer;"></i>
+            </button> 
+
             </div>
         </a>
     </div>
+</div>
     
     </div>
     
@@ -264,23 +281,24 @@ Personnels
 </div>
 
 <script>
-  elements = document.getElementsByClassName("effected")
+  elements = document.getElementsByClassName("effected");
 
-  for (var i = 0; i<elements.length; i++){
-    if (localStorage.getItem('darkMode') == 'enabled') {
-        elements[i].classList.add("dark-mode")
-    }else {
-        elements[i].classList.add("light-mode")
-    }
+  for (var i = 0; i < elements.length; i++) {
+      if (localStorage.getItem('darkMode') == 'enabled') {
+          elements[i].classList.add("dark-mode");
+      } else {
+          elements[i].classList.add("light-mode");
+      }
   }
+
   const ctx = document.getElementById('pieChart').getContext('2d');
   const pieChart = new Chart(ctx, {
       type: 'pie',
       data: {
           labels: ['On Time', 'Late'],
           datasets: [{
-              data: [11, 5], // Values for On Time and Late
-              backgroundColor: ['#49b2e7', '#f97070'], // Colors: On Time (Green), Late (Red)
+              data: [{{ total_ontime }}, {{ total_late }}], // Dynamic values from the backend
+              backgroundColor: ['#49b2e7', '#f97070'], // Colors: On Time (Blue), Late (Red)
               hoverOffset: 4
           }]
       },
@@ -302,6 +320,70 @@ Personnels
       }
   });
 
+  document.addEventListener("DOMContentLoaded", () => {
+    const downloadButton = document.getElementById("excel-chart-btn");
+    const startDatePicker = document.getElementById("date-picker-1");
+    const endDatePicker = document.getElementById("date-picker-2");
+
+    downloadButton.addEventListener("click", () => {
+        const startDate = startDatePicker.value;
+        const endDate = endDatePicker.value;
+
+        if (!startDate || !endDate) {
+            alert("Please select both start and end dates.");
+            return;
+        }
+
+        // Construct the URL with query parameters
+        const url = `/download_personnel_presence?start_date=${startDate}&end_date=${endDate}`;
+        
+        // Redirect to the backend endpoint to trigger the download
+        window.location.href = url;
+    });
+});
+
+  function submitForm() {
+    // Get the values of the selected dates from the date pickers
+    var startDate = document.getElementById('date-picker-1').value;
+    var endDate = document.getElementById('date-picker-2').value;
+
+    // Prepare data to send to the server (you may add additional parameters here if needed)
+    var data = {
+      'start_date': startDate,
+      'end_date': endDate,
+    };
+
+    // Make an AJAX request to submit the form without reloading the page
+    var xhr = new XMLHttpRequest();
+    xhr.open("POST", "{% url 'personnels' %}", true); // Replace 'your_view_name' with the actual URL name
+    xhr.setRequestHeader("Content-Type", "application/json");
+
+    xhr.onreadystatechange = function() {
+      if (xhr.readyState == 4 && xhr.status == 200) {
+        // On successful response, update the frontend dynamically with new data
+        var response = JSON.parse(xhr.responseText);
+
+        // Example: Update the displayed data with the new response
+        document.getElementById('late-count').textContent = response.lateCount;
+        document.getElementById('ontime-count').textContent = response.ontimeCount;
+        document.getElementById('total-personnel-presence').textContent = response.totalPresence;
+
+        // Update the pie chart data
+        pieChart.data.datasets[0].data = [response.ontimeCount, response.lateCount];
+        pieChart.update();
+
+        // Any other dynamic updates based on the response data
+      }
+    };
+
+    // Send the data to the server
+    xhr.send(JSON.stringify(data));
+  }
+
+  // Optional: You can trigger the form submission when the page loads with the default date values
+  window.onload = function() {
+    submitForm();
+  };
 </script>
 
 <script>
@@ -536,6 +618,7 @@ Personnels
   
   var inputName = document.querySelector("input[name='name']")
   var inputGender = document.querySelector("select[name='gender']")
+  var inputEmployement = document.querySelector("select[name='employment_status']")
 
   var personnelForm = document.getElementById('personnel-form')
 
@@ -547,6 +630,7 @@ Personnels
     addPersonnelBtn.style.display = 'block'
     inputName.value = ''
     inputGender.value = 'M'
+    inputEmployement.value = 'S'
     personnelForm.action = "{% url 'add_personnel' %}"
     formTitle.textContent = "Insert Personnel"
   }
@@ -557,6 +641,7 @@ Personnels
     addPersonnelBtn.style.display = 'none'
     inputName.value = '{{Selected.name}}'
     inputGender.value = '{{Selected.gender}}'
+    inputEmployement.value = '{{Selected.employment_status}}'
     personnelForm.action = "{% url 'edit_personnel' %}"
     formTitle.textContent = "Edit Personnel"
   }

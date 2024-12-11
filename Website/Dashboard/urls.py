@@ -23,8 +23,13 @@ urlpatterns = [
     path('change_camera', camera.change_camera, name="change_camera"),
     path('edit_camera/<str:id>', camera.edit_camera, name="edit_camera"),
     path('edit_personnel', personnel.edit_personnel, name="edit_personnel"),
+    path('personnel-entries', personnel.personnel_entries_data, name='personnel_entries_data'),
+    path('download_personnel_presence', personnel.download_personnel_presence, name='download_personnel_presence'),
     path('settings', settings.settings, name="settings"),
     path('presence', presence.presence, name="presence"),
+    path('download_presence_excel', presence.download_presence_excel, name="download_presence_excel"),
     path('download', home.download, name="download"),
+    
+\
 
 ]

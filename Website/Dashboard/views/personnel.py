@@ -4,6 +4,7 @@ import cv2
 import shutil
 from datetime import datetime
 from .var import var
+from django.utils.dateparse import parse_date
 
 
 # Backend Library
@@ -11,7 +12,10 @@ from .var import var
 from django.shortcuts import render, redirect, HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ObjectDoesNotExist
-from django.http.response import JsonResponse
+from django.http import JsonResponse, HttpResponse
+from django.db.models import Count, Q
+from xlsxwriter.workbook import Workbook
+import io
 from .. import forms, models
 
 # Artificial Intelligence Library
@@ -65,6 +69,32 @@ def personnels(request):
     img_list = [file for file in os.listdir(os.path.join(
         var.personnel_path, selected_personnel_name)) if not file.endswith('.txt')]
     img_list.reverse()
+    
+    try:
+        selected_personnel_instance = models.Personnels.objects.get(name=selected_personnel_name)
+    except models.Personnels.DoesNotExist:
+        print("Selected Personnel Not Found") 
+
+    # Extract data for the selected personnel
+    personnel_entries = models.Personnel_Entries.objects.filter(personnel=selected_personnel_instance)
+    
+    # Filter by date range if provided
+    start_date = request.GET.get('start_date')
+    end_date = request.GET.get('end_date')
+
+    if start_date and end_date:
+        try:
+            start_date = parse_date(start_date)
+            end_date = parse_date(end_date)
+            personnel_entries = personnel_entries.filter(timestamp__date__range=(start_date, end_date))
+        except ValueError:
+            pass
+
+    # Calculate totals
+    total_presence = personnel_entries.count()
+    total_ontime = personnel_entries.filter(presence_status='ONTIME').count()
+    total_late = personnel_entries.filter(presence_status='LATE').count()
+    total_absence = personnel_entries.filter(presence_status='UNKNOWN').count()
 
     if request.method == "POST":
         command = request.POST.get('command', None)
@@ -219,33 +249,44 @@ def personnels(request):
                         image_path=os.path.join(personnel_folder, filename)
                     )
 
-                    img = cv2.imread(os.path.join(personnel_folder, filename))
+                #     img = cv2.imread(os.path.join(personnel_folder, filename))
 
-                    feats, _ = RV.get_feature(img)
+                #     feats, _ = RV.get_feature(img)
 
-                    if len(RV.known_features) == 0:
-                        RV.set_all_known_faces()
+                #     if len(RV.known_features) == 0:
+                #         RV.set_all_known_faces()
 
-                    if len(feats) == 1:
-                        if selected_personnel not in RV.known_features:
-                            RV.known_features[selected_personnel] = []
+                #     if len(feats) == 1:
+                #         if selected_personnel not in RV.known_features:
+                #             RV.known_features[selected_personnel] = []
 
-                        RV.known_features[selected_personnel].append(feats[0])
-                    else:
-                        os.remove(os.path.join(personnel_folder, filename))
-                        request.session['status'] = 'img_adding_error1'
-                        no_face_count += 1
+                #         RV.known_features[selected_personnel].append(feats[0])
+                #     else:
+                #         if os.path.exists(os.path.join(personnel_folder, filename)):
+                #             os.remove(os.path.join(personnel_folder, filename))
+                #         else:
+                #             print(f"File {filename} not found in {personnel_folder}. Skipping deletion.")
+                #         # os.remove(os.path.join(personnel_folder, filename))
+                #         request.session['status'] = 'img_adding_error1'
+                #         no_face_count += 1
 
-                    x += 1
+                #     x += 1
 
-                if no_face_count == len(files):
-                    request.session['status'] = 'img_adding_error2'
+                # if no_face_count == len(files):
+                #     request.session['status'] = 'img_adding_error2'
 
             return redirect('personnels')
     else:
         request.session['selected_image'] = []
 
-        return render(request, 'personnels.html', {'Personnels': data, 'Page': "Personnels", 'Selected': selected, 'Img_List': img_list})
+        return render(request, 'personnels.html', {'Personnels': data, 'Page': "Personnels", 'Selected': selected, 'Img_List': img_list,         'personnel_name': selected_personnel_name,
+        'total_presence': total_presence,
+        'total_ontime': total_ontime,
+        'total_late': total_late,
+        'total_absence': total_absence,
+        'entries': personnel_entries,
+        'start_date': start_date,
+        'end_date': end_date,})
 
 # Function to add personnel
 
@@ -275,7 +316,6 @@ def add_personnel(request):
     return render(request, 'add_personnel.html', {'Selected_Personnel': None})
 
 # Function to add pic
-
 
 @login_required(login_url='login')
 def add_pic(request):
@@ -311,7 +351,7 @@ def edit_personnel(request):
                 os.rename(os.path.join(var.personnel_path, request.session['selected_personnel']), os.path.join(
                     var.personnel_path, selected.name))
 
-                RV.set_personnel_known_faces(selected.name)
+                # RV.set_personnel_known_faces(selected.name)
 
                 request.session['selected_personnel'] = selected.name
 
@@ -349,5 +389,79 @@ def handle_uploaded_file(request, f, filename):
             destination.write(chunk)
 
 
-# selected personel must return personnel id not name
-# after uploaded to static/img/personnel_pic/* directory then SAVE TO DB at personnel_images(id, personnel_id(fk to personnels), image_path, predicted_status) table
+def personnel_entries_data(request):
+    # Get date range from the request
+    start_date = request.GET.get('start_date')
+    end_date = request.GET.get('end_date')
+
+    if not start_date or not end_date:
+        return JsonResponse({"error": "Date range is required."}, status=400)
+
+    # Query personnel entries within the date range
+    entries = models.Personnel_Entries.objects.filter(timestamp__date__range=[start_date, end_date])
+
+    # Aggregate data
+    late_count = entries.filter(presence_status='LATE').count()
+    ontime_count = entries.filter(presence_status='ONTIME').count()
+    total_presence = entries.filter(~Q(presence_status='UNKNOWN')).count()
+    total_absence = entries.filter(presence_status='UNKNOWN').count()
+
+    # Return data as JSON
+    return JsonResponse({
+        "late_count": late_count,
+        "ontime_count": ontime_count,
+        "total_presence": total_presence,
+        "total_absence": total_absence,
+    })
+
+
+def download_personnel_presence(request):
+    # Get date range from the request
+    start_date = request.GET.get('start_date')
+    end_date = request.GET.get('end_date')
+
+    if not start_date or not end_date:
+        return JsonResponse({"error": "Date range is required."}, status=400)
+
+    # Query personnel entries within the date range
+    entries = models.Personnel_Entries.objects.filter(timestamp__date__range=[start_date, end_date])
+
+    # Aggregate data by personnel
+    personnel_data = entries.values('personnel__name').annotate(
+        ontime_count=Count('id', filter=Q(presence_status='ONTIME')),
+        late_count=Count('id', filter=Q(presence_status='LATE')),
+        total_absence=Count('id', filter=Q(presence_status='UNKNOWN'))
+    )
+
+    # Determine file name based on personnel
+    personnel_names = request.session['selected_personnel']
+
+    # Create an in-memory output file
+    output = io.BytesIO()
+    workbook = Workbook(output, {'in_memory': True})
+    worksheet = workbook.add_worksheet('Attendance Report')
+
+    # Write headers
+    headers = ['Personnel Name', 'On-Time Count', 'Late Count', 'Absence Count']
+    for col_num, header in enumerate(headers):
+        worksheet.write(0, col_num, header)
+
+    # Write personnel data
+    for row_num, data in enumerate(personnel_data, start=1):
+        worksheet.write(row_num, 0, data['personnel__name'])
+        worksheet.write(row_num, 1, data['ontime_count'])
+        worksheet.write(row_num, 2, data['late_count'])
+        worksheet.write(row_num, 3, data['total_absence'])
+
+    # Close the workbook
+    workbook.close()
+    output.seek(0)
+
+    # Return the file as a response
+    response = HttpResponse(output, content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = (
+        f'attachment; filename="Attendance_Report_{personnel_names}_{start_date}_to_{end_date}.xlsx"'
+    )
+
+    return response
+

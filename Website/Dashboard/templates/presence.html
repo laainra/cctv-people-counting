@@ -130,12 +130,76 @@
       <span id="page-info" class="mx-2 mt-2" style="text-align: center;"></span>
       <button id="next" class="btn btn-primary" onclick="changePage(1)">Next</button>
     </div>
+
+
     
   </div>
+  <div class="d-flex justify-content-end mb-5 responsive responsive-card effected flex">
+    <!-- Button to download today's data -->
+    <button
+        id="download-today-btn"
+        class="btn btn-success d-flex align-items-center justify-content-center gap-2 mr-2"
+        style="color: white; font-size: medium; min-height: 38px;"
+        onclick="downloadExcel('today')">
+        Download Today
+        <i class="d-flex fa-solid fa-table text-center align-items-center justify-content-center text-white" 
+           style="font-size: 12px; margin-left: 2px; cursor: pointer;"></i>
+    </button> 
+
+    <!-- Button to download all data -->
+    <button
+        id="download-all-btn"
+        class="btn btn-success d-flex align-items-center justify-content-center gap-2 mr-2"
+        style="color: white; font-size: medium; min-height: 38px;"
+        onclick="downloadExcel('all')">
+        Download All
+        <i class="d-flex fa-solid fa-table text-center align-items-center justify-content-center text-white" 
+           style="font-size: 12px; margin-left: 2px; cursor: pointer;"></i>
+    </button> 
+</div>
+
 
 </div>
 
 <script>
+  document.addEventListener("DOMContentLoaded", () => {
+    // Get the current date in YYYY-MM-DD format
+    const getCurrentDate = () => {
+        const today = new Date();
+        const year = today.getFullYear();
+        const month = String(today.getMonth() + 1).padStart(2, "0");
+        const day = String(today.getDate()).padStart(2, "0");
+        return `${year}-${month}-${day}`;
+    };
+
+    // Function to download presence data
+    const downloadPresenceData = (date = null) => {
+        let url = "/download_presence_excel"; // Replace with your endpoint
+        if (date) {
+            url += `?date=${date}`;
+        }
+        // Redirect the user to the URL to trigger the download
+        window.location.href = url;
+    };
+
+    // Add event listeners to the buttons
+    const todayButton = document.getElementById("download-today-btn");
+    const allButton = document.getElementById("download-all-btn");
+
+    if (todayButton) {
+        todayButton.addEventListener("click", () => {
+            const today = getCurrentDate();
+            downloadPresenceData(today);
+        });
+    }
+
+    if (allButton) {
+        allButton.addEventListener("click", () => {
+            downloadPresenceData(); // No date parameter for "Download All"
+        });
+    }
+});
+
   let currentTab = 'all';
   function getCurrentDate() {
     const today = new Date();

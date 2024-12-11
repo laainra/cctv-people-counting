@@ -2,7 +2,6 @@ import json
 import os
 from datetime import datetime, timedelta
 import time
-from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.db import connection
 from django.utils import timezone
@@ -11,7 +10,10 @@ from watchdog.events import FileSystemEventHandler
 from threading import Thread
 from .. import models
 from django.shortcuts import render
-from django.http import HttpRequest
+from django.http import HttpRequest, HttpResponse, JsonResponse
+from xlsxwriter.workbook import Workbook
+from io import BytesIO
+
 
 
 # Directory paths
@@ -373,3 +375,63 @@ def start_watching():
     
     delete_and_create_json()
     
+def download_presence_excel(request):
+    """
+    Generate an Excel file containing presence data.
+    If a date is provided via request, filter data for that date using the 'timestamp' field.
+    """
+    from django.utils.timezone import make_aware
+    from datetime import datetime
+
+    # Retrieve the 'date' parameter from the request (if provided)
+    date_str = request.GET.get('date')  # Date in the format 'YYYY-MM-DD'
+    date = None
+
+    # If the 'date' parameter is provided, try to parse it
+    if date_str:
+        try:
+            # Convert the date string to a datetime object
+            date = datetime.strptime(date_str, "%Y-%m-%d").date()
+        except ValueError:
+            # If the date format is incorrect, return an error or handle it accordingly
+            return HttpResponse("Invalid date format. Please use YYYY-MM-DD.", status=400)
+
+    # Create an in-memory output file for the workbook
+    output = BytesIO()
+    workbook = Workbook(output, {'in_memory': True})
+    worksheet = workbook.add_worksheet("Presence Data")
+
+    # Add headers to the worksheet
+    headers = ["ID", "Name", "Role", "Timestamp", "Presence Status", "Camera ID"]
+    for col_num, header in enumerate(headers):
+        worksheet.write(0, col_num, header)
+
+    # Filter presence data based on the provided date
+    if date:
+        # Filter by the date part of the timestamp
+        presences = models.Personnel_Entries.objects.filter(
+            timestamp__date=date
+        )
+    else:
+        presences = models.Personnel_Entries.objects.all()
+
+    # Add presence data to the worksheet
+    for row_num, presence in enumerate(presences, start=1):
+        worksheet.write(row_num, 0, presence.id)
+        worksheet.write(row_num, 1, presence.personnel.name if presence.personnel else "Unknown")
+        worksheet.write(row_num, 2, presence.personnel.employment_status if presence.personnel else "Unknown")
+        worksheet.write(row_num, 3, presence.timestamp.strftime("%Y-%m-%d %H:%M:%S"))
+        worksheet.write(row_num, 4, presence.presence_status)
+        worksheet.write(row_num, 5, presence.camera_id)
+
+    # Close the workbook
+    workbook.close()
+
+    # Create an HTTP response with the Excel file
+    response = HttpResponse(content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+    file_name = f"presence_data_{date if date else 'all'}.xlsx"
+    response["Content-Disposition"] = f"attachment; filename={file_name}"
+
+    # Write the Excel data to the response
+    response.write(output.getvalue())
+    return response
