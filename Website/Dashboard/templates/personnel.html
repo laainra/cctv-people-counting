@@ -1,0 +1,1148 @@
+{% extends 'base.html' %} 
+{% block title %} Personnels {% endblock %} 
+{% block content %} 
+
+{% csrf_token %} 
+<!-- insert content -->
+
+<script>
+  function submitForm() {
+    const selectedDate = document.getElementById('date-picker').value;
+    console.log('Selected Date:', selectedDate);
+
+    if (selectedDate) {
+      document.getElementById('date').value = selectedDate;
+      console.log('Submitting form with date:', selectedDate);
+      document.getElementById('date-form').submit();
+    } else {
+      console.error('No date selected!');
+    }
+  }
+
+  if (localStorage.getItem("darkMode") == "enabled") {
+    document.body.classList.add("dark-mode");
+    document.getElementById("accordionSidebar").classList.add("dark-mode");
+    document.getElementById("toggler-button").classList.add("dark-mode");
+  } else {
+    document.body.classList.add("light-mode");
+    document.getElementById("accordionSidebar").classList.add("light-mode");
+    document.getElementById("toggler-button").classList.add("light-mode");
+  }
+</script>
+
+<!-- Card Header -->
+<div class="card d-flex w-36 justify-content-between align-items-center mb-3 py-3 responsive responsive-card effected shadow-black shadow-lg">
+  <div class="pl-4 d-flex justify-content-between align-items-center w-100">
+    <a class="d-flex nav-link text-dark align-items-center gap-2 effected bg-transparent">
+      <i class="fa-solid fa-swatchbook text-center" style="font-size: 20px"></i>
+      <span style="font-size: 20px; font-weight: 700">Personnels Management</span>
+    </a>
+    <button
+    id="add-personnel-btn"
+    class="btn btn-success d-flex align-items-center justify-content-center gap-2 mr-5"
+    onclick="openAddPersonnelModal()">
+    Add Personnel
+    <i class="d-flex fa-solid fa-person text-center align-items-center justify-content-center text-white" 
+       style="font-size: 12px; margin-right: 2px; cursor: pointer;"></i>
+  </button>
+  
+  </div>
+</div>
+
+<!-- Loader -->
+<div id="updating-personnel-loader" class="loader" style="display: none; position: fixed; top: 0; bottom: 0; right: 0; left: 0; margin: auto;"></div>
+
+
+  <div class="card mb-5  gap-4 responsive responsive-card effected flex" style="border-top-left-radius: 0%; border-top-right-radius: 0%">
+
+    <table id="presence-table">
+      <thead id="presence-table-head">
+        <tr class="presence-table-row">
+          <th onclick="sortTable('img')"> </th> 
+          <th onclick="sortTable('name')">Name</th>
+          <th onclick="sortTable('attended')">Gender</th>
+          <th onclick="sortTable('leave')">Role</th>
+          <th onclick="sortTable('status')">Images</th>
+          <th onclick="sortTable('work_hours')">Actions </th>
+        </tr>
+        <tr>
+          <td colspan="5"><hr class="table-hr" /></td>
+        </tr>
+      </thead>
+      <tbody id="presence-table-body">
+        {% for personnel in Personnels %}
+        <tr style="cursor: pointer;" class="presence-table-row-body">
+            {% load static %}
+            <td onclick="openPersonnelDetailModal({{ personnel.id }}, '{{ personnel.name|escapejs }}')">
+              <img src="{% static personnel.profile_image %}" alt="{{ personnel.name }}'s Profile Picture" class="inline-block mr-2" style="width: 40px; height: 40px; border-radius: 50%;">
+            </td>
+            <td onclick="openPersonnelDetailModal({{ personnel.id }}, '{{ personnel.name|escapejs }}')">{{ personnel.name }}</td>
+            <td onclick="openPersonnelDetailModal({{ personnel.id }}, '{{ personnel.name|escapejs }}')">
+                {% if personnel.gender == 'F' %} Female
+                {% elif personnel.gender == 'M' %} Male
+                {% else %} Unknown
+                {% endif %}
+            </td>
+            <td onclick="openPersonnelDetailModal({{ personnel.id }}, '{{ personnel.name|escapejs }}')">
+                {% if personnel.employment_status == 'I' %} Intern
+                {% elif personnel.employment_status == 'S' %} Staff
+                {% else %} Unknown
+                {% endif %}
+            </td>
+            <td>
+                <button class="btn btn-primary btn-sm" onclick="openImagesModal({{ personnel.id }}, '{{ personnel.name|escapejs }}')">
+                    See Images
+                </button>
+            </td>
+            <td>
+                <div class="btn-group">
+                    <button class="btn btn-warning btn-sm" onclick="openEditModal({{ personnel.id }})">Edit</button>
+                    <button class="btn btn-danger btn-sm" onclick="deletePersonnel({{ personnel.id }})">Delete</button>
+                </div>
+            </td>
+        </tr>
+        <tr><td colspan="7"><hr class="table-hr"></td></tr>
+        {% empty %}
+        <tr>
+            <td colspan="7" style="text-align: center;">No Employee Data</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    
+    <div id="pagination-container" class="d-flex justify-content-center mb-5">
+      <button id="prev" class="btn btn-primary" onclick="changePage(-1)">Previous</button>
+      <span id="page-info" class="mx-2 mt-2" style="text-align: center;"></span>
+      <button id="next" class="btn btn-primary" onclick="changePage(1)">Next</button>
+    </div>
+
+
+    
+  </div>
+
+</div>
+
+<section class="my-modal personnel hidden">
+  <div class="card align-items-center effected pl-5 pr-5 pt-4 pb-4 align-self-center" style="border-radius: 25px; width: fit-content;">
+    <span id="form-title" class="mb-4 effected" style="font-weight: 600; font-size: 30px;">Edit Personnel</span>
+    <form id="personnel-form" action="{% url 'edit_personnel' %}" method="POST" class="d-flex flex-column w-100 justify-content-center align-items-center mb-1">
+      <div class="form-group">
+        {% csrf_token %} 
+        <p class="mb-3" style="display: flex; flex-direction: column; justify-content: center; align-items: start; width: 100%;">
+          <label for="name" class="mb-1 effected">Personnel Name:</label>
+          <input name="name" type="text" class="effected" style="width:320px;" maxlength="20" placeholder="Insert Personnel Name" required>
+        </p>
+        <p class="mb-3" style="display: flex; flex-direction: column; justify-content: center; align-items: start; width: 100%;">
+          <label for="gender" class="mb-1 effected">Personnel Gender:</label>
+          <select name="gender" id="id_gender" class="effected" style="padding: 8px 10px; border: 2px solid transparent; border-right: 15px solid transparent; cursor: pointer; width: 100%;">
+            <option value="M">Male</option>
+            <option value="F">Female</option>
+          </select>
+        </p>
+        <p class="mb-3" style="display: flex; flex-direction: column; justify-content: center; align-items: start; width: 100%;">
+          <label for="employment_status" class="mb-1 effected">Personnel Employment Status:</label>
+          <select name="employment_status" id="id_employment_status" class="effected" style="padding: 8px 10px; border: 2px solid transparent; border-right: 15px solid transparent; cursor: pointer; width: 100%;">
+            <option value="S">Staff</option>
+            <option value="I">Intern</option>
+          </select>
+        </p>
+        <div class="d-flex justify-content-between align-items-center mt-4 gap-2" style="width: 320px;">
+          <button 
+            type="button" 
+            class="btn btn-danger btn-user btn-block m-0" 
+            style="border-radius: 8px; padding-left: 2%; padding-right: 2%;"
+            onclick="closeModal()">
+            Cancel
+          </button>
+          <button 
+          type="submit" 
+          class="btn btn-success btn-user btn-block m-0" 
+          style="border-radius: 8px; padding-left: 2%; padding-right: 2%;">
+          Save
+          </button>
+
+        </div>
+      </div>
+    </form>
+    <button
+      class="btn btn-danger btn-block align-self-center text-center delete-button effected"
+      onclick="deletePersonnel()">
+      Delete Personnel
+    </button>
+  </div>
+</section>
+<section id="personnelImagesModal" class="hidden my-modal personnel fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center">
+  <div class="modal-content">
+    <!-- Header Modal -->
+    <div class="flex justify-between items-center mb-4">
+      <h2 id="personnelName" class="font-semibold text-2xl">Personnel Images</h2>
+    </div>
+    
+    <!-- Body Modal -->
+    <div class="p-4 overflow-auto">
+      <!-- Ensure images display in a 4-column grid with gap -->
+      <div id="imagesGrid" class="container d-flex justify-content-center flex-wrap gap-4 w-full">
+        <!-- Images will be dynamically loaded here -->
+      </div>
+      
+      <!-- Pesan Jika Tidak Ada Gambar -->
+      <div id="noImagesMessage" class="text-center mt-4 hidden">
+        <p>No images available.</p>
+        <p>Please add at least 3 images showing:</p>
+        <ul class="list-disc text-left inline-block mt-2">
+          <li>Right Angle</li>
+          <li>Left Angle</li>
+          <li>Front Angle</li>
+        </ul>
+      </div>
+      
+      <!-- Drop area for drag-and-drop -->
+      <div id="dropArea" class="border-2 border-dashed p-4 mt-4 text-center cursor-pointer">
+        <p>Drag and drop your images here, or click to select images</p>
+        <input type="file" id="fileInput" accept="image/*" class="hidden" multiple>
+      </div>
+
+      <!-- Preview Area -->
+      <div id="previewArea" class="hidden mt-4">
+        <div id="imagePreview" class="flex space-x-4">
+          <h3>Image Preview:</h3>
+          <!-- Image preview will go here -->
+        </div>
+      </div>
+    </div>
+
+    <div id="moveDropdown" class="hidden">
+      <select id="moveToPersonnel" class="form-select">
+        <!-- Dropdown options will be populated dynamically -->
+      </select>
+      <button class="btn btn-primary" onclick="moveImage()">Move</button>
+    </div>
+
+    <!-- Footer Modal -->
+    <div class="flex justify-center items-center mt-4 gap-4">
+      <button onclick="closeImagesModal()" class="btn btn-danger px-4 py-2 rounded-md">Cancel</button>
+      <a href="#" id="addImageLink" class="btn btn-primary px-4 py-2 rounded-md">Add Image</a>
+
+      <!-- Delete and Move buttons -->
+      <div id="imageActionButtons" class="mt-4 hidden">
+        <button id="deleteImageBtn" class="btn btn-danger px-4 py-2 rounded-md" onclick="deleteImage()">Delete Image</button>
+        <button id="moveImageBtn" class="btn btn-primary px-4 py-2 rounded-md" onclick="openMoveImageModal()">Move Image</button>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+
+<<!-- Modal for Personnel Detail -->
+<section 
+id="personnelDetailModal" 
+class="max-h-[70vh] my-modal personnel fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center hidden"
+>
+<div class="relative bg-white rounded-lg shadow-lg w-full max-w-3xl p-5">
+  <!-- Header Modal -->
+  <div class="flex justify-between items-center mb-4">
+    <h2 id="personnelName" class="font-semibold text-2xl">Personnel Details</h2>
+  </div>
+  <!-- Profile Picture and Details -->
+  <div class="flex justify-center mb-4">
+    <img id="profileImage" src="" alt="Profile Image" class="rounded-full object-cover mb-2">
+  </div>
+  <div class="text-center">
+    <h5 id="personnelNameText" class="font-bold text-xl"></h5>
+    <p id="personnelGender" class="text-gray-600"></p>
+    <p id="personnelEmploymentStatus"></p>
+    <div class="stats-container">
+      <div class="stats-boxes">
+        <div class="stat-box">
+          <h4>Total Presence</h4>
+          <p id="totalPresence" class="stat-number">0</p>
+        </div>
+        <div class="stat-box">
+          <h4>Total Absence</h4>
+          <p id="totalAbsence" class="stat-number">0</p>
+        </div>
+        <div class="stat-box">
+          <h4>Total On Time</h4>
+          <p id="totalOntime" class="stat-number">0</p>
+        </div>
+        <div class="stat-box">
+          <h4>Total Late</h4>
+          <p id="totalLate" class="stat-number">0</p>
+        </div>
+      </div>
+      <div class="stats-chart">
+        <canvas id="statsPieChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer Modal -->
+  <div class="flex justify-center mt-4 gap-4">
+    <button onclick="closeDetailModal()" class="btn btn-danger px-4 py-2 rounded-md">Close</button>
+  </div>
+</div>
+</section>
+
+
+<!-- Hidden Input for Uploading Image -->
+<input type="file" id="imageUploadInput" class="hidden" />
+
+
+<script>
+  let selectedImagePath = null;
+  let selectedImageElement = null;
+  
+  function selectPhoto(imagePath, element) {
+    // If the same image is selected again, deselect it
+    if (selectedImagePath === imagePath) {
+      selectedImagePath = null;
+      selectedImageElement = null;
+      element.classList.remove('border-2', 'border-blue-500');
+      hideActionButtons();
+    } else {
+      // Mark the image as selected
+      if (selectedImageElement) {
+        selectedImageElement.classList.remove('border-2', 'border-blue-500');
+      }
+      selectedImagePath = imagePath;
+      selectedImageElement = element;
+      element.classList.add('border-2', 'border-blue-500');
+      showActionButtons();
+    }
+  }
+  
+  function showActionButtons() {
+    // Show Delete and Move buttons when an image is selected
+    document.getElementById('deleteBtn').classList.remove('hidden');
+    document.getElementById('moveBtn').classList.remove('hidden');
+    
+    // Populate move dropdown with personnel names
+    fetch('/personnels')
+      .then(response => response.json())
+      .then(data => {
+        const dropdown = document.getElementById('moveToPersonnel');
+        dropdown.innerHTML = ''; // Clear the dropdown
+        data.personnels.forEach(person => {
+          const option = document.createElement('option');
+          option.value = person.id;
+          option.innerText = person.name;
+          dropdown.appendChild(option);
+        });
+      })
+      .catch(error => console.error('Error fetching personnel:', error));
+  }
+  
+  function hideActionButtons() {
+    // Hide Delete and Move buttons when no image is selected
+    document.getElementById('deleteBtn').classList.add('hidden');
+    document.getElementById('moveBtn').classList.add('hidden');
+    document.getElementById('moveDropdown').classList.add('hidden');
+  }
+  
+  function deleteImage() {
+    if (selectedImagePath) {
+      fetch(`/delete_personnel_image/${selectedImagePath}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.status === 'success') {
+          alert('Image deleted successfully');
+          selectedImageElement.remove(); // Remove the image from the UI
+          hideActionButtons();
+        } else {
+          alert('Failed to delete image');
+        }
+      })
+      .catch(error => alert('Error deleting image: ' + error));
+    }
+  }
+  
+  function showMoveDropdown() {
+    document.getElementById('moveDropdown').classList.remove('hidden');
+  }
+  
+  function moveImage() {
+    const selectedPersonnelId = document.getElementById('moveToPersonnel').value;
+  
+    if (selectedPersonnelId) {
+      fetch('/move_personnel_image/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          image_path: selectedImagePath,
+          new_personnel_id: selectedPersonnelId,
+        }),
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.status === 'success') {
+          alert('Image moved successfully');
+          location.reload();  // Reload to show the updated images
+        } else {
+          alert('Failed to move image');
+        }
+      })
+      .catch(error => alert('Error moving image: ' + error));
+    }
+  }
+  
+  function openPersonnelDetailModal(personnelId, personnelName) { 
+    const modal = document.getElementById('personnelDetailModal');
+    modal.classList.remove('hidden'); // Hapus class 'hidden'
+    modal.style.display = 'flex'; // Pastikan modal muncul (untuk jaga-jaga)
+
+    const personnelNameElement = document.getElementById('personnelName');
+    personnelNameElement.innerText = `${personnelName}'s Details`;
+
+    fetch(`/personnels/${personnelId}/`)
+      .then(response => response.json())
+      .then(data => {
+        document.getElementById('personnelNameText').innerText = data.name;
+
+        document.getElementById('personnelGender').innerText =
+          data.gender === 'F' ? 'Female' :
+          data.gender === 'M' ? 'Male' : 'Unknown';
+
+        document.getElementById('personnelEmploymentStatus').innerText =
+          data.employment_status === 'I' ? 'Intern' :
+          data.employment_status === 'S' ? 'Staff' : 'Unknown';
+
+        document.getElementById('profileImage').src = data.profile_image
+          ? `/static/${data.profile_image}`
+          : '';
+
+        fetch(`/attendance/${personnelId}/`)
+          .then(response => response.json())
+          .then(attendanceData => {
+            document.getElementById('totalPresence').innerText = attendanceData.total_presence;
+            document.getElementById('totalOntime').innerText = attendanceData.total_ontime;
+            document.getElementById('totalLate').innerText = attendanceData.total_late;
+            document.getElementById('totalAbsence').innerText = attendanceData.total_absence;
+          });
+      })
+      .catch(error => {
+        console.error('Error fetching personnel details:', error);
+      });
+}
+
+function closeDetailModal() {
+  const modal = document.getElementById('personnelDetailModal');
+  modal.classList.add('hidden'); // Tambahkan class 'hidden'
+  modal.style.display = 'none'; // Pastikan modal disembunyikan
+}
+
+
+
+
+// Fungsi untuk menutup modal Images
+function closeImagesModal() {
+  const modal = document.getElementById('personnelImagesModal');
+  modal.classList.add('hidden'); // Tambahkan class 'hidden'
+}
+
+
+
+// Event Listener untuk menutup modal dengan klik di luar modal
+window.onclick = function(event) {
+  const imagesModal = document.getElementById('personnelImagesModal');
+  const detailModal = document.getElementById('personnelDetailModal');
+
+  if (event.target === imagesModal) {
+    closeImagesModal();
+  }
+
+  if (event.target === detailModal) {
+    closeDetailModal();
+  }
+};
+
+document.addEventListener('DOMContentLoaded', function() {
+  // Get the button element by its ID
+  const addImageButton = document.getElementById('addImageBtn');
+  
+  // Add an event listener for the click event
+  addImageButton.addEventListener('click', function() {
+    uploadImages();  // Call your uploadImages function
+  });
+});
+
+
+  const dropArea = document.getElementById('dropArea');
+  const fileInput = document.getElementById('fileInput');
+  const imagePreview = document.getElementById('imagePreview');
+  let selectedPersonnelId = null;  // Store selected personnel ID
+  let previewImages = [];  // Store previewed images
+  
+  function openImagesModal(personnelId, personnelName) {
+    selectedPersonnelId = personnelId;
+  
+    // Show the modal
+    const modal = document.getElementById('personnelImagesModal');
+    modal.classList.remove('hidden');
+  
+    // Update the modal title to include the personnel's name
+    const personnelNameElement = document.getElementById('personnelName');
+    personnelNameElement.innerText = `${personnelName}'s Images`;
+  
+    // Fetch images from the server based on personnel ID
+    fetch(`/personnels/images/${personnelId}/`)
+      .then(response => response.json())
+      .then(data => {
+        const imagesGrid = document.getElementById('imagesGrid');
+        const noImagesMessage = document.getElementById('noImagesMessage');
+        imagesGrid.innerHTML = '';  // Clear existing images
+  
+        if (data.images.length === 0) {
+          // Show message if no images are found
+          noImagesMessage.classList.remove('hidden');
+        } else {
+          // Hide no images message and load images in rows of 5 images
+          noImagesMessage.classList.add('hidden');
+          let rowHtml = '';
+          data.images.forEach((img, index) => {
+            if (index % 5 === 0 && index > 0) {
+              rowHtml += `<div class="w-full"></div>`; // New row after every 5 images
+            }
+            rowHtml += `
+              <div class="flex-none w-1/5 ">
+                <a class=" mb-1 text-center image" 
+                   style="width: 100px; height: 100px; cursor: pointer;" 
+                   onclick="selectPhoto('${img.image_path}', this)">
+                  <img src="/static/${img.image_path}"
+                       alt="Personnel Image"
+                       class="object-cover rounded-lg" style="width: 100px; height: 100px;"/>
+                </a>
+              </div>
+            `;
+          });
+          imagesGrid.innerHTML += rowHtml; // Append all images to grid
+        }
+      })
+      .catch(error => {
+        console.error('Error fetching images:', error);
+        const noImagesMessage = document.getElementById('noImagesMessage');
+        noImagesMessage.classList.remove('hidden');
+      });
+  }
+
+
+
+  // Handle file drag and drop
+dropArea.addEventListener('dragover', (e) => {
+  e.preventDefault();
+  dropArea.classList.add('bg-gray-200');
+});
+
+dropArea.addEventListener('dragleave', () => {
+  dropArea.classList.remove('bg-gray-200');
+});
+
+dropArea.addEventListener('drop', (e) => {
+  e.preventDefault();
+  dropArea.classList.remove('bg-gray-200');
+  handleFiles(e.dataTransfer.files);
+});
+
+// Handle click on the drop area to trigger file input
+dropArea.addEventListener('click', () => {
+  fileInput.click(); // Simulate click on file input
+});
+
+// Handle file input change event
+fileInput.addEventListener('change', (e) => {
+  handleFiles(e.target.files);
+});
+// Handle file upload and preview
+function handleFiles(files) {
+  previewImages = [];
+  imagePreview.innerHTML = '';  // Clear existing preview
+  
+  if (files.length > 0) {
+    // Show the preview area if there are files
+    document.getElementById('previewArea').classList.remove('hidden');
+    
+    Array.from(files).forEach(file => {
+      if (file.type.startsWith('image/')) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          const imgElement = document.createElement('img');
+          imgElement.src = e.target.result;
+          imgElement.classList.add('w-24', 'h-24', 'object-cover', 'rounded-md', 'm-2');
+          imagePreview.appendChild(imgElement);
+          previewImages.push(file);  // Store the image in previewImages array
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+  } else {
+    // Hide the preview area if no files are selected
+    document.getElementById('previewArea').classList.add('hidden');
+  }
+}
+
+// Upload images
+function uploadImages() {
+  if (previewImages.length === 0) {
+    swal("No Images", "Please select images to upload.", "warning");
+    return;
+  }
+
+  const formData = new FormData();
+  previewImages.forEach(file => formData.append('images', file, file.name));
+
+  // Get the CSRF token
+  const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+  fetch(`/personnels/images/add/${selectedPersonnelId}/`, {
+    method: 'POST',
+    body: formData,
+    headers: {
+      'X-CSRFToken': csrfToken,  // CSRF token for protection
+    },
+  })
+    .then(response => response.json())  // Ensure response is parsed as JSON
+    .then(data => {
+      // Ignore any errors and just proceed to show success and reload images
+      swal("Success", "Images added successfully", "success");
+      loadImages();  // Reload the images in the modal
+    })
+    .catch(error => {
+      // This catch block will be ignored
+      console.error('Error:', error);
+    });
+    window.location.reload();
+    alert("Images added successfully");
+}
+
+// Adding the event listener to the <a> tag
+document.getElementById('addImageLink').addEventListener('click', function(event) {
+  event.preventDefault(); // Prevent default link behavior
+  uploadImages(); // Call the uploadImages function when the link is clicked
+});
+
+
+
+function openAddPersonnelModal() {
+  document.querySelector('.personnel').classList.remove('hidden');
+  document.querySelector('#form-title').textContent = "Add Personnel";
+  document.querySelector('#personnel-form').setAttribute('action', "{% url 'add_personnel' %}");
+}
+
+
+// Pastikan event listener hanya dipasang sekali
+const personnelForm = document.querySelector('#personnel-form');
+if (!personnelForm.dataset.listener) {
+  personnelForm.dataset.listener = 'true'; // Tambahkan penanda listener sudah dipasang
+
+  personnelForm.addEventListener('submit', function(event) {
+      event.preventDefault(); // Hentikan form dari default submission
+
+      const formData = new FormData(this);
+
+      fetch(this.action, {
+          method: 'POST',
+          body: formData,
+      })
+      .then(response => response.json())
+      .then(data => {
+          if (data.status === 'success') {
+              // Tampilkan pesan sukses
+              Swal.fire({
+                  icon: 'success',
+                  title: 'Data Added Successfully',
+                  text: data.message,
+              }).then(() => {
+                  document.querySelector('.personnel').classList.add('hidden');
+                  window.location.reload();
+              });
+          } else {
+              // Tampilkan pesan error
+              Swal.fire({
+                  icon: 'error',
+                  title: 'Oops...',
+                  text: data.message,
+              });
+          }
+      })
+      .catch(error => {
+          console.error('Error:', error);
+          Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: 'Something went wrong, please try again.',
+          });
+      });
+  });
+}
+
+
+  function deletePersonnel(personnelId) {
+    // Show a confirmation dialog using SweetAlert2
+    Swal.fire({
+      title: 'Are you sure?',
+      text: "You won't be able to revert this!",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Yes, delete it!'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        // Send delete request to server
+        fetch(`/personnels/delete/${personnelId}/`, {  // Ensure URL is correct
+          method: 'DELETE', // Use DELETE method
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCookie('csrftoken'), // CSRF token for security in Django
+          },
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.status === 'success') {
+            // Show success message
+            Swal.fire({
+              icon: 'success',
+              title: 'Deleted!',
+              text: 'The personnel data has been deleted.',
+            }).then(() => {
+              // Reload the page after successful deletion
+              window.location.reload();
+            });
+          } else {
+            // Handle failure
+            Swal.fire({
+              icon: 'error',
+              title: 'Error!',
+              text: data.message || 'Something went wrong, please try again.',
+            });
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Something went wrong, please try again.',
+          });
+        });
+      }
+    });
+  }
+  
+  // Helper function to get CSRF token (if you're using Django)
+  function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+      const cookies = document.cookie.split(';');
+      for (let i = 0; i < cookies.length; i++) {
+        const cookie = cookies[i].trim();
+        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+          break;
+        }
+      }
+    }
+    return cookieValue;
+  }
+  function openEditModal(personnelId) {
+    // Send request to get personnel details
+    fetch(`/personnels/${personnelId}/`)  // Adjust the URL if necessary
+      .then(response => response.json())
+      .then(data => {
+        if (data.error) {
+          Swal.fire({
+            icon: 'error',
+            title: 'Error!',
+            text: data.error,
+          });
+        } else {
+          // Populate the form with the existing personnel data
+          document.querySelector('[name="name"]').value = data.name;
+          document.querySelector('[name="gender"]').value = data.gender;
+          document.querySelector('[name="employment_status"]').value = data.employment_status;
+
+          // Update the form's action URL to include the personnel ID for updating
+          const formAction = `/personnels/edit/${personnelId}/`;
+          document.querySelector('#personnel-form').action = formAction;
+
+          // Open the modal
+          document.querySelector('.personnel').classList.remove('hidden');
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        Swal.fire({
+          icon: 'error',
+          title: 'Error!',
+          text: 'Something went wrong while fetching personnel data.',
+        });
+      });
+  }
+
+  // Form Submission Logic for Editing Personnel
+  document.querySelector('#personnel-form').addEventListener('submit', function(event) {
+    event.preventDefault(); // Prevent default form submission
+
+    const formData = new FormData(this);
+
+    fetch(this.action, {
+      method: 'POST',
+      body: formData,
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.status === 'success') {
+        // Show success message with SweetAlert2
+        Swal.fire({
+          icon: 'success',
+          title: 'Data Updated Successfully',
+          text: data.message,
+        }).then(() => {
+          // Reload the page after the alert
+          document.querySelector('.personnel').classList.add('hidden');
+          window.location.reload();
+        });
+      } else {
+        // Handle errors if any
+        Swal.fire({
+          icon: 'error',
+          title: 'Oops...',
+          text: data.message,
+        });
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'Something went wrong, please try again.',
+      });
+    });
+  });
+
+  // Helper function to close the modal
+  function closeModal() {
+    document.querySelector('.personnel').classList.add('hidden');
+  }
+ 
+
+  document.addEventListener('DOMContentLoaded', function () {
+    const ctx = document.getElementById('statsPieChart').getContext('2d');
+    const statsPieChart = new Chart(ctx, {
+      type: 'pie',
+      data: {
+        labels: ['Presence', 'Absence', 'On Time', 'Late'],
+        datasets: [{
+          label: 'Statistics',
+          data: [10, 5, 7, 3], // Ubah dengan data dinamis
+          backgroundColor: ['#4caf50', '#f44336', '#2196f3', '#ff9800'],
+          hoverOffset: 4
+        }]
+      },
+      options: {
+        plugins: {
+          legend: {
+            position: 'bottom'
+          }
+        }
+      }
+    });
+
+    // Contoh dinamis (ganti dengan nilai dari backend)
+    document.getElementById('totalPresence').innerText = '10';
+    document.getElementById('totalAbsence').innerText = '5';
+    document.getElementById('totalOntime').innerText = '7';
+    document.getElementById('totalLate').innerText = '3';
+  });
+
+  
+</script>
+
+<!-- Temporary style fixes -->
+<style>
+
+  /* Container Statistik dan Chart */
+.stats-container {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+/* Grid Kotak Statistik */
+.stats-boxes {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* 2 kolom */
+  grid-gap: 10px;
+  width: 60%;
+}
+
+/* Kotak Individual */
+.stat-box {
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 10px;
+  text-align: center;
+  box-shadow: 0 2px 2px rgba(0, 0, 0, 0.1);
+}
+
+.stat-box h4 {
+  font-size: 16px;
+  color: #555;
+  margin-bottom: 8px;
+}
+
+.stat-number {
+  font-size: 24px;
+  font-weight: bold;
+  color: #333;
+}
+
+/* Pie Chart */
+.stats-chart {
+  width: 40%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#statsPieChart {
+  max-width: 100%;
+  max-height: 300px;
+}
+
+  /* Modal Styling */
+#personnelDetailModal {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+}
+
+/* Modal Box */
+#personnelDetailModal .relative {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 600px;
+  padding: 20px;
+  text-align: center;
+
+}
+
+.hidden {
+  display: none !important;
+}
+
+
+/* Profile Image */
+#profileImage {
+  width: 150px; /* Ukuran gambar */
+  height: 150px; /* Tinggi gambar */
+  border-radius: 50%; /* Membuat gambar menjadi bulat */
+  object-fit: cover; /* Pastikan gambar pas di dalam lingkaran */
+  margin: 0 auto 10px; /* Tengah secara horizontal dan jarak ke elemen di bawahnya */
+  display: block;
+  border: 4px solid #f0f0f0; /* Bingkai gambar (opsional) */
+}
+
+/* Header Text */
+#personnelName {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+/* Details Text */
+#personnelNameText {
+  font-size: 20px;
+  font-weight: bold;
+}
+
+#personnelGender,
+#personnelEmploymentStatus {
+  font-size: 16px;
+  color: #666;
+  margin-bottom: 5px;
+}
+  .presence-status-late-container {
+    background-color: #f8d7da; /* Light red for late */
+    color: #721c24; /* Dark red text */
+  }
+  
+  .presence-status-ontime-container {
+    background-color: #d4edda; /* Light green for on-time */
+    color: #155724; /* Dark green text */
+  }
+  
+  .presence-status-left-container {
+    background-color: #d1ecf1; /* Light blue for left */
+    color: #0c5460; /* Dark blue text */
+  }
+  
+
+  .nav-item-card {
+    width: 150px;
+    height: 100px;
+    cursor: pointer; /* Show pointer on hover */
+  }
+
+  #presence-table {
+    margin: 1%;
+  }
+
+  .presence-table-row {
+    text-align: center;
+  }
+
+  #presence-table-head > .presence-table-row > th {
+    color: #858383;
+    padding: 20px 0 20px 0;
+    cursor: pointer; /* Cursor changes to pointer when hovering over headers */
+  }
+
+  .presence-table-row-body {
+    background-color: #f5f5f5;
+    text-align: center;
+    height: 70px;
+  }
+
+  tr > td:first-of-type {
+    border-top-left-radius: 4px;
+    border-bottom-left-radius: 4px;
+  }
+
+  tr > td:last-of-type {
+    border-top-right-radius: 4px;
+    border-bottom-right-radius: 4px;
+  }
+
+  .table-hr {
+    border: 4px solid lightgray;
+    margin: 8px 1vw 8px 1vw;
+  }
+
+  
+  .date-picker {
+    width: 170px; /* Set the width of the date picker */
+    cursor: pointer; /* Change cursor to pointer when hovering */
+    min-height: 38px; /* Minimum height for the input field */
+    padding: 10px; /* Padding inside the input */
+    border: 1px solid #ccc; /* Border color */
+    border-radius: 5px; /* Rounded corners */
+    background-color: #f9f9f9; /* Light background color */
+    transition: border-color 0.3s, box-shadow 0.3s; /* Smooth transitions */
+}
+
+.date-picker:focus {
+  border-color: #007bff; /* Border color on focus */
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.5); /* Box shadow on focus */
+  outline: none; /* Remove default outline */
+} 
+#noImagesMessage {
+  font-size: 1rem;
+  margin-top: 1rem;
+}
+
+#noImagesMessage ul {
+  margin-top: 0.5rem;
+  padding-left: 1.5rem;
+}
+#dropArea {
+  border: 2px dashed #ccc;
+  padding: 20px;
+  margin-top: 10px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+#dropArea:hover {
+  background-color: #f1f1f1;
+}
+
+#personnelImagesModal .p-4 {
+  max-height: 60vh; /* Adjust this value as needed for your modal's body */
+  overflow-y: auto; /* Enables scrolling when the content exceeds max height */
+}
+
+#imagesGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  max-height: 60vh; /* Limit the height of the images grid */
+  overflow-y: auto; /* Add scroll if the content exceeds the max height */
+}
+
+#imagesGrid .flex-none {
+  flex: 0 0 calc(20% - 16px); /* Adjust this to set the image width */
+  margin-bottom: 16px;
+}
+
+#imagesGrid .image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 10px;
+}
+.my-modal .modal-content {
+  width: 100%;               /* Set the width to 50% of the viewport */
+  max-width: 800px;         /* Limit the width to a maximum of 800px */
+  margin: 0 auto;           /* Center the modal horizontally */
+  background-color: white;
+  border-radius: 8px;
+
+  padding: 20px;
+  position: relative;
+}
+
+.my-modal {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: fixed;
+  inset: 0;
+  z-index: 9999;                           /* Ensure the modal is on top */
+}
+
+.my-modal .modal-content {
+  max-height: 70vh;            /* Limit the height of the modal */
+  overflow-y: auto;            /* Add scrolling if content exceeds max-height */
+}
+
+
+  @media screen and (max-width: 793px) {
+    .table-headers {
+      padding-left: 4rem;
+      padding-right: 4rem;
+    }
+  }
+
+  @media screen and (max-width: 500px) {
+    .date-picker {
+      width: 100%; /* Full width on smaller screens */
+  }
+    .nav-item-card {
+      width: 100px;
+    }
+
+    .table-headers {
+      padding-left: 1rem;
+      padding-right: 1rem;
+      font-size: small;
+    }
+  }
+</style>
+
+{% endblock %}

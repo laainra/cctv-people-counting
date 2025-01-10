@@ -29,7 +29,15 @@ urlpatterns = [
     path('presence', presence.presence, name="presence"),
     path('download_presence_excel', presence.download_presence_excel, name="download_presence_excel"),
     path('download', home.download, name="download"),
-    
-\
+    path('personnels/add', personnel.add_personnel, name='add_personnel'),
+    path('personnels/<int:personnel_id>/', personnel.get_personnel, name='get_personnel'),
+    path('personnels/edit/<int:personnel_id>/', personnel.edit_personnel, name='edit_personnel'),
+    path('personnels/delete/<int:personnel_id>/', personnel.delete_personnel, name='delete_personnel'),
+    path('personnels/attendance/<int:personnel_id>/', personnel.attendance_details, name='attendance_details'),
+    path('personnels/images/<int:personnel_id>/', personnel.get_personnel_images, name='personnel_images'),
+    path('personnels/images/add/<int:personnel_id>/', personnel.add_personnel_image, name='add_personnel_image'),
+    path('personnels/images/delete/<int:image_id>/', personnel.delete_personnel_image, name='delete_personnel_image'),
+    path('personnels/images/move/<int:image_id>/', personnel.move_personnel_image, name='move_personnel_image'),
+
 
 ]

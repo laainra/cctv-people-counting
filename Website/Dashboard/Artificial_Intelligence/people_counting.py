@@ -75,7 +75,8 @@ class PeopleCounting:
     def get_label_img(self, img, bbox):
         (bbox_x1, bbox_y1, bbox_x2, bbox_y2), bbox_id, bbox_conf = bbox
 
-        text = self.id[bbox_id]['name'] + " - " + self.id[bbox_id]['gender']
+        # text = f"{self.id[bbox_id]['name']} - {self.id[bbox_id]['gender']} ({bbox_conf:.2f})"
+        text = f"{self.id[bbox_id]['name']} "
 
         (w, h), _ = cv2.getTextSize(text, self.font, self.font_size, self.font_thickness)
 
@@ -83,8 +84,8 @@ class PeopleCounting:
         cv2.rectangle(img, (bbox_x1, bbox_y1), (bbox_x1 + w, bbox_y1 - h), (255, 252, 46), -1)
         cv2.rectangle(img, (bbox_x1, bbox_y1), (bbox_x2, bbox_y2), (255, 252, 46), 3)
         cv2.drawMarker(img, (int(bbox_x2), int(bbox_y2)), (0, 0, 255), thickness=1)
-        cv2.putText(img, text, (bbox_x1, bbox_y1), self.font, self.font_size, (255, 255, 255), self.font_thickness)
-
+        cv2.putText(img, text, (bbox_x1, bbox_y1 - 10), self.font, self.font_size, (255, 255, 255), self.font_thickness)
+        
         return img
     
     # Function to get persons bounding box 

@@ -31,18 +31,18 @@ def read_attendance_data():
     yesterday_json_path = os.path.join(DIR, 'static', 'attendance', f'{attendance_date_yesterday}.json')
     today_json_path = os.path.join(DIR, 'static', 'attendance', f'{attendance_date_today}.json')
     
-    print("JSON_PATH:", JSON_PATH)
-    print("File exists:", os.path.isfile(JSON_PATH))
+    # print("JSON_PATH:", JSON_PATH)
+    # print("File exists:", os.path.isfile(JSON_PATH))
 
     try:
         # Cek apakah file untuk tanggal kemarin ada, jika ada hapus
         if os.path.isfile(yesterday_json_path):
-            print(f"File untuk {attendance_date_yesterday} ditemukan, menghapus file lama.")
+            # print(f"File untuk {attendance_date_yesterday} ditemukan, menghapus file lama.")
             os.remove(yesterday_json_path)
 
         # Membuat file baru untuk tanggal hari ini
         if not os.path.isfile(today_json_path):
-            print(f"File untuk {attendance_date_today} tidak ditemukan, membuat file baru.")
+            # print(f"File untuk {attendance_date_today} tidak ditemukan, membuat file baru.")
             with open(today_json_path, 'w') as file:
                 json.dump([], file)  # Inisialisasi dengan array kosong
         
@@ -73,7 +73,7 @@ def read_attendance_data():
 def insert_presence(cam_id, personnel_id, detected_time, status, image_path):
 
     if not cam_id or not personnel_id or not detected_time or not status:
-        print("Invalid data detected, skipping insertion.")
+        # print("Invalid data detected, skipping insertion.")
         return
 
     with connection.cursor() as cursor:
@@ -233,17 +233,15 @@ def process_attendance_entry(data, cam_id):
     current_time = detected_time.time()
 
     # Tentukan status berdasarkan waktu yang terdeteksi
-    # Penanganan waktu lebih dari satu rentang (misalnya jika waktu mulai lebih besar dari waktu berakhir)
     if attendance_start <= current_time <= attendance_end:
         status = 'ONTIME'
     elif leaving_start <= current_time <= leaving_end:
         status = 'LEAVE'
     else:
-        # Cek apakah waktu yang terdeteksi berada di luar rentang `attendance_time_end` dan `leaving_time_start`
         if attendance_end < current_time < leaving_start:
             status = 'LATE'
         else:
-            status = 'LEAVE'  # Status 'LEAVE' jika berada di luar range yang valid, bisa disesuaikan
+            status = 'LEAVE'
 
     # Query untuk cek entri yang sudah ada untuk tanggal dan status tertentu
     query = '''
@@ -256,18 +254,24 @@ def process_attendance_entry(data, cam_id):
         cursor.execute(query, [personnel_id, detected_time.date(), personnel_id, detected_time.date(), personnel_id, detected_time.date()])
         has_ontime, has_late, has_leave = cursor.fetchone()
 
-    # Jika sudah ada ONTIME atau statusnya sudah ada pada tanggal yang sama, jangan insert
-    if (status == "ONTIME" and has_ontime) or (status == 'LATE' and (has_ontime or has_late)) or (status == 'LEAVE' and has_leave):
-        print(f"Duplicate entry found for {name} on {detected_time.date()} with status {status}. Skipping insert.")
-        return  # Skip duplicate entries
+    # Jika belum ada ONTIME atau LATE, tolak entri LEAVE
+    if status == 'LEAVE' and not (has_ontime or has_late):
+        # print(f"Skipping LEAVE entry for {name} on {detected_time.date()} due to no ONTIME or LATE status.")
+        return
 
-    # Jika statusnya 'LATE' dan sudah ada ONTIME, maka statusnya diubah menjadi 'LEAVING'
+    # Jika status sudah ada di database, abaikan duplikat
+    if (status == 'ONTIME' and has_ontime) or (status == 'LATE' and (has_ontime or has_late)) or (status == 'LEAVE' and has_leave):
+        # print(f"Duplicate entry found for {name} on {detected_time.date()} with status {status}. Skipping insert.")
+        return
+
+    # Jika statusnya 'LATE' dan sudah ada ONTIME, maka ubah menjadi 'LEAVE'
     if status == 'LATE' and has_ontime:
-        status = 'LEAVE'  # Update status to LEAVE if there's an ONTIME entry for the same person on that day
+        status = 'LEAVE'
 
     # Fungsi untuk menyimpan entri ke database
     insert_presence(cam_id, personnel_id, detected_time, status, image_path)
     print(f"Inserted {status} entry for {name} at {detected_time}")
+
 
     
 # Main function to process presence
@@ -409,9 +413,8 @@ def download_presence_excel(request):
     # Filter presence data based on the provided date
     if date:
         # Filter by the date part of the timestamp
-        presences = models.Personnel_Entries.objects.filter(
-            timestamp__date=date
-        )
+        presences = models.Personnel_Entries.objects.filter(timestamp__date=date)
+
     else:
         presences = models.Personnel_Entries.objects.all()
 

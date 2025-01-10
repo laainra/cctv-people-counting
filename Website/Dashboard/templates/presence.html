@@ -56,25 +56,25 @@
   <div class="responsive-card responsive effected" style="background-color: transparent">
     <ul class="nav mt-4" style="background-color: transparent; gap: 0.6rem">
       <li class="nav-item">
-        <a class="nav-link nav-item-card p-2 tab-link" id="all-tab" style="background-color: white; border-top-left-radius: 10px; border-top-right-radius: 10px; color: #11468f; cursor: pointer;" onclick="showTab('all')">
+        <a class="nav-link nav-item-card p-2 tab-link" id="all-tab" style="background-color: white; border-top-left-radius: 10px; border-top-right-radius: 10px; color: #11468f; " onclick="showTab('all')">
           <p id="all-count" style="font-weight: bold;"></p>
           <p>All</p>
         </a>
       </li>
       <li class="nav-item">
-        <a class="nav-link nav-item-card p-2 tab-link" id="on-time-tab" style="background-color: #11468f; border-top-left-radius: 10px; border-top-right-radius: 10px; color: white; cursor: pointer;" onclick="showTab('on-time')">
+        <a class="nav-link nav-item-card p-2 tab-link" id="on-time-tab" style="background-color: #11468f; border-top-left-radius: 10px; border-top-right-radius: 10px; color: white; " onclick="showTab('on-time')">
           <p id="on-time-count" style="font-weight: bold;"></p>
           <p>On Time</p>
         </a>
       </li>
       <li class="nav-item">
-        <a class="nav-link nav-item-card p-2 tab-link" id="late-tab" style="background-color: #11468f; border-top-left-radius: 10px; border-top-right-radius: 10px; color: white; cursor: pointer;" onclick="showTab('late')">
+        <a class="nav-link nav-item-card p-2 tab-link" id="late-tab" style="background-color: #11468f; border-top-left-radius: 10px; border-top-right-radius: 10px; color: white; " onclick="showTab('late')">
           <p id="late-count" style="font-weight: bold;"></p>
           <p>Late</p>
         </a>
       </li>
       <li class="nav-item">
-        <a class="nav-link nav-item-card p-2 tab-link" id="left-tab" style="background-color: #11468f; border-top-left-radius: 10px; border-top-right-radius: 10px; color: white; cursor: pointer;" onclick="showTab('left')">
+        <a class="nav-link nav-item-card p-2 tab-link" id="left-tab" style="background-color: #11468f; border-top-left-radius: 10px; border-top-right-radius: 10px; color: white; " onclick="showTab('left')">
           <p id="left-count" style="font-weight: bold;"></p>
           <p>Left</p>
         </a>
@@ -92,13 +92,13 @@
       <thead id="presence-table-head">
         <tr class="presence-table-row">
           {% comment %} <th onclick="sortTable('id')">ID <span id="arrow-up-id">▲</span><span id="arrow-down-id" style="display: none;">▼</span></th>  {% endcomment %}
-          <th onclick="sortTable('name')">Name <span id="arrow-up-name">▲</span><span id="arrow-down-name" style="display: none;">▼</span></th>
-          <th onclick="sortTable('attended')">Time Attended <span id="arrow-up-attended">▲</span><span id="arrow-down-attended" style="display: none;">▼</span></th>
-          <th onclick="sortTable('leave')">Time Leaving <span id="arrow-up-leave">▲</span><span id="arrow-down-leave" style="display: none;">▼</span></th>
-          <th onclick="sortTable('status')">Status <span id="arrow-up-status">▲</span><span id="arrow-down-status" style="display: none;">▼</span></th>
-          <th onclick="sortTable('work_hours')">Work Hours <span id="arrow-up-work_hours">▲</span><span id="arrow-down-work_hours" style="display: none;">▼</span></th>
-          <th onclick="sortTable('notes')">Notes <span id="arrow-up-notes">▲</span><span id="arrow-down-notes" style="display: none;">▼</span></th>
-          <th onclick="sortTable('image')">Image <span id="arrow-up-image">▲</span><span id="arrow-down-image" style="display: none;">▼</span></th>
+          <th onclick="sortTable('name')">Name</th>
+          <th onclick="sortTable('attended')">Time Attended </th>
+          <th onclick="sortTable('leave')">Time Leaving </th>
+          <th onclick="sortTable('status')">Status</th>
+          <th onclick="sortTable('work_hours')">Work Hours </th>
+          <th onclick="sortTable('notes')">Notes </th>
+          <th onclick="sortTable('image')">Image </th>
         </tr>
         <tr>
           <td colspan="5"><hr class="table-hr" /></td>

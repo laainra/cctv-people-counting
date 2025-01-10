@@ -70,38 +70,48 @@ def home(request):
             total_unknown_enter = [int(model.unknown_gender_entries) for model in today_data if str(model.timestamp).split('-')[0] == datetime.now().strftime('%D')]
             total_unknown_enter = sum(total_unknown_enter[:-1]) + unknown_enter
 
+            total_enter = total_unknown_enter + total_female_enter + total_male_enter
+
             total_exit = [int(model.people_exits) for model in today_data if str(model.timestamp).split('-')[0] == datetime.now().strftime('%D')]
             total_exit = sum(total_exit[:-1]) + out
 
-            inside = (total_male_enter + total_female_enter + total_unknown_enter) - total_exit
-            inside = inside if inside >= 0 else 0
-            
+            # ✅ Validasi keluar tidak lebih dari masuk
+            if total_enter == 0 and out > 0:
+                out = 0  # Jika belum ada yang masuk, keluar tidak dihitung
+
+            if total_exit > total_enter:
+                total_exit = total_enter  # Jika keluar melebihi masuk, sesuaikan keluar dengan masuk
+
+            # ✅ Hitung jumlah orang di dalam
+            inside = total_enter - total_exit
+            inside = inside if inside >= 0 else 0  # Pastikan nilai tidak negatif
+
             male_percentage = 0
             female_percentage = 0
 
             if (total_female_enter + total_male_enter) != 0:
                 female_percentage = (total_female_enter / (total_female_enter + total_male_enter)) * 100
-
                 male_percentage = (total_male_enter / (total_female_enter + total_male_enter)) * 100
 
-            total_enter = total_unknown_enter + total_female_enter + total_male_enter
-
             ai_status = (int(datetime.now().strftime('%X').replace(':', '')) > int(active_cam.cam_start.replace(':', ''))
-                         and int(datetime.now().strftime('%X').replace(':', '')) < int(active_cam.cam_stop.replace(':', '')))
+                        and int(datetime.now().strftime('%X').replace(':', '')) < int(active_cam.cam_stop.replace(':', '')))
 
-            return JsonResponse({'total_unknown_enter':str(total_unknown_enter), 
-                                 'total_male_enter':str(total_male_enter), 
-                                 'total_female_enter':str(total_female_enter),
-                                 'total_enter':str(total_enter),
-                                 'current_unknown_enter':str(unknown_enter),
-                                 'current_male_enter':str(male_enter),
-                                 'current_female_enter':str(female_enter),
-                                 'male_percent':str(round(male_percentage)),
-                                 'female_percent':str(round(female_percentage)),
-                                 'total_exit': str(total_exit),
-                                 'current_exit': str(out),
-                                 'inside': str(inside),
-                                 'ai_status': str(ai_status)})
+            return JsonResponse({
+                'total_unknown_enter': str(total_unknown_enter), 
+                'total_male_enter': str(total_male_enter), 
+                'total_female_enter': str(total_female_enter),
+                'total_enter': str(total_enter),
+                'current_unknown_enter': str(unknown_enter),
+                'current_male_enter': str(male_enter),
+                'current_female_enter': str(female_enter),
+                'male_percent': str(round(male_percentage)),
+                'female_percent': str(round(female_percentage)),
+                'total_exit': str(total_exit),
+                'current_exit': str(out),
+                'inside': str(inside),
+                'ai_status': str(ai_status)
+            })
+
         
         elif request.POST['command'] == 'get_daily_report':
             date = datetime.strptime(request.POST['date'], "%Y-%m-%d").strftime("%m/%d/%y")

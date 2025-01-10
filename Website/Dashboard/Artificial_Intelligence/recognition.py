@@ -64,18 +64,27 @@ class FaceRecognition:
     
     # Function to detect feature from a single face
     def detect_features(self, img, face):
-        fy = 1/(self.img_resized_size[0]/self.img_ori_size[0])
-        fx = 1/(self.img_resized_size[1]/self.img_ori_size[1])
+        fy = 1 / (self.img_resized_size[0] / self.img_ori_size[0])
+        fx = 1 / (self.img_resized_size[1] / self.img_ori_size[1])
 
-        for i in range(0, 14, 2): face[i] = face[i] * fx
-        
-        for i in range(1, 14, 2): face[i] = face[i] * fy
+        for i in range(0, 14, 2): 
+            face[i] = face[i] * fx
+        for i in range(1, 14, 2): 
+            face[i] = face[i] * fy
 
         aligned_face = self.face_recognizer.alignCrop(img, face)
+        
+        if aligned_face is None or aligned_face.size == 0:
+            raise ValueError("Aligned face is empty or invalid.")
+
+        # Ensure the image is resized to the expected input dimensions
+        aligned_face = cv2.resize(aligned_face, (112, 112))  # Example dimensions; check your model requirements
+        aligned_face = aligned_face.astype('float32') / 255.0  # Normalize if required
 
         feat = self.face_recognizer.feature(aligned_face)
         
         return feat
+
 
     # Function to extract feature and store it to global variables
     def extract_features(self, img):
