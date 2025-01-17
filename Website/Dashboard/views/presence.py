@@ -13,6 +13,8 @@ from django.shortcuts import render
 from django.http import HttpRequest, HttpResponse, JsonResponse
 from xlsxwriter.workbook import Workbook
 from io import BytesIO
+from django.contrib.auth.decorators import login_required
+from ..decorators import role_required
 
 
 
@@ -285,21 +287,24 @@ def presence_process(cam_id):
     # delete_attendance_file()
     return {'status': 'success', 'message': 'Attendance data processed successfully'}
 
-def get_active_cam_id():
+def get_active_cam_ids():
     with connection.cursor() as cursor:
-        cursor.execute("SELECT id FROM dashboard_camera_settings WHERE cam_is_active = 1")
-        result = cursor.fetchone()
-        if result:
-            return result[0]
-        else:
-            return None
+        cursor.execute("""
+            SELECT id FROM dashboard_camera_settings 
+            WHERE cam_is_active = 1 
+            AND role_camera IN ('p_in', 'p_out')
+        """)
+        active_cam_ids = cursor.fetchall()
+        return [cam_id[0] for cam_id in active_cam_ids] 
 
 @csrf_exempt
+@login_required(login_url='login')
+@role_required('admin')
 def presence(request):
     if request.method == "POST":
         cam_id = request.POST.get("cam_id")  # Mengambil `cam_id` dari POST request
         if not cam_id:
-            cam_id = get_active_cam_id()
+            cam_id = get_active_cam_ids()
             if not cam_id:
                 return JsonResponse({'status': 'error', 'message': 'No active camera found'})
 
@@ -352,15 +357,18 @@ class AttendanceHandler(FileSystemEventHandler):
         super().__init__()
     
     def on_created(self, event):
-        cam_id = 1 
-        print("File created, running presence process.")
-        presence_process(cam_id)
+        # Retrieve active camera IDs with role 'p_in' and 'p_out'
+        active_cam_ids = get_active_cam_ids()
+        for cam_id in active_cam_ids:
+            print(f"File created, running presence process for camera ID: {cam_id}")
+            presence_process(cam_id)
 
     def on_modified(self, event):
-        cam_id = 1 
-        print("File modified, running presence process.")
-        presence_process(cam_id)
-
+        # Retrieve active camera IDs with role 'p_in' and 'p_out'
+        active_cam_ids = get_active_cam_ids()
+        for cam_id in active_cam_ids:
+            print(f"File modified, running presence process for camera ID: {cam_id}")
+            presence_process(cam_id)
 
 # Watchdog observer setup
 def start_watching():

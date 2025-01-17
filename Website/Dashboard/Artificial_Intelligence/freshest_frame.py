@@ -5,7 +5,10 @@ import time
 class FreshestFrame(threading.Thread):
     def __init__(self, capture, name='FreshestFrame'):
         self.capture = capture
-        assert self.capture.isOpened()
+        # assert self.capture.isOpened()
+        
+        if not self.capture.isOpened():
+            raise ValueError("Camera source failed to open.")
 
         # this lets the read() method block until there's a new frame
         self.cond = threading.Condition()

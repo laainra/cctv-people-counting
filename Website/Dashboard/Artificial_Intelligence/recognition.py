@@ -2,6 +2,9 @@ import cv2
 import os
 import concurrent.futures
 from ..Artificial_Intelligence.variables import RecognitionVariable as RV
+from ..Artificial_Intelligence.variables import GlobalVariable as GV
+from datetime import datetime, timedelta
+
 
 class FaceRecognition:
     def __init__(self):
@@ -23,10 +26,13 @@ class FaceRecognition:
         # Face data
         self.face_coordinates = []
         self.feats = []
+        self.names = []  # Added attribute for storing names
 
         # Images size variables
         self.img_ori_size = ()
         self.img_resized_size = ()
+        
+        self.detection_times = {}
 
     # Function to match detected feature with known features
     def match(self, feature1):
@@ -94,6 +100,12 @@ class FaceRecognition:
 
         self.face_coordinates = [row[0:1][0] for row in face_data]
         self.feats = [row[1:2][0] for row in face_data]
+        self.names = [row[1][0] for row in face_data]  # Store the names extracted
+        
+         # Update detection times
+        for feat, face in zip(feats, faces):
+            name = self.match(feat)
+            self.update_detection_time(name)
 
     def get_face_data(self, feat, face):
         name, score = self.match(feat)
@@ -105,5 +117,8 @@ class FaceRecognition:
 
         return [[[x1, y1, x2, y2, w, h], center_x, center_y], [name, score, feat]]
 
-
-    
+    def update_detection_time(self, name):
+        if name not in self.detection_times:
+            self.detection_times[name] = datetime.now()
+        else:
+            self.detection_times[name] = datetime.now() - self.detection_times[name]

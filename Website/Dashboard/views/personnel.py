@@ -12,6 +12,7 @@ from django.utils.dateparse import parse_date
 
 from django.shortcuts import render, redirect, HttpResponse
 from django.contrib.auth.decorators import login_required
+from ..decorators import role_required
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import JsonResponse, HttpResponse
 from django.db.models import Count, Q
@@ -33,10 +34,15 @@ import os
 import shutil
 
 @login_required(login_url='login')
+@role_required('admin')
 def personnels(request):
     """Display a list of all personnel."""
-    personnels = models.Personnels.objects.all()
+    company_id = models.Company.objects.get(user=request.user)
+    personnels = models.Personnels.objects.filter(company=company_id)
+    divisions = models.Divisions.objects.filter(company=company_id)
+
     personnel_data = []
+    divisions_data = [{'id': division.id, 'name': division.name} for division in divisions]  # Corrected
 
     for personnel in personnels:
         # Fetch images for each personnel
@@ -50,21 +56,24 @@ def personnels(request):
 
         # Add personnel details to the list
         personnel_data.append({
-            'id':personnel.id,
+            'id': personnel.id,
             'name': personnel.name,
+            'username': personnel.user.username,
+            'email': personnel.user.email,
+            'password': personnel.user.password,
+            'division': personnel.division.name,
             'gender': personnel.gender,
             'employment_status': personnel.employment_status,
             'profile_image': profile_image,
         })
 
-    return render(request, 'personnel.html', {'Personnels': personnel_data, 'Page': "Personnels"})
+    return render(request, 'personnel.html', {'Personnels': personnel_data, 'Divisions': divisions_data, 'Page': "Personnels"})
 
 
 def get_personnel(request, personnel_id):
     """Display the data of one personnel."""
     try:
         personnel = models.Personnels.objects.get(id=personnel_id)
-        
 
         images = models.Personnel_Images.objects.filter(personnel=personnel)
         
@@ -74,12 +83,17 @@ def get_personnel(request, personnel_id):
             profile_image = 'img/user_default.png' 
 
         data = {
-            'id':personnel_id,
+            'id': personnel.id,
             'name': personnel.name,
+            'username': personnel.user.username,
+            'email': personnel.user.email,
+            'password': personnel.user.password,
+            'division': personnel.division.name,
             'gender': personnel.gender,
             'employment_status': personnel.employment_status,
-            'profile_image': profile_image,  
+            'profile_image': profile_image,
         }
+        
         
         return JsonResponse(data)
     
@@ -90,45 +104,42 @@ def get_personnel(request, personnel_id):
 @login_required(login_url='login')
 @csrf_exempt
 def add_personnel(request):
-    """Handle adding a new personnel."""
+    """Handle adding a new personnel along with username, email, and password."""
+    
     if request.method == 'POST':
-        name = request.POST.get('name')
-        gender = request.POST.get('gender')
-        employment_status = request.POST.get('employment_status')
-
-        # Debugging output to check the values received
-        print(f"Received data - Name: {name}, Gender: {gender}, Employment Status: {employment_status}")
-
-        if name and gender and employment_status:
-            # Check if personnel with the same name already exists
-            existing_personnel = models.Personnels.objects.filter(name=name).first()
+        form = forms.PersonnelForm(request.POST)
+        
+        if form.is_valid():
+            name = form.cleaned_data['name']
+            gender = form.cleaned_data['gender']
+            employment_status = form.cleaned_data['employment_status']
+            division = form.cleaned_data['division']
+            company = models.Company.objects.get(user=request.user)
+            
+            # Ensure that the personnel's name is unique for the same company
+            existing_personnel = models.Personnels.objects.filter(name=name, company=company).first()
             if existing_personnel:
                 return JsonResponse({'status': 'error', 'message': 'Personnel with this name already exists'})
 
-            personnel = models.Personnels.objects.create(
-                name=name,
-                gender=gender,
-                employment_status=employment_status
-            )
-
-            # Debugging: Check the path before creating directory
+            # Path for storing personnel images
             path = os.path.join(var.personnel_path, name)
-            print(f"Directory path: {path}")
-
-            # Ensure directory exists
             if not os.path.exists(path):
                 try:
-                    os.makedirs(path, exist_ok=True)  # Creates directory if not exists
-                    print(f"Directory created: {path}")
+                    os.makedirs(path, exist_ok=True)
                 except Exception as e:
-                    print(f"Error creating directory: {e}")
                     return JsonResponse({'status': 'error', 'message': f'Failed to create directory: {e}'})
 
-            return JsonResponse({'status': 'success', 'message': 'Personnel added successfully'})
-        else:
-            return JsonResponse({'status': 'error', 'message': 'Missing data in request'})
+            # Save personnel and associated user
+            personnel = form.save(commit=False)
+            personnel.company = company  # Associate the personnel with the company
+            personnel.save()
 
-    return JsonResponse({'status': 'error', 'message': 'Failed to add personnel'})
+            return JsonResponse({'status': 'success', 'message': 'Personnel added successfully'})
+
+        else:
+            return JsonResponse({'status': 'error', 'message': 'Invalid form data'})
+
+    return JsonResponse({'status': 'error', 'message': 'Invalid request method'})
 
 @login_required(login_url='login')
 @csrf_exempt
@@ -739,4 +750,47 @@ def download_personnel_presence(request):
 
     return response
 
+def get_divisions(request):
+    divisions = models.Division.objects.all()
+    divisions_data = [{'id': division.id, 'name': division.name} for division in divisions]
+    return JsonResponse({'status': 'success', 'divisions': divisions_data})
 
+@login_required(login_url='login')
+def add_division(request):
+    try:
+        # Get the company associated with the currently logged-in user
+        company = models.Company.objects.get(user=request.user)
+    except models.Company.DoesNotExist:
+        return JsonResponse({'status': 'error', 'message': 'User does not belong to any company'}, status=403)
+
+    if request.method == 'POST':
+        form = forms.AddDivisionForm(request.POST)
+        if form.is_valid():
+            # Save the form, associating it with the logged-in user's company
+            division = form.save(commit=False)
+            division.company = company
+            division.save()
+            return JsonResponse({'status': 'success', 'message': 'Division created successfully'})
+        else:
+            return JsonResponse({'status': 'error', 'message': 'Invalid form data', 'errors': form.errors})
+    else:
+        form = forms.AddDivisionForm()
+        
+    return JsonResponse({'status': 'error', 'message': 'Invalid request method'})
+    
+# Get Division Details (for Edit)
+def get_division(request, id):
+    try:
+        division = models.Divisions.objects.get(id=id)
+        return JsonResponse({'status': 'success', 'division': {'id': division.id, 'name': division.name}})
+    except models.Divisions.DoesNotExist:
+        return JsonResponse({'status': 'error', 'message': 'Division not found'}, status=404)
+
+# Delete Division
+def delete_division(request, id):
+    try:
+        division = models.Divisions.objects.get(id=id)
+        division.delete()
+        return JsonResponse({'status': 'success', 'message': 'Division deleted successfully'})
+    except models.Divisions.DoesNotExist:
+        return JsonResponse({'status': 'error', 'message': 'Division not found'}, status=404)

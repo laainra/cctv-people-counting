@@ -1,0 +1,253 @@
+
+{% extends '../components/base.html' %}
+{% block title %}
+Dashboard Superadmin
+{% endblock %}
+<!-- This is comment to prevent Prettifier -->
+{% block content %} {% csrf_token %}
+
+<div class="content">
+    <div class="container-xl">
+      <!-- Page title -->
+      <div class="page-header">
+        <div class="row align-items-center">
+          <div class="col-auto">
+            <!-- Page pre-title -->
+            <div class="page-pretitle">
+              Users
+            </div>
+            <h2 class="page-title">
+              Master User Admin
+            </h2>
+          </div>
+          <!-- Page title actions -->
+          <div class="col-auto ml-auto d-print-none">
+            <a href="#" class="btn btn-primary ml-3 d-none d-sm-inline-block" data-toggle="modal" data-target="#modal-tambah">
+              <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
+              Add
+            </a>
+            <a href="#" class="btn btn-primary ml-3 d-sm-none btn-icon" data-toggle="modal" data-target="#modal-tambah">
+              <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
+            </a>
+          </div>
+        </div>
+      </div>
+      <div class="row row-deck row-cards">
+        <div class="col-12">
+            <div class="card">
+                <!-- <div class="card-header">
+                    
+                </div> -->
+                <div class="card-body border-bottom py-3">
+                    <div class="d-flex">
+                    <div class="text-muted">
+                        Show
+                        <div class="mx-2 d-inline-block">
+                        <input type="text" class="form-control form-control-sm" value="8" size="3">
+                        </div>
+                        entries
+                    </div>
+                    <div class="ml-auto text-muted">
+                        Search:
+                        <div class="ml-2 d-inline-block">
+                        <input type="text" class="form-control form-control-sm">
+                        </div>
+                    </div>
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table card-table table-vcenter text-nowrap datatable">
+                        <thead>
+                            <tr>
+                                <th class="w-1">
+                                    <input class="form-check-input m-0 align-middle" type="checkbox">
+                                </th>
+                                <th class="w-1">
+                                    No.
+                                </th>
+                                <th>ID Perusahaan</th>
+                                <th>Nama Perusahaan</th>
+                                <th>Username</th>
+                                <th>Password</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <input class="form-check-input m-0 align-middle" type="checkbox" aria-label="Select invoice">
+                                </td>
+                                <td>1</td>
+                                <td>
+                                    <span class="text-muted">001401</span>
+                                </td>
+                                <td>
+                                    Carlson Limited
+                                </td>
+                                <td>
+                                    admin
+                                </td>
+                                <td>
+                                    *****
+                                </td>
+                                <td class="text-right">
+                                    <span class="dropdown ml-1">
+                                    <button class="btn btn-white btn-sm dropdown-toggle align-text-top" data-boundary="viewport" data-toggle="dropdown">Actions</button>
+                                    <div class="dropdown-menu dropdown-menu-right">
+                                        <a class="dropdown-item" href="#">
+                                        Action
+                                        </a>
+                                        <a class="dropdown-item" href="#">
+                                        Another action
+                                        </a>
+                                    </div>
+                                    </span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <input class="form-check-input m-0 align-middle" type="checkbox" aria-label="Select invoice">
+                                </td>
+                                <td>2</td>
+                                <td>
+                                    <span class="text-muted">001402</span>
+                                </td>
+                                <td>
+                                    Adobe
+                                </td>
+                                <td>
+                                    admin2
+                                </td>
+                                <td>
+                                    ******
+                                </td>
+                                <td class="text-right">
+                                    <span class="dropdown ml-1">
+                                    <button class="btn btn-white btn-sm dropdown-toggle align-text-top" data-boundary="viewport" data-toggle="dropdown">Actions</button>
+                                    <div class="dropdown-menu dropdown-menu-right">
+                                        <a class="dropdown-item" href="#">
+                                        Action
+                                        </a>
+                                        <a class="dropdown-item" href="#">
+                                        Another action
+                                        </a>
+                                    </div>
+                                    </span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <input class="form-check-input m-0 align-middle" type="checkbox" aria-label="Select invoice">
+                                </td>
+                                <td>3</td>
+                                <td>
+                                    <span class="text-muted">001403</span>
+                                </td>
+                                <td>
+                                    Salesforce
+                                </td>
+                                <td>
+                                    admin3
+                                </td>
+                                <td>
+                                    ******
+                                </td>
+                                <td class="text-right">
+                                    <span class="dropdown ml-1">
+                                    <button class="btn btn-white btn-sm dropdown-toggle align-text-top" data-boundary="viewport" data-toggle="dropdown">Actions</button>
+                                    <div class="dropdown-menu dropdown-menu-right">
+                                        <a class="dropdown-item" href="#">
+                                        Action
+                                        </a>
+                                        <a class="dropdown-item" href="#">
+                                        Another action
+                                        </a>
+                                    </div>
+                                    </span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="card-footer d-flex align-items-center">
+                    <p class="m-0 text-muted">Showing <span>1</span> to <span>8</span> of <span>16</span> entries</p>
+                    <ul class="pagination m-0 ml-auto">
+                    <li class="page-item disabled">
+                        <a class="page-link" href="#" tabindex="-1">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><polyline points="15 6 9 12 15 18" /></svg>
+                        prev
+                        </a>
+                    </li>
+                    <li class="page-item"><a class="page-link" href="#">1</a></li>
+                    <li class="page-item active"><a class="page-link" href="#">2</a></li>
+                    <li class="page-item"><a class="page-link" href="#">3</a></li>
+                    <li class="page-item"><a class="page-link" href="#">4</a></li>
+                    <li class="page-item"><a class="page-link" href="#">5</a></li>
+                    <li class="page-item">
+                        <a class="page-link" href="#">
+                        next <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><polyline points="9 6 15 12 9 18" /></svg>
+                        </a>
+                    </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- MODAL TAMBAH -->
+<div class="modal modal-blur fade" id="modal-tambah" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Tambah User Admin</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label class="form-label">ID Perusahaan</label>
+            <input type="text" class="form-control">
+          </div>
+          
+          <div class="mb-3">
+            <label class="form-label">Nama Perusahaan</label>
+            <input type="text" class="form-control">
+          </div>
+          
+          <div class="mb-3">
+            <label class="form-label">Username</label>
+            <input type="text" class="form-control">
+          </div>
+          
+          <div class="mb-3">
+            <label class="form-label">Password</label>
+            <input type="password" class="form-control">
+          </div>
+
+        </div>
+        <div class="modal-footer">
+          <a href="#" class="btn btn-link link-secondary" data-dismiss="modal">
+            Cancel
+          </a>
+          <a href="#" class="btn btn-primary ml-auto" data-dismiss="modal">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
+            Tambahkan
+          </a>
+        </div>
+      </div>
+    </div>
+</div>
+
+
+ <script> 
+          function updateTotal(value) {
+            document.getElementById('total-companies-display').innerText = value;
+          }
+</script>
+{% endblock %}

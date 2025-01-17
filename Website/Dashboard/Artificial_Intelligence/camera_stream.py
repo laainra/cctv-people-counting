@@ -12,6 +12,7 @@ from ..Artificial_Intelligence.variables import GlobalVariable
 from ..Artificial_Intelligence.freshest_frame import FreshestFrame
 from .. import models
 from datetime import datetime
+from ..Artificial_Intelligence.work_timer import WorkTimer
 
 class CameraStream:
     def __init__(self, camera, ID):
@@ -97,6 +98,9 @@ class CameraStream:
         self.face_folder = os.path.join(os.path.dirname(__file__), '..', 'static', 'img', 'extracted_faces', 'raw')
         if not os.path.exists(self.face_folder):
             os.makedirs(self.face_folder)
+            
+        self.work_timer = WorkTimer()
+        
 
     def check_time_range(self, time_range):
         time_start = int(time_range[0].replace(':', ''))
@@ -124,6 +128,8 @@ class CameraStream:
                     
                     if self.fr_active:
                         self.FR.extract_features(img)
+                        for name in self.FR.names:
+                            self.FR.update_detection_time(name)       
 
                     # Run people counting model
                     self.PC.extract_bboxes(img)
@@ -148,6 +154,25 @@ class CameraStream:
 
                 if self.fc_active:
                     self.extract_and_save_faces(img)
+                 
+                for name, duration in self.FR.detection_times.items():
+                    try:
+                        personnel = models.Personnels.objects.get(name=name)
+                        work_timer, created = models.Work_Timer.objects.get_or_create(
+                            personnel=personnel,
+                            camera=self.ID,
+                            type='FACE_DETECTED',
+                            defaults={'datetime': datetime.now(), 'timer': 0}
+                        )
+                        
+                        if not created:
+                            work_timer.timer += duration.total_seconds()
+                            work_timer.datetime = datetime.now()
+                            work_timer.save()
+                    except models.Personnels.DoesNotExist:
+                        print(f"Personnel '{name}' not found in the database. Marking as 'Unknown'.")
+                        # Assign "Unknown" to bounding box or handle the detection accordingly
+                        name = "Unknown"
 
     def extract_and_save_faces(self, img):
         for idx, ((x1, y1, x2, y2, w, h), _, _) in enumerate(self.GV.face_coordinates):

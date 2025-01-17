@@ -1,0 +1,319 @@
+{% load static %}
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+    <meta name="description" content="" />
+    
+    <meta name="author" content="" />
+    <title>{% block title %}{% endblock %} </title>
+    <link
+      rel="icon"
+      href="{% static '/img/logo_small_white.png' %}"
+      type="image/x-icon"
+    />
+    <link
+      href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
+      crossorigin="anonymous"
+    />
+    <link
+      href="https://cdn.syncfusion.com/ej2/20.3.60/styles/material.css"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.syncfusion.com/ej2/20.3.60/dist/ej2.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    {%block javascript_custom%} {%endblock%}
+    <!-- Custom fonts for this template -->
+    <link
+      href="{% static 'Dashboard/vendor/fontawesome-free/css/all.min.css' %}"
+      rel="stylesheet"
+      type="text/css"
+    />
+
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+      integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+
+    <link
+      href="{% static 'Dashboard/css/style.css' %}"
+      rel="stylesheet"
+      type="text/css"
+    />
+
+    <link
+      href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
+      rel="stylesheet"
+    />
+    <link
+      href="{% static 'Dashboard/css/sb-admin-2.min.css' %}"
+      rel="stylesheet"
+    />
+
+    <link href="{% static 'Dashboard/dist/libs/jqvmap/dist/jqvmap.min.css' %}" rel="stylesheet"/>
+    <link href="{% static 'Dashboard/dist/css/tabler.min.css' %}" rel="stylesheet"/>
+    <link href="{% static 'Dashboard/dist/css/demo.min.css' %}" rel="stylesheet"/>
+
+    <!-- Custom styles for this page -->
+    <!-- <link
+      href="{% static 'Dashboard/vendor/datatables/dataTables.bootstrap4.min.css' %}"
+      rel="stylesheet"
+    /> -->
+    <script
+      src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
+      integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js"
+      integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+"
+      crossorigin="anonymous"
+    ></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- Libs JS -->
+    <script src="{% static 'Dashboard/dist/libs/bootstrap/dist/js/bootstrap.bundle.min.js' %}"></script>
+    <script src="{% static 'Dashboard/dist/libs/jquery/dist/jquery.slim.min.js' %}"></script>
+    <script src="{% static 'Dashboard/dist/libs/peity/jquery.peity.min.js' %}"></script>
+    <!-- Tabler Core -->
+    <script src="../dist/js/tabler.min.js"></script>
+    <link
+      rel="shortcut icon"
+      type="image/x-icon"
+      href="{% static 'Dashboard/logo_small_white.png' %}"
+    />
+
+    <!-- <link rel="stylesheet" href="{% static 'css/styles.css' %}" /> -->
+    {% comment %} <meta name="csrf-token" content="{% csrf_token %}"/> {% endcomment %}
+  </head>
+
+  <style>
+    ::-webkit-scrollbar {
+      width: 10px;
+      height: 10px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 25px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #8a8a8a;
+      border-radius: 25px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: #9d9d9d;
+    }
+    .wrapper {
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh; /* Memastikan wrapper setinggi viewport */
+    }
+    .content {
+        flex: 1; /* Membuat elemen ini mengisi sisa ruang di antara header dan footer */
+    }
+    
+    .footer {
+        background-color: #f8f9fa; /* Contoh warna latar belakang footer */
+        padding: 20px 0;
+    }
+  
+    /* Main content styles */
+    #content-container {
+      margin-left: 230px; /* Default margin when sidebar is expanded */
+      transition: margin-left 0.3s; /* Smooth transition for margin */
+    }
+
+    /* If sidebar is toggled */
+    #accordionSidebar.toggled ~ #content-container {
+      margin-left: 110px; /* Adjust margin when sidebar is collapsed */
+    }
+
+
+    @media (max-width: 768px) {
+      #content-container {
+        margin-left: 0 !important; /* Hilangkan margin di layar kecil */
+        padding-left: 0; /* Pastikan tidak ada padding di kiri */
+        padding-right: 0; /* Pastikan tidak ada padding di kanan */
+      }
+
+      /* Jika tidak ada sidebar, pastikan tidak ada margin */
+      body.no-sidebar #content-container {
+        margin-left: 0 !important;
+      }
+
+      /* Untuk halaman login, hilangkan margin */
+      body.login-page #content-container {
+        margin-left: 0 !important;
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+      }
+      body.no-sidebar #accordionSidebar {
+        display: none;
+      }
+      
+      body.no-sidebar #content-container {
+        margin-left: 0 !important;
+      }
+    }
+  </style>
+
+  <body class="{% if request.path == '/login' %}no-sidebar{% endif %} antialiased wrapper">
+    {% comment %} {% include 'navbar.html' %} {% endcomment %}
+    <div class="page content">
+        {% include 'components/navbar.html' %}
+
+      <div>
+        <!-- Warning message if there is error / success messages -->
+        {% if messages %} {% for message in messages %}
+        <div
+          class="alert alert-warning alert-dismissable fade show"
+          role="alert"
+        >
+          {{message}}
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="alert"
+            aria-label="Close"
+          ></button>
+        </div>
+        {% endfor %} {% endif %}
+        <!-- Warning message if there is error / success messages -->
+        <br />
+
+        <!-- base html inner content -->
+        {% block content %}
+        <!-- insert content in the corresponding .html -->
+        {% endblock %}
+    </div>
+        <!-- base html inner content -->
+        {% include 'components/footer.html' %}
+</div>
+    <!-- <a class="scroll-to-top rounded" href="#page-top">
+      <i class="fas fa-angle-up"></i>
+    </a> -->
+    <!-- Logout Modal-->
+  
+    </div>
+
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+      crossorigin="anonymous"
+    ></script>
+    <!-- Bootstrap core JavaScript-->
+    <script src="{% static 'Dashboard/vendor/jquery/jquery.min.js' %}"></script>
+    <script src="{% static 'Dashboard/vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+
+    <!-- Core plugin JavaScript-->
+    <script src="{% static 'Dashboard/vendor/jquery-easing/jquery.easing.min.js' %}"></script>
+
+    <!-- Custom scripts for all pages-->
+    <script src="{% static 'Dashboard/js/sb-admin-2.min.js' %}"></script>
+
+    <!-- Page level plugins -->
+    <!-- <script src="{% static 'Dashboard/vendor/datatables/jquery.dataTables.min.js' %}"></script> -->
+    <!-- <script src="{% static 'Dashboard/vendor/datatables/dataTables.bootstrap4.min.js' %}"></script> -->
+
+    <!-- Page level custom scripts -->
+    <!-- <script src="{% static 'Dashboard/js/demo/datatables-demo.js' %}"></script> -->
+    <!-- <script src="{% static 'Dashboard/vendor/chart.js/Chart.min.js' %}"></script> -->
+    <!-- <script src="{% static 'Dashboard/vendor/chart.js/Chart.extension.js' %}"></script> -->
+    {% block script %} {% endblock %}
+  </body>
+
+  <script>
+    function toggleSidebar() {
+      const sidebar = document.getElementById("accordionSidebar");
+      const contentContainer = document.getElementById("content-container");
+      const overlay = document.querySelector(".overlay");
+      const body = document.body;
+    
+      sidebar.classList.toggle("toggled");
+      overlay.classList.toggle("hidden");
+    
+      // Add or remove the `no-sidebar` class to the body element when expanded
+      body.classList.toggle("no-sidebar");
+    
+      // Update the margin-left of content-container based on sidebar visibility
+      if (sidebar.classList.contains("toggled")) {
+        contentContainer.style.marginLeft = "110px"; // Collapsed sidebar width
+      } else {
+        contentContainer.style.marginLeft = "230px"; // Expanded sidebar width
+      }
+    }
+    
+    // Close sidebar if overlay is clicked
+    document.querySelector(".overlay").addEventListener("click", function () {
+      const sidebar = document.getElementById("accordionSidebar");
+      sidebar.classList.add("toggled");
+      document.body.classList.add("no-sidebar");
+      document.getElementById("content-container").style.marginLeft = "0";
+      document.querySelector(".overlay").classList.add("hidden");
+    });
+    
+
+    document.querySelector(".overlay").addEventListener("click", function (e) {
+      document.querySelector(".overlay").classList.add("hidden");
+      document.getElementById("accordionSidebar").classList.add("toggled");
+
+      // Reset margin-left of content-container when sidebar is hidden
+      document.getElementById("content-container").style.marginLeft = "80px"; // Adjust to collapsed width
+    });
+
+    document.querySelector(".overlay").addEventListener("click", function (e) {
+      if (document.getElementById("updating-personnel-loader") != null) {
+        if (
+          document.getElementById("updating-personnel-loader").style.display ==
+          "none"
+        ) {
+          document.querySelector(".overlay").classList.add("hidden");
+        }
+      } else {
+        document.querySelector(".overlay").classList.add("hidden");
+      }
+
+      try {
+        document
+          .getElementById("img_stream")
+          .classList.remove("expand-vertical");
+        document
+          .getElementById("img_stream")
+          .classList.remove("expand-horizontal");
+      } catch {}
+
+      try {
+        document.querySelector(".my-modal").classList.add("hidden");
+      } catch {}
+
+      if (
+        e.target != document.getElementById("accordionSidebar") &&
+        parseInt(window.innerWidth) < 992
+      ) {
+        document.getElementById("accordionSidebar").classList.add("toggled");
+      }
+    });
+  </script>
+</html>
