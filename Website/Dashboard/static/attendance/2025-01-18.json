@@ -1,0 +1,14 @@
+[
+    {
+        "name": "lala",
+        "datetime": "2025-01-18 17:22:58",
+        "confidence": 0.9214603900909424,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20250118/lala_20250118_172258.jpg"
+    },
+    {
+        "name": "lala",
+        "datetime": "2025-01-18 17:23:01",
+        "confidence": 0.9297372102737427,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20250118/lala_20250118_172301.jpg"
+    }
+]

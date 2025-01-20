@@ -135,49 +135,69 @@
     </a>
     
     <div class="d-inline-flex nav-link align-items-center gap-3 p-0 mt-2 mr-3 effected">
-      <i title="Add Camera" id="add-camera" class="d-flex fa-solid fa-plus text-center effected" style="font-size: 20px; cursor: pointer;" onclick="redirectToAddCamera()"></i>
+      <i title="Add Camera" id="add-camera" class="d-flex fa-solid fa-plus text-center effected" style="font-size: 20px; cursor: pointer;" onclick="showCameraOptions()"></i>
       <!-- <a class="effected" href="{% url 'add_camera' %}" style="text-decoration: none;">
       </a> -->
     </div>
   </div>
-  
   <div id="camera-list" class="scrollmenu horizontal-scroll effected" style="align-self: center;">
     {% for cam in Cams %}
       <a 
-      {% if Active_Cam.id == cam.id %}
-      class="card mb-1 text-center effected camera-item m-0 active"   
-      {% else %}
-      class="card mb-1 text-center camera-item m-0 effected"   
-      {% endif %}
-      onclick="selectCamera('{{cam.id}}', this)">
+        {% if Active_Cam.id == cam.id %}
+          class="card mb-1 text-center effected camera-item m-0 active"   
+        {% else %}
+          class="card mb-1 text-center camera-item m-0 effected"   
+        {% endif %}
+        >
+        
         {% load static %}
         {% if Active_Cam.id == cam.id %}
           <div class="camera-marker effected" style="padding: 0; border-radius: 0px 0px 8px 8px; position: absolute; height: 6px; width: 100px; top: 0; margin-left: auto; margin-right: auto; left: 0; right: 0;"></div>
         {% endif %}
-
+  
         <div class="container d-flex flex-column justify-content-between align-items-center text-center">
-          
-
-            <i title="Open Camera Settings" class="d-flex fa-solid fa-gear text-center effected"  onclick="RedirectToEditCamera({{ cam.id }})"> </i>
-          
-          <div class="d-flex align-items-center justify-content-center mb-2 apply-shadow" style="border-radius: 50%; width: 105px; height: 105px; background-color: #ffffff;">
+          <!-- Camera Settings Icon -->
+          <i title="Open Camera Settings" 
+          class="d-flex fa-solid fa-gear text-center effected"  
+          style="font-size: 20px; cursor: pointer; color: #0A5C36;"
+          onclick="RedirectToEditCamera('{{ cam.id }}','{{ cam.role_camera }}')"> 
+       </i>
+          <!-- Camera Icon -->
+          <div class="d-flex align-items-center justify-content-center mb-2 apply-shadow" style="border-radius: 50%; width: 105px; height: 105px; background-color: #ffffff;" onclick="selectCamera('{{ cam.id }}', this)">
             {% if cam.cam_is_active == False %}
-            <i class="d-flex fa-solid fa-video-slash text-center effected" style="font-size: 40px; cursor: pointer; color: #B80F0A;"></i>
+              <i class="d-flex fa-solid fa-video-slash text-center effected" style="font-size: 40px; cursor: pointer; color: #B80F0A;"></i>
             {% else %}
-            <i class="d-flex fa-solid fa-video text-center effected" style="font-size: 40px; cursor: pointer; color: #0A5C36;"></i>
+              <i class="d-flex fa-solid fa-video text-center effected" style="font-size: 40px; cursor: pointer; color: #0A5C36;"></i>
             {% endif %}    
           </div>
-          <p class="mb-0">{{cam.cam_name}}</p>
+          
+          <!-- Camera Name -->
+          <p  style="font-size: 18px;" class="mb-0 ">{{ cam.cam_name }}</p>
+  
+          <!-- Camera Role -->
+          <p class="mb-0"  style="font-size: 12px; ">
+            {% if cam.role_camera == 'T' %}
+              Tracking
+            {% elif cam.role_camera == 'P_IN' %}
+              Presence In
+            {% elif cam.role_camera == 'P_OUT' %}
+              Presence Out
+            {% else %}
+              Unknown Role
+            {% endif %}
+          </p>
+          
+          <!-- Camera Status (Active/Inactive) -->
           {% if cam.cam_is_active == False %}
-          <p class="m-0" style="font-size: 12px;">Inactive</p>
+            <p class="m-0" style="font-size: 12px; font-weight: bold; color: #B80F0A;">Inactive</p>
           {% else %}
-          <p class="m-0" style="font-size: 12px;">Active</p>
+            <p class="m-0" style="font-size: 12px;font-weight: bold; color: #0A5C36">Active</p>
           {% endif %}
         </div> 
       </a>
     {% endfor %}
   </div>
-
+  
 
   {% if Active_Cam != None %}
   <div class="w-100 mt-1">
@@ -229,8 +249,7 @@
           />
           </svg>
         {% endif %}
-        <img id="img_stream" src="{% url 'video_feed' %}" style="width: 100%; border-radius: 10px; z-index: 1001; position: relative;" onclick="expandStream(this)"/>
-    </div>
+        <img id="img_stream" src="{% url 'ai_video_feed' %}" style="width: 100%; border-radius: 10px; z-index: 1001; position: relative;" onclick="expandStream(this)"/>
   </div>
   {% else %}
   <div id="camera-stream-loader" class="loader" style="width: 50px; height: 50px; margin: -80px 0 0 -25px;"></div>
@@ -312,6 +331,49 @@
         elements[i].classList.add("light-mode")
     }
   }
+
+
+
+    function showCameraOptions() {
+        Swal.fire({
+            title: 'Select Camera Type',
+            icon: 'question',
+            showCancelButton: false,
+            showConfirmButton: false,
+            html: `
+                <div style="display: flex; justify-content: space-around; padding-top: 20px;">
+                    <div style="text-align: center; cursor: pointer;" onclick="redirectToAddTrackingCamera()">
+                        <i class="fa-solid fa-location-dot" style="font-size: 40px;"></i>
+                        <p>Tracking Camera</p>
+                    </div>
+                    <div style="text-align: center; cursor: pointer;" onclick="redirectToAddPresenceCamera()">
+                        <i class="fa-solid fa-user-check" style="font-size: 40px;"></i>
+                        <p>Presence Camera</p>
+                    </div>
+                </div>
+            `,
+            background: '#fff',
+            width: '500px',
+            padding: '20px',
+            showCloseButton: true,
+            customClass: {
+                popup: 'swal-wide-popup'
+            }
+        });
+    }
+
+    // Redirect functions
+    function redirectToAddTrackingCamera() {
+        // Your redirect logic for tracking camera
+        window.location.href = '/add_tracking_camera'; // Update with your URL
+    }
+
+    function redirectToAddPresenceCamera() {
+        // Your redirect logic for presence camera
+        window.location.href = '/add_presence_camera'; // Update with your URL
+    }
+
+
 </script>
 
 <script type="text/javascript">
@@ -607,9 +669,16 @@
     window.location.href = '/add_camera';
 }
 
-function RedirectToEditCamera(id) {
-  window.location.href = "{% url 'edit_camera' 'camera_id' %}".replace('camera_id', id);
+function RedirectToEditCamera(id,role) {
+  if(role == 'T'){
+    window.location.href = "{% url 'edit_tracking_camera' 'camera_id' %}".replace('camera_id', id);}
+  else {
+    window.location.href = "{% url 'edit_presence_camera' 'camera_id' %}".replace('camera_id', id);
+  }
+ // window.location.href = "{% url 'edit_camera' 'camera_id' %}".replace('camera_id', id);
 }
+
+
 
   function closeModal(){
     modal.classList.add('hidden')

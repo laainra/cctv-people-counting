@@ -1,0 +1,133 @@
+{% extends 'base.html' %} {% block content %}
+<div class="card d-flex w-36 justify-content-between align-items-start mb-3 py-3 responsive responsive-card effected shadow-black shadow-lg">
+  <div class="pl-4">
+    <a class="d-flex nav-link text-dark align-items-center gap-2 effected bg-transparent">
+      <i class="fa-solid fa-camera text-center" style="font-size: 20px"></i>
+      {% if Active_Cam == None %}
+      <span class="effected" style="font-weight: 600; font-size: 20px">Add Tracking Camera</span>
+      {% else %}
+      <span class="effected" style="font-weight: 600; font-size: 20px">Camera Settings</span>
+      {% endif %}
+    </a>
+  </div>
+</div>
+<div class="card d-flex w-36 justify-content-between align-items-start mx-5 mb-20 py-3 px-4 responsive responsive-card effected shadow-black shadow-lg" style="border-radius: 25px;">
+  <form id="camera_form" action="{% url 'add_tracking_camera' %}" method="POST" class="d-flex flex-column justify-content-center align-items-center mb-3 w-100">
+    {% csrf_token %}
+    <p style="align-items: start; width: 100%">
+      <span class="effected">Camera Name:</span>
+      <br />
+      <input name="cam_name" type="text" class="effected edit-text" style="width: 100%" maxlength="21" value="{{Active_Cam.cam_name}}" placeholder="Insert Camera Name" required />
+    </p>
+    <p style="align-items: start; width: 100%">
+      <span class="effected">RTSP Link:</span>
+      <br />
+      <input name="feed_src" type="text" class="effected edit-text" style="width: 100%" value="{{Active_Cam.feed_src}}" placeholder="Insert RTSP Link" required />
+    </p>
+   
+    <p class="d-flex flex-column justify-content-between align-items-start" style="width: 100%">
+      <span class="d-flex align-items-center effected">Used AI Detection:</span>
+ 
+      <!-- Uniform Detection -->
+      <a class="d-flex ml-1 align-items-center" style="text-decoration: none">
+        {% if Active_Cam == None %}
+        <input name="uniform_detection" type="checkbox" class="effected" />
+        {% else %}
+        {% if Active_Cam.uniform_detection == True %}
+        <input name="uniform_detection" type="checkbox" class="effected" checked />
+        {% else %}
+        <input name="uniform_detection" type="checkbox" class="effected" />
+        {% endif %}
+        {% endif %}
+        <span class="ml-2 effected">Uniform Detection</span>
+      </a>
+      <span class="mb-2 effected" style="font-size: 13px; font-style: italic; text-align: justify; margin-left: 25px;">Detect uniforms worn by personnel entering the area</span>
+
+      <!-- ID Card Detection -->
+      <a class="d-flex ml-1 align-items-center" style="text-decoration: none">
+        {% if Active_Cam == None %}
+        <input name="id_card_detection" type="checkbox" class="effected" />
+        {% else %}
+        {% if Active_Cam.id_card_detection == True %}
+        <input name="id_card_detection" type="checkbox" class="effected" checked />
+        {% else %}
+        <input name="id_card_detection" type="checkbox" class="effected" />
+        {% endif %}
+        {% endif %}
+        <span class="ml-2 effected">ID Card Detection</span>
+      </a>
+      <span class="mb-2 effected" style="font-size: 13px; font-style: italic; text-align: justify; margin-left: 25px;">Detect ID cards worn by personnel entering the area</span>
+
+      <!-- Shoes Detection -->
+      <a class="d-flex ml-1 align-items-center" style="text-decoration: none">
+        {% if Active_Cam == None %}
+        <input name="shoes_detection" type="checkbox" class="effected" />
+        {% else %}
+        {% if Active_Cam.shoes_detection == True %}
+        <input name="shoes_detection" type="checkbox" class="effected" checked />
+        {% else %}
+        <input name="shoes_detection" type="checkbox" class="effected" />
+        {% endif %}
+        {% endif %}
+        <span class="ml-2 effected">Shoes Detection</span>
+      </a>
+      <span class="mb-2 effected" style="font-size: 13px; font-style: italic; text-align: justify; margin-left: 25px;">Detect the shoes worn by personnel entering the area</span>
+
+      <!-- Cigarette Detection -->
+      <a class="d-flex ml-1 align-items-center" style="text-decoration: none">
+        {% if Active_Cam == None %}
+        <input name="ciggerate_detection" type="checkbox" class="effected" />
+        {% else %}
+        {% if Active_Cam.ciggerate_detection == True %}
+        <input name="ciggerate_detection" type="checkbox" class="effected" checked />
+        {% else %}
+        <input name="ciggerate_detection" type="checkbox" class="effected" />
+        {% endif %}
+        {% endif %}
+        <span class="ml-2 effected">Cigarette Detection</span>
+      </a>
+      <span class="mb-2 effected" style="font-size: 13px; font-style: italic; text-align: justify; margin-left: 25px;">Detect if a person is carrying or smoking a cigarette</span>
+
+    </p>
+
+    <div class="d-flex justify-content-between align-items-center gap-2" style="width: 100%">
+      <button type="button" class="btn btn-danger btn-user btn-block m-0" style="border-radius: 20px; padding-left: 2%; padding-right: 2%" onclick="backToCameraPage()">Cancel</button>
+      {% if Active_Cam == None %}
+      <button class="btn btn-primary btn-user btn-block m-0" type="submit" style="border-radius: 20px; padding-left: 2%; padding-right: 2%">Add Camera</button>
+      {% else %}
+      <button type="submit" class="btn btn-success btn-user btn-block m-0" style="border-radius: 20px; padding-left: 2%; padding-right: 2%">Save</button>
+      {% endif %}
+    </div>
+  </form>
+  {% if Active_Cam != None %}
+  <a class="align-self-center mt-2 text-center" style="border-radius: 20px; padding-left: 2%; padding-right: 2%; width: 200px; color: red; font-weight: 600; cursor: pointer; text-decoration: none" href="{% url 'delete_camera' Active_Cam.id %}">Delete Camera</a>
+
+  {% endif %}
+</div>
+
+<script>
+  var labels = document.getElementsByTagName("label");
+  for (var i = 0; i < labels.length; i++) {
+    labels[i].classList.add("effected");
+  }
+
+  elements = document.getElementsByClassName("effected");
+
+  for (var i = 0; i < elements.length; i++) {
+    if (localStorage.getItem("darkMode") == "enabled") {
+      elements[i].classList.add("dark-mode");
+    } else {
+      elements[i].classList.add("light-mode");
+    }
+  }
+
+  function backToCameraPage() {
+    // Your redirect logic for tracking camera
+    window.location.href = '/camera'; // Update with your URL
+}
+<script>
+</script>
+
+</script>
+<!-- end logged cases -->
+{% endblock %} {% block title %}Presence Camera {% endblock %}

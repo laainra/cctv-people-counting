@@ -1,0 +1,604 @@
+
+
+{% extends 'base.html' %}
+{% block title %}
+Company Management
+{% endblock %}
+<!-- This is comment to prevent Prettifier -->
+{% block content %} {% csrf_token %}
+
+<script>
+
+    if (localStorage.getItem('darkMode') == 'enabled') {
+        document.body.classList.add("dark-mode")
+        document.getElementById("accordionSidebar").classList.add("dark-mode")
+        document.getElementById("toggler-button").classList.add("dark-mode")
+        // companyScrollmenu.classList.add("dark-mode");
+    }else {
+        document.body.classList.add("light-mode")
+        document.getElementById("accordionSidebar").classList.add("light-mode")
+        document.getElementById("toggler-button").classList.add("light-mode")
+        // companyScrollmenu.classList.add("light-mode");
+    }
+
+    elements = document.getElementsByClassName("effected")
+
+    for (var i = 0; i<elements.length; i++){
+        if (localStorage.getItem('darkMode') == 'enabled') {
+            elements[i].classList.add("dark-mode")
+        }else {
+            elements[i].classList.add("light-mode")
+        }
+    }
+</script>
+
+<head>
+    <script src="https://cdn.syncfusion.com/ej2/dist/ej2.min.js" type="text/javascript"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+</head>
+
+<!-- Card Header -->
+<div class="card d-flex w-36 justify-content-between align-items-center mb-3 py-3 responsive responsive-card effected shadow-black shadow-lg">
+    <div class="pl-4 d-flex justify-content-between align-items-center w-100">
+      <a class="d-flex nav-link text-dark align-items-center gap-2 effected bg-transparent">
+        <i class="fa-solid fa-swatchbook text-center" style="font-size: 20px"></i>
+        <span style="font-size: 20px; font-weight: 700">Company Management</span>
+      </a>
+      <button
+      id="add-company-btn"
+      class="btn btn-success d-flex align-items-center justify-content-center gap-2 mr-5"
+      onclick="openAddCompanyModal()">
+      Add Company
+      <i class="d-flex fa-solid fa-person text-center align-items-center justify-content-center text-white" 
+         style="font-size: 12px; margin-right: 2px; cursor: pointer;"></i>
+    </button>
+    
+    </div>
+  </div>
+  
+
+  <div id="updating-company-loader" class="loader" style="display: none; position: fixed; top: 0; bottom: 0; right: 0; left: 0; margin: auto;"></div>
+
+
+  <div class="card mb-5  gap-4 responsive responsive-card effected flex" style="border-top-left-radius: 0%; border-top-right-radius: 0%">
+
+    <table id="company-table">
+      <thead id="company-table-head">
+        <tr class="company-table-row">
+          <th onclick="sortTable('no')"> No </th> 
+          <th onclick="sortTable('name')">Company Name</th>
+          <th onclick="sortTable('')">Company Email</th>
+          <th onclick="sortTable('leave')">Admin Username</th>
+          <th onclick="sortTable('work_hours')">Actions </th>
+        </tr>
+        <tr>
+          <td colspan="5"><hr class="table-hr" /></td>
+        </tr>
+      </thead>
+      <tbody id="company-table-body">
+        <tbody id="company-list">
+            {% for company in companies %}
+            <tr class="company-table-row-body">
+                <td>{{ forloop.counter }}</td>
+                <td>{{ company.name }}</td>
+                <td>{{ company.user.email }}</td>
+                <td>{{ company.user.username }}</td>
+
+                <td>
+                    <button class="btn btn-warning btn-sm" onclick="openEditModal({{ company.id }})">Edit</button>
+                    <button class="btn btn-danger btn-sm" onclick="deleteCompany({{ company.id }})">Delete</button>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="4" class="text-center">No companies found.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    
+
+
+
+    
+  </div>
+
+</div>
+
+<section class="my-modal company hidden">
+    <div class="card align-items-center effected pl-5 pr-5 pt-4 pb-4 align-self-center" style="border-radius: 25px; width: fit-content;">
+      <span id="form-title" class="mb-4 effected" style="font-weight: 600; font-size: 30px;">Edit Company</span>
+      <form id="company-form" action="" method="POST" class="d-flex flex-column w-100 justify-content-center align-items-center mb-1">
+        <div class="form-group">
+          {% csrf_token %} 
+          <p class="mb-3" style="display: flex; flex-direction: column; justify-content: center; align-items: start; width: 100%;">
+            <label for="company_name" class="mb-1 effected">Company Name:</label>
+            <input name="company_name" type="text" class="effected" style="width:320px;" maxlength="20" placeholder="Insert Company Name" required>
+          </p>
+          <p class="mb-3" style="display: flex; flex-direction: column; justify-content: center; align-items: start; width: 100%;">
+            <label for="email" class="mb-1 effected">Company Email:</label>
+            <input name="email" type="text" class="effected" style="width:320px;" maxlength="20" placeholder="Insert Company Email" required>
+          </p>
+          <p class="mb-3" style="display: flex; flex-direction: column; justify-content: center; align-items: start; width: 100%;">
+            <label for="username" class="mb-1 effected">Company Admin Username:</label>
+            <input name="username" type="text" class="effected" style="width:320px;" maxlength="20" placeholder="Insert Admin Username" required>
+          </p>
+          <p class="mb-3" style="display: flex; flex-direction: column; justify-content: center; align-items: start; width: 100%;">
+            <label for="password" class="mb-1 effected">Company Admin Password:</label>
+            <input name="password" type="password" class="effected" style="width:320px;" maxlength="20" placeholder="Insert Admin Password" required>
+          </p>
+
+          <div class="d-flex justify-content-between align-items-center mt-4 gap-2" style="width: 320px;">
+            <button 
+              type="button" 
+              class="btn btn-danger btn-user btn-block m-0" 
+              style="border-radius: 8px; padding-left: 2%; padding-right: 2%;"
+              onclick="closeModal()">
+              Cancel
+            </button>
+            <button 
+            type="submit" 
+            class="btn btn-success btn-user btn-block m-0" 
+            style="border-radius: 8px; padding-left: 2%; padding-right: 2%;">
+            Save
+            </button>
+  
+          </div>
+        </div>
+      </form>
+      <button
+        class="btn btn-danger btn-block align-self-center text-center delete-button effected"
+        onclick="deleteCompany()">
+        Delete company
+      </button>
+    </div>
+  </section>
+
+<script>
+    elements = document.getElementsByClassName("effected")
+
+    for (var i = 0; i<elements.length; i++){
+        if (localStorage.getItem('darkMode') == 'enabled') {
+            elements[i].classList.add("dark-mode")
+        }else {
+            elements[i].classList.add("light-mode")
+        }
+    }
+</script>
+<!-- Add this script for SweetAlert -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    // Function to open the add modal
+    function closeModal(){
+        document.querySelector('.company').classList.add('hidden');
+    }
+
+    function openAddCompanyModal() {
+        document.getElementById('form-title').textContent = "Add Company";
+        document.querySelector('#company-form').reset();
+        document.querySelector('#company-form').action = "/companies/add/"; // Add the correct route for adding
+        document.querySelector('.company').classList.remove('hidden');
+        
+        // Hide the Delete button when it's an "Add" modal
+        document.querySelector('.delete-button').style.display = "none";
+    }
+
+    // Function to open the edit modal
+    function openEditModal(companyId) {
+        // Send request to get company details
+        fetch(`/companies/${companyId}/`)  // Adjust the URL if necessary
+          .then(response => response.json())
+          .then(data => {
+            if (data.error) {
+              Swal.fire({
+                icon: 'error',
+                title: 'Error!',
+                text: data.error,
+              });
+            } else {
+              // Populate the form with the existing company data
+              document.querySelector('[name="company_name"]').value = data.company_name;
+              document.querySelector('[name="username"]').value = data.username;
+              document.querySelector('[name="email"]').value = data.email;
+
+              // Update the form's action URL to include the company ID for updating
+              const formAction = `/companies/edit/${companyId}/`;
+              document.querySelector('#company-form').action = formAction;
+    
+              // Open the modal
+              document.querySelector('.company').classList.remove('hidden');
+    
+              // Show the Delete button when it's an "Edit" modal
+              document.querySelector('.delete-button').style.display = "block";
+            }
+          })
+          .catch(error => {
+            console.error('Error:', error);
+            Swal.fire({
+              icon: 'error',
+              title: 'Error!',
+              text: 'Something went wrong while fetching company data.',
+            });
+          });
+    }
+
+    // Function to delete the company
+    function deleteCompany(companyId) {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: 'You won\'t be able to revert this!',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Yes, delete it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Send a request to delete the company
+                fetch(`/companies/delete/${companyId}/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': document.querySelector('[name="csrfmiddlewaretoken"]').value
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Deleted!',
+                            text: 'The company has been deleted.',
+                        });
+                        // Reload the page after success
+                        setTimeout(() => {
+                            location.reload();
+                        }, 1500);
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error!',
+                            text: data.error || 'Something went wrong.',
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error!',
+                        text: 'Something went wrong while deleting the company.',
+                    });
+                });
+            }
+        });
+    }
+
+    // Function to handle form submission (Add/Edit)
+    document.querySelector('#company-form').addEventListener('submit', function(event) {
+        event.preventDefault();
+        const formAction = document.querySelector('#company-form').action;
+
+        // Send a POST request for adding or updating the company
+        fetch(formAction, {
+            method: 'POST',
+            body: new FormData(this),
+            headers: {
+                'X-CSRFToken': document.querySelector('[name="csrfmiddlewaretoken"]').value
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success!',
+                    text: data.message || 'Company information has been saved.',
+                });
+                // Reload the page after success
+                document.querySelector('.company').classList.add('hidden');
+                    location.reload();
+
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error!',
+                    text: data.error || 'Something went wrong.',
+                });
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Error!',
+                text: 'Something went wrong while saving the company data.',
+            });
+        });
+    });
+</script>
+
+
+<!-- Temporary style fixes -->
+<style>
+
+    /* Container Statistik dan Chart */
+  .stats-container {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+  }
+  
+  /* Grid Kotak Statistik */
+  .stats-boxes {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* 2 kolom */
+    grid-gap: 10px;
+    width: 60%;
+  }
+  
+  /* Kotak Individual */
+  .stat-box {
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 10px;
+    text-align: center;
+    box-shadow: 0 2px 2px rgba(0, 0, 0, 0.1);
+  }
+  
+  .stat-box h4 {
+    font-size: 16px;
+    color: #555;
+    margin-bottom: 8px;
+  }
+  
+  .stat-number {
+    font-size: 24px;
+    font-weight: bold;
+    color: #333;
+  }
+  
+  /* Pie Chart */
+  .stats-chart {
+    width: 40%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  #statsPieChart {
+    max-width: 100%;
+    max-height: 300px;
+  }
+  
+    /* Modal Styling */
+  #personnelDetailModal {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+  }
+  
+  /* Modal Box */
+  #personnelDetailModal .relative {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 600px;
+    padding: 20px;
+    text-align: center;
+  
+  }
+  
+  .hidden {
+    display: none !important;
+  }
+  
+  
+  /* Profile Image */
+  #profileImage {
+    width: 150px; /* Ukuran gambar */
+    height: 150px; /* Tinggi gambar */
+    border-radius: 50%; /* Membuat gambar menjadi bulat */
+    object-fit: cover; /* Pastikan gambar pas di dalam lingkaran */
+    margin: 0 auto 10px; /* Tengah secara horizontal dan jarak ke elemen di bawahnya */
+    display: block;
+    border: 4px solid #f0f0f0; /* Bingkai gambar (opsional) */
+  }
+  
+  /* Header Text */
+  #personnelName {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 10px;
+  }
+  
+  /* Details Text */
+  #personnelNameText {
+    font-size: 20px;
+    font-weight: bold;
+  }
+  
+  #personnelGender,
+  #personnelEmploymentStatus {
+    font-size: 16px;
+    color: #666;
+    margin-bottom: 5px;
+  }
+    .presence-status-late-container {
+      background-color: #f8d7da; /* Light red for late */
+      color: #721c24; /* Dark red text */
+    }
+    
+    .presence-status-ontime-container {
+      background-color: #d4edda; /* Light green for on-time */
+      color: #155724; /* Dark green text */
+    }
+    
+    .presence-status-left-container {
+      background-color: #d1ecf1; /* Light blue for left */
+      color: #0c5460; /* Dark blue text */
+    }
+    
+  
+    .nav-item-card {
+      width: 150px;
+      height: 100px;
+      cursor: pointer; /* Show pointer on hover */
+    }
+  
+    #company-table {
+      margin: 1%;
+    }
+  
+    .company-table-row {
+      text-align: center;
+    }
+  
+    #company-table-head > .company-table-row > th {
+      color: #858383;
+      padding: 20px 0 20px 0;
+      cursor: pointer; /* Cursor changes to pointer when hovering over headers */
+    }
+  
+    .company-table-row-body {
+      background-color: #f5f5f5;
+      text-align: center;
+      height: 70px;
+    }
+  
+    tr > td:first-of-type {
+      border-top-left-radius: 4px;
+      border-bottom-left-radius: 4px;
+    }
+  
+    tr > td:last-of-type {
+      border-top-right-radius: 4px;
+      border-bottom-right-radius: 4px;
+    }
+  
+    .table-hr {
+      border: 4px solid lightgray;
+      margin: 8px 1vw 8px 1vw;
+    }
+  
+    
+    .date-picker {
+      width: 170px; /* Set the width of the date picker */
+      cursor: pointer; /* Change cursor to pointer when hovering */
+      min-height: 38px; /* Minimum height for the input field */
+      padding: 10px; /* Padding inside the input */
+      border: 1px solid #ccc; /* Border color */
+      border-radius: 5px; /* Rounded corners */
+      background-color: #f9f9f9; /* Light background color */
+      transition: border-color 0.3s, box-shadow 0.3s; /* Smooth transitions */
+  }
+  
+  .date-picker:focus {
+    border-color: #007bff; /* Border color on focus */
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5); /* Box shadow on focus */
+    outline: none; /* Remove default outline */
+  } 
+  #noImagesMessage {
+    font-size: 1rem;
+    margin-top: 1rem;
+  }
+  
+  #noImagesMessage ul {
+    margin-top: 0.5rem;
+    padding-left: 1.5rem;
+  }
+  #dropArea {
+    border: 2px dashed #ccc;
+    padding: 20px;
+    margin-top: 10px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  #dropArea:hover {
+    background-color: #f1f1f1;
+  }
+  
+  #personnelImagesModal .p-4 {
+    max-height: 60vh; /* Adjust this value as needed for your modal's body */
+    overflow-y: auto; /* Enables scrolling when the content exceeds max height */
+  }
+  
+  #imagesGrid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    max-height: 60vh; /* Limit the height of the images grid */
+    overflow-y: auto; /* Add scroll if the content exceeds the max height */
+  }
+  
+  #imagesGrid .flex-none {
+    flex: 0 0 calc(20% - 16px); /* Adjust this to set the image width */
+    margin-bottom: 16px;
+  }
+  
+  #imagesGrid .image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 10px;
+  }
+  .my-modal .modal-content {
+    width: 100%;               /* Set the width to 50% of the viewport */
+    max-width: 800px;         /* Limit the width to a maximum of 800px */
+    margin: 0 auto;           /* Center the modal horizontally */
+    background-color: white;
+    border-radius: 8px;
+  
+    padding: 20px;
+    position: relative;
+  }
+  
+  .my-modal {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: fixed;
+    inset: 0;
+    z-index: 9999;                           /* Ensure the modal is on top */
+  }
+  
+  .my-modal .modal-content {
+    max-height: 70vh;            /* Limit the height of the modal */
+    overflow-y: auto;            /* Add scrolling if content exceeds max-height */
+  }
+  
+  
+    @media screen and (max-width: 793px) {
+      .table-headers {
+        padding-left: 4rem;
+        padding-right: 4rem;
+      }
+    }
+  
+    @media screen and (max-width: 500px) {
+      .date-picker {
+        width: 100%; /* Full width on smaller screens */
+    }
+      .nav-item-card {
+        width: 100px;
+      }
+  
+      .table-headers {
+        padding-left: 1rem;
+        padding-right: 1rem;
+        font-size: small;
+      }
+    }
+  </style>
+
+  
+{% endblock %}
+

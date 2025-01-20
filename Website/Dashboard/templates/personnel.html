@@ -1,5 +1,5 @@
 {% extends 'base.html' %} 
-{% block title %} Personnels {% endblock %} 
+{% block title %} Employee {% endblock %} 
 {% block content %} 
 
 {% csrf_token %} 
@@ -35,17 +35,26 @@
   <div class="pl-4 d-flex justify-content-between align-items-center w-100">
     <a class="d-flex nav-link text-dark align-items-center gap-2 effected bg-transparent">
       <i class="fa-solid fa-swatchbook text-center" style="font-size: 20px"></i>
-      <span style="font-size: 20px; font-weight: 700">Personnels Management</span>
+      <span style="font-size: 20px; font-weight: 700">Employee Management</span>
     </a>
-    <button
-    id="add-personnel-btn"
-    class="btn btn-success d-flex align-items-center justify-content-center gap-2 mr-5"
-    onclick="openAddPersonnelModal()">
-    Add Personnel
-    <i class="d-flex fa-solid fa-person text-center align-items-center justify-content-center text-white" 
-       style="font-size: 12px; margin-right: 2px; cursor: pointer;"></i>
-  </button>
-  
+    <div class="d-flex gap-2 mr-2">
+      <button
+        id="add-personnel-btn"
+        class="btn btn-primary d-flex align-items-center justify-content-center gap-2"
+        onclick="openAddPersonnelModal()">
+        Add Personnel
+        <i class="d-flex fa-solid fa-person text-center align-items-center justify-content-center text-white" 
+          style="font-size: 12px; margin-right: 2px; cursor: pointer;"></i>
+      </button>
+      <button
+        id="add-division-btn"
+        class="btn btn-success d-flex align-items-center justify-content-center gap-2"
+        onclick="openAddDivisionModal()">
+        Add Division
+        <i class="d-flex fa-solid fa-folder-tree text-center align-items-center justify-content-center text-white" 
+          style="font-size: 12px; margin-right: 2px; cursor: pointer;"></i>
+      </button>
+    </div>
   </div>
 </div>
 
@@ -60,8 +69,11 @@
         <tr class="presence-table-row">
           <th onclick="sortTable('img')"> </th> 
           <th onclick="sortTable('name')">Name</th>
-          <th onclick="sortTable('attended')">Gender</th>
-          <th onclick="sortTable('leave')">Role</th>
+          <th onclick="sortTable('division')">Division</th>
+          <th onclick="sortTable('division')">Email</th>
+          <th onclick="sortTable('division')">Username</th>
+          {% comment %} <th onclick="sortTable('attended')">Gender</th>
+          <th onclick="sortTable('leave')">Role</th> {% endcomment %}
           <th onclick="sortTable('status')">Images</th>
           <th onclick="sortTable('work_hours')">Actions </th>
         </tr>
@@ -77,7 +89,10 @@
               <img src="{% static personnel.profile_image %}" alt="{{ personnel.name }}'s Profile Picture" class="inline-block mr-2" style="width: 40px; height: 40px; border-radius: 50%;">
             </td>
             <td onclick="openPersonnelDetailModal({{ personnel.id }}, '{{ personnel.name|escapejs }}')">{{ personnel.name }}</td>
-            <td onclick="openPersonnelDetailModal({{ personnel.id }}, '{{ personnel.name|escapejs }}')">
+            <td onclick="openPersonnelDetailModal({{ personnel.id }}, '{{ personnel.division|escapejs }}')">{{ personnel.division }}</td>
+            <td onclick="openPersonnelDetailModal({{ personnel.id }}, '{{ personnel.division|escapejs }}')">{{ personnel.email }}</td>
+            <td onclick="openPersonnelDetailModal({{ personnel.id }}, '{{ personnel.division|escapejs }}')">{{ personnel.username }}</td>
+            {% comment %} <td onclick="openPersonnelDetailModal({{ personnel.id }}, '{{ personnel.name|escapejs }}')">
                 {% if personnel.gender == 'F' %} Female
                 {% elif personnel.gender == 'M' %} Male
                 {% else %} Unknown
@@ -88,7 +103,8 @@
                 {% elif personnel.employment_status == 'S' %} Staff
                 {% else %} Unknown
                 {% endif %}
-            </td>
+            </td> {% endcomment %}
+
             <td>
                 <button class="btn btn-primary btn-sm" onclick="openImagesModal({{ personnel.id }}, '{{ personnel.name|escapejs }}')">
                     See Images
@@ -109,13 +125,13 @@
         {% endfor %}
       </tbody>
     </table>
-    
+{% comment %}     
     <div id="pagination-container" class="d-flex justify-content-center mb-5">
       <button id="prev" class="btn btn-primary" onclick="changePage(-1)">Previous</button>
       <span id="page-info" class="mx-2 mt-2" style="text-align: center;"></span>
       <button id="next" class="btn btn-primary" onclick="changePage(1)">Next</button>
     </div>
-
+ {% endcomment %}
 
     
   </div>
@@ -133,6 +149,18 @@
           <input name="name" type="text" class="effected" style="width:320px;" maxlength="20" placeholder="Insert Personnel Name" required>
         </p>
         <p class="mb-3" style="display: flex; flex-direction: column; justify-content: center; align-items: start; width: 100%;">
+          <label for="username" class="mb-1 effected">Personnel Username:</label>
+          <input name="username" type="text" class="effected" style="width:320px;" maxlength="20" placeholder="Insert Personnel Username" required>
+        </p>
+        <p class="mb-3" style="display: flex; flex-direction: column; justify-content: center; align-items: start; width: 100%;">
+          <label for="email" class="mb-1 effected">Personnel Email:</label>
+          <input name="email" type="text" class="effected" style="width:320px;" maxlength="20" placeholder="Insert Personnel Email" required>
+        </p>
+        <p class="mb-3" style="display: flex; flex-direction: column; justify-content: center; align-items: start; width: 100%;">
+          <label for="password" class="mb-1 effected">Personnel Password:</label>
+          <input name="password" type="password" class="effected" style="width:320px;" maxlength="20" placeholder="Insert Personnel Password" required>
+        </p>
+        <p class="mb-3" style="display: flex; flex-direction: column; justify-content: center; align-items: start; width: 100%;">
           <label for="gender" class="mb-1 effected">Personnel Gender:</label>
           <select name="gender" id="id_gender" class="effected" style="padding: 8px 10px; border: 2px solid transparent; border-right: 15px solid transparent; cursor: pointer; width: 100%;">
             <option value="M">Male</option>
@@ -144,6 +172,14 @@
           <select name="employment_status" id="id_employment_status" class="effected" style="padding: 8px 10px; border: 2px solid transparent; border-right: 15px solid transparent; cursor: pointer; width: 100%;">
             <option value="S">Staff</option>
             <option value="I">Intern</option>
+          </select>
+        </p>
+        <p class="mb-3" style="display: flex; flex-direction: column; justify-content: center; align-items: start; width: 100%;">
+          <label for="division" class="mb-1 effected">Personnel Division:</label>
+          <select name="division" id="id_employment_status" class="effected" style="padding: 8px 10px; border: 2px solid transparent; border-right: 15px solid transparent; cursor: pointer; width: 100%;">
+            {% for division in Divisions %}
+            <option value="{{ division.id }}">{{ division.name }}</option>
+        {% endfor %}
           </select>
         </p>
         <div class="d-flex justify-content-between align-items-center mt-4 gap-2" style="width: 320px;">
@@ -171,6 +207,75 @@
     </button>
   </div>
 </section>
+
+<section class="division-modal personnel hidden">
+  <div class="card align-items-center effected pl-5 pr-5 pt-4 pb-4 align-self-center" style="border-radius: 25px; width: fit-content;">
+    <span id="form-title" class="mb-4 effected" style="font-weight: 600; font-size: 30px;">Division</span>
+
+    <!-- Form for Adding or Editing Division -->
+    <form id="division-form" action="{% url 'add_division' %}" method="POST" class="d-flex flex-column w-100 justify-content-center align-items-center mb-1">
+      {% csrf_token %}
+      <input type="hidden" name="id" id="division-id"> <!-- Hidden field for edit ID -->
+
+      <div class="form-group">
+        <p class="mb-3" style="display: flex; flex-direction: column; justify-content: center; align-items: start; width: 100%;">
+          <label for="name" class="mb-1 effected">Division Name:</label>
+          <input name="name" id="division-name" type="text" class="effected" style="width:320px;" maxlength="20" placeholder="Insert Division Name" required>
+        </p>
+
+        <div class="d-flex justify-content-between align-items-center mt-4 gap-2" style="width: 320px;">
+          <button 
+            type="button" 
+            class="btn btn-danger btn-user btn-block m-0" 
+            style="border-radius: 8px; padding-left: 2%; padding-right: 2%;"
+            onclick="closeDivisionModal()">
+            Cancel
+          </button>
+          <button 
+            type="submit" 
+            class="btn btn-success btn-user btn-block m-0" 
+            style="border-radius: 8px; padding-left: 2%; padding-right: 2%;">
+            Save
+          </button>
+        </div>
+      </div>
+    </form>
+
+    <!-- Division List Table -->
+    <div class="mt-4 w-100">
+      <h5>Existing Divisions</h5>
+      <table class="table table-bordered table-striped">
+        <thead>
+          <tr>
+              <th>Division Name</th>
+              <th>Actions</th>
+          </tr>
+      </thead>
+      <tbody>
+          {% for division in Divisions %}
+          <tr>
+              <td>{{ division.name }}</td>
+              <td>
+
+
+                {% comment %} <button class="btn btn-warning btn-sm" onclick="editDivision({{ division.id }})">Edit</button> {% endcomment %}
+                    <button class="btn btn-danger btn-sm" onclick="deleteDivision({{ division.id }})">Delete</button>
+
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+              <td>No divisions available</td>
+          </tr>
+          {% endfor %}
+      </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+
+
 <section id="personnelImagesModal" class="hidden my-modal personnel fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center">
   <div class="modal-content">
     <!-- Header Modal -->
@@ -188,12 +293,7 @@
       <!-- Pesan Jika Tidak Ada Gambar -->
       <div id="noImagesMessage" class="text-center mt-4 hidden">
         <p>No images available.</p>
-        <p>Please add at least 3 images showing:</p>
-        <ul class="list-disc text-left inline-block mt-2">
-          <li>Right Angle</li>
-          <li>Left Angle</li>
-          <li>Front Angle</li>
-        </ul>
+
       </div>
       
       <!-- Drop area for drag-and-drop -->
@@ -290,6 +390,168 @@ class="max-h-[70vh] my-modal personnel fixed inset-0 bg-gray-800 bg-opacity-50 f
 
 
 <script>
+  function fetchDivision() {
+    fetch('divisions/')  // Ensure this is the correct URL for your API endpoint
+      .then(response => response.json())
+      .then(data => {
+        console.log('Fetched Data:', data);  // Add this line for debugging
+        if (data.status === 'success') {
+          const divisionList = document.getElementById('division-list');
+          divisionList.innerHTML = ''; // Clear existing list before adding new data
+  
+          // Loop through the divisions and create rows for the table
+          data.divisions.forEach(division => {
+            const row = document.createElement('tr');
+            row.dataset.id = division.id;
+  
+            row.innerHTML = `
+              <td>${division.name}</td>
+              <td>
+                <button type="button" class="btn btn-warning btn-sm" onclick="editDivision(${division.id})">
+                  Edit
+                </button>
+                <button type="button" class="btn btn-danger btn-sm" onclick="deleteDivision(${division.id})">
+                  Delete
+                </button>
+              </td>
+            `;
+  
+            divisionList.appendChild(row);
+          });
+        } else {
+          console.error('Failed to fetch divisions:', data.message);
+        }
+      })
+      .catch(error => {
+        console.error('Error fetching divisions:', error);
+      });
+  }
+  
+// Handling the form submission with Swal and fetchDivision
+document.getElementById('division-form').addEventListener('submit', function(event) {
+  event.preventDefault();
+
+  const formData = new FormData(this);
+  fetch('{% url "add_division" %}', {
+    method: 'POST',
+    body: formData,
+    headers: {
+      'X-CSRFToken': document.querySelector('[name="csrfmiddlewaretoken"]').value,
+    }
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.status === 'success') {
+      closeDivisionModal()
+      Swal.fire({
+        title: 'Success!',
+        text: data.message,
+        icon: 'success',
+        confirmButtonText: 'OK'
+      }).then(() => {
+        fetchDivision(); // Refresh the table with the updated data
+        openAddDivisionModal(); // Close the modal
+      });
+    } else {
+      Swal.fire({
+        title: 'Error!',
+        text: data.message,
+        icon: 'error',
+        confirmButtonText: 'Try Again'
+      });
+    }
+  })
+  .catch(error => {
+    Swal.fire({
+      title: 'Error!',
+      text: 'An error occurred while saving the division.',
+      icon: 'error',
+      confirmButtonText: 'Try Again'
+    });
+  });
+});
+
+// Open modal and clear the form for adding a new division
+function openAddDivisionModal() {
+  fetchDivision()
+  document.getElementById('division-id').value = ''; // Clear hidden ID field
+  document.getElementById('division-name').value = ''; // Clear name field
+  document.getElementById('form-title').innerText = 'Add Division';
+  const modal = document.querySelector('.division-modal');
+  modal.classList.remove('hidden');
+}
+
+// Close modal
+function closeDivisionModal() {
+  const modal = document.querySelector('.division-modal');
+  modal.classList.add('hidden');
+}
+
+// Edit Division
+function editDivision(divisionId) {
+  fetch(`/get-division/${divisionId}/`)
+    .then(response => response.json())
+    .then(data => {
+      if (data.status === 'success') {
+        document.getElementById('division-id').value = data.division.id;
+        document.getElementById('division-name').value = data.division.name;
+        document.getElementById('form-title').innerText = 'Edit Division';
+        openAddDivisionModal();
+      }
+    })
+    .catch(error => {
+      console.error('Error editing division:', error);
+    });
+}
+
+// Delete Division
+function deleteDivision(divisionId) {
+  closeDivisionModal();
+  Swal.fire({
+    title: 'Are you sure?',
+    text: 'You won\'t be able to revert this!',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonText: 'Yes, delete it!',
+    cancelButtonText: 'No, cancel!',
+  }).then((result) => {
+    if (result.isConfirmed) {
+      fetch(`/delete-division/${divisionId}/`, {
+        method: 'DELETE',
+        headers: {
+          'X-CSRFToken': document.querySelector('[name="csrfmiddlewaretoken"]').value,
+        },
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.status === 'success') {
+          Swal.fire(
+            'Deleted!',
+            'The division has been deleted.',
+            'success'
+          );
+          location.reload(); // Reload page to reflect changes
+        } else {
+          Swal.fire(
+            'Failed!',
+            'The division could not be deleted.',
+            'error'
+          );
+        }
+      })
+      .catch(error => {
+        console.error('Error deleting division:', error);
+        Swal.fire(
+          'Error!',
+          'An error occurred while deleting the division.',
+          'error'
+        );
+      });
+    }
+  });
+}
+
+
   let selectedImagePath = null;
   let selectedImageElement = null;
   
@@ -765,7 +1027,11 @@ if (!personnelForm.dataset.listener) {
         } else {
           // Populate the form with the existing personnel data
           document.querySelector('[name="name"]').value = data.name;
+          document.querySelector('[name="username"]').value = data.username;
+          document.querySelector('[name="email"]').value = data.email;
+          document.querySelector('[name="password"]').value = data.password;
           document.querySelector('[name="gender"]').value = data.gender;
+          document.querySelector('[name="division"]').value = data.division;
           document.querySelector('[name="employment_status"]').value = data.employment_status;
 
           // Update the form's action URL to include the personnel ID for updating
@@ -1107,7 +1373,7 @@ if (!personnelForm.dataset.listener) {
   position: relative;
 }
 
-.my-modal {
+.my-modal{
   display: flex;
   justify-content: center;
   align-items: center;
@@ -1116,11 +1382,20 @@ if (!personnelForm.dataset.listener) {
   z-index: 9999;                           /* Ensure the modal is on top */
 }
 
-.my-modal .modal-content {
+.my-modal .modal-content .{
   max-height: 70vh;            /* Limit the height of the modal */
   overflow-y: auto;            /* Add scrolling if content exceeds max-height */
 }
 
+.division-modal {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: fixed;
+  inset: 0;
+  z-index: 9999;  
+}
 
   @media screen and (max-width: 793px) {
     .table-headers {

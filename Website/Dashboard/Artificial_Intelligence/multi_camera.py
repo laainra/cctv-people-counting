@@ -66,8 +66,10 @@ class MultiCamera:
 
     # Function to get all camera status
     def get_camera_status(cam_id):
-        if MultiCamera.obj_list.get(str(cam_id)) != None:
-            isRunning = MultiCamera.obj_list[str(cam_id)]['thread'].is_alive()
+        if MultiCamera.obj_list.get(str(cam_id)) is not None:
+            # Check if the 'thread' key exists before accessing it
+            thread = MultiCamera.obj_list[str(cam_id)].get('thread')
+            isRunning = thread.is_alive() if thread else False
         else:
             isRunning = False
 
