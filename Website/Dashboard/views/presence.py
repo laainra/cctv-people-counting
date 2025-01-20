@@ -322,12 +322,15 @@ def presence(request):
     elif request.method == 'GET':
         try:
             today = request.GET.get('date', timezone.now().date().strftime('%Y-%m-%d'))
-            presence_data = get_presence_data(today)
+            personnel_id = request.GET.get('personnel_id')
+            presence_data = get_presence_data(today, personnel_id)
             status = get_presence_by_status(today)
+            personnel_list = models.Personnels.objects.all()
             return render(request, 'presence.html', {
                 'presence_data': presence_data,
                 'date': today,
                 'status': status,
+                'personnel_list': personnel_list,
             })
 
         except Exception as e:

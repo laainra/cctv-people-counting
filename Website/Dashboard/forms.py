@@ -22,20 +22,12 @@ class RegisterForm(UserCreationForm):
             'username', 'password1', 'password2'
         ]
 
-
 class PersonnelForm(forms.ModelForm):
     name = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter name'}))
     username = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter username'}))
     password = forms.CharField(widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Enter password'}))
     email = forms.EmailField(widget=forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Enter email'}))
-    gender = forms.ChoiceField(
-        choices=[(key, value) for key, value in models.Personnels.genders.items()],
-        widget=forms.Select(attrs={'class': 'form-control'}),
-    )
-    employment_status = forms.ChoiceField(
-        choices=[(key, value) for key, value in models.Personnels.roles.items()],
-        widget=forms.Select(attrs={'class': 'form-control'}),
-    )
+
     division = forms.ModelChoiceField(
         queryset=models.Divisions.objects.all(),
         widget=forms.Select(attrs={'class': 'form-control'}),
@@ -44,23 +36,30 @@ class PersonnelForm(forms.ModelForm):
 
     class Meta:
         model = models.Personnels
-        fields = ['name', 'gender', 'employment_status', 'division']
+        fields = ['name', 'division']
 
     def save(self, commit=True):
         personnel = super().save(commit=False)
 
-        # Create a related user
+        # Update or create a related user
         username = self.cleaned_data.get('username')
         password = self.cleaned_data.get('password')
         email = self.cleaned_data.get('email')
 
-        user = models.CustomUsers.objects.create_user(
-            username=username,
-            password=password,
-            email=email,
-            role='employee',  # Default to employee role; adjust as necessary
-        )
-        personnel.user = user
+        if personnel.user:
+            user = personnel.user
+            user.username = username
+            user.email = email
+            if password:
+                user.set_password(password)
+            user.save()
+        else:
+            user = models.CustomUsers.objects.create_user(
+                username=username,
+                password=password,
+                email=email,
+            )
+            personnel.user = user
 
         if commit:
             personnel.save()
@@ -206,6 +205,7 @@ class AddTrackingCameraForm(forms.ModelForm):
     id_card_detection = forms.BooleanField(required=False, widget=forms.CheckboxInput(attrs={'class': 'form-check-input'}))
     shoes_detection = forms.BooleanField(required=False, widget=forms.CheckboxInput(attrs={'class': 'form-check-input'}))
     ciggerate_detection = forms.BooleanField(required=False, widget=forms.CheckboxInput(attrs={'class': 'form-check-input'}))
+    sit_detection = forms.BooleanField(required=False, widget=forms.CheckboxInput(attrs={'class': 'form-check-input'}))
 
     class Meta:
         model = models.Camera_Settings
@@ -215,5 +215,6 @@ class AddTrackingCameraForm(forms.ModelForm):
             'uniform_detection', 
             'id_card_detection', 
             'shoes_detection', 
-            'ciggerate_detection'
+            'ciggerate_detection',
+            'sit_detection'
         ]

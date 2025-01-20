@@ -29,7 +29,7 @@ def user_login(request):  # View untuk login
                 if user.is_superadmin:
                     return redirect('superadmin_home')
                 elif user.is_admin:
-                    return redirect('home')
+                    return redirect('admin_home')
                 elif user.is_employee:
                     return redirect('employee_home')
                 else:

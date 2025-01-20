@@ -24,6 +24,9 @@ class CustomUsers(AbstractUser):
         self.is_employee = self.role == 'employee'
         super().save(*args, **kwargs)
 
+    def __str__(self):
+        return self.username
+    
 class Company(models.Model):
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=100)
@@ -48,9 +51,10 @@ class Personnels(models.Model):
         "I": "Intern",
     }
     id = models.AutoField(primary_key=True)
+    # employeeid = models.CharField(max_length=100, unique=True, null=True)
     name = models.CharField(max_length=100)
-    employment_status = models.CharField(max_length=100, choices=roles)
-    gender = models.CharField(max_length=10, choices=genders)
+    # employment_status = models.CharField(max_length=100, choices=roles)
+    # gender = models.CharField(max_length=10, choices=genders)
     createdAt = models.DateTimeField(auto_now_add=True, null=True)
     updatedAt = models.DateTimeField(auto_now=True, null=True)
     user = models.OneToOneField(CustomUsers, on_delete=models.CASCADE, null=True)
@@ -101,8 +105,8 @@ class Camera_Settings(models.Model):
     shoes_detection = models.BooleanField(default=False)
     ciggerate_detection = models.BooleanField(default=False)
     sit_detection = models.BooleanField(default=False)
-    cam_start = models.CharField(max_length=200, default="00:01", null=True, blank=True)
-    cam_stop = models.CharField(max_length=200, default="23:59", null=True, blank=True)
+    cam_start = models.CharField(max_length=200, default="00:01:00", null=True, blank=True)
+    cam_stop = models.CharField(max_length=200, default="23:59:00", null=True, blank=True)
     attendance_time_start = models.CharField(max_length=200, null=True, blank=True)
     attendance_time_end = models.CharField(max_length=200, null=True, blank=True)
     leaving_time_start = models.CharField(max_length=200, null=True, blank=True)

@@ -1,0 +1,405 @@
+
+{% extends '../components/base.html' %}
+{% block title %}
+Division
+{% endblock %}
+
+{% block content %} {% csrf_token %}
+<div class="content">
+    <div class="container-xl">
+      <!-- Page title -->
+      <div class="page-header">
+        <div class="row align-items-center">
+          <div class="col-auto">
+            <!-- Page pre-title -->
+            <div class="page-pretitle">
+              Employees
+            </div>
+            <h2 class="page-title">
+              Divisions
+            </h2>
+          </div>
+          <!-- Page title actions -->
+          <div class="col-auto ml-auto d-print-none">
+            <a href="#" class="btn btn-primary ml-3 d-none d-sm-inline-block" data-toggle="modal" data-target="#modal-tambah">
+              <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
+              Add
+            </a>
+            <a href="#" class="btn btn-primary ml-3 d-sm-none btn-icon" data-toggle="modal" data-target="#modal-tambah">
+              <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
+            </a>
+          </div>
+        </div>
+      </div>
+      <div class="row row-deck row-cards">
+
+        <div class="col-12">
+            <div class="card">
+                <!-- <div class="card-header">
+                    
+                </div> -->
+                <div class="card-body border-bottom py-3">
+                    <div class="d-flex">
+                    <div class="text-muted">
+                        Show
+                        <div class="mx-2 d-inline-block">
+                        <input type="number" id="entries-count" class="form-control form-control-sm" value="{{ division_count }}" size="3">
+                        </div>
+                        entries
+                    </div>
+                    <div class="ml-auto text-muted">
+                        Search:
+                        <div class="ml-2 d-inline-block">
+                        <input type="text"  id="search-input" class="form-control form-control-sm">
+                        </div>
+                    </div>
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table card-table table-vcenter text-nowrap datatable">
+                        <thead>
+                            <tr>
+                                <th class="w-1">
+                                    No.
+                                </th>
+                                <th> Division Name</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody id="division-table-body">
+                            {% for division in divisions %}
+                            <tr>
+                                <td>{{forloop.counter}}</td>
+                                <td>{{division.name}}</td>
+                                <td class="text-right">
+                                    <span class="dropdown ml-1">
+                                    <button class="btn btn-white btn-sm dropdown-toggle align-text-top" data-boundary="viewport" data-toggle="dropdown">Actions</button>
+                                    <div class="dropdown-menu dropdown-menu-right">
+                                        <a class="dropdown-item" href="#" onclick="showEditDivisionModal({{ division.id }})">Edit</a>
+                                        <a class="dropdown-item" href="#" onclick="deleteDivision({{ division.id }})">Delete</a>
+                                    </div>
+                                    </span>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="card-footer d-flex align-items-center">
+                    <p class="m-0 text-muted">Showing <span id="start-entry">1</span> to <span id="end-entry">{{ divisions|length }}</span> of <span>{{ division_count }}</span> entries</p>
+                    <ul class="pagination m-0 ml-auto" id="pagination">
+                        <!-- Pagination will be dynamically generated -->
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div class="modal modal-blur fade" id="modal-tambah" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Add Division</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
+          </button>
+        </div>
+        <div class="modal-body">
+            <div class="mb-3">
+                <label class="form-label">Division Name</label>
+                <input type="text" class="form-control" id="add-division-name">
+            </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-primary" onclick="addDivision()">Add</button>
+        </div>
+      </div>
+    </div>
+</div>
+
+<div class="modal modal-blur fade" id="modal-edit" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Edit Division</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
+          </button>
+        </div>
+        <div class="modal-body">
+            <input type="hidden" id="edit-division-id">
+            <div class="mb-3">
+                <label class="form-label">Division Name</label>
+                <input type="text" class="form-control" id="edit-division-name">
+            </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-primary" onclick="editDivision()">Save</button>
+        </div>
+      </div>
+    </div>
+</div>
+<!-- Libs JS -->
+<script src="../dist/libs/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+<script src="../dist/libs/jquery/dist/jquery.slim.min.js"></script>
+<script src="../dist/libs/peity/jquery.peity.min.js"></script>
+<script src="../dist/libs/apexcharts/dist/apexcharts.min.js"></script>
+<script src="../dist/libs/flatpickr/dist/flatpickr.min.js"></script>
+<!-- Tabler Core -->
+<script src="../dist/js/tabler.min.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        flatpickr(document.getElementsByClassName("input-time"), {
+            enableTime:true,
+            noCalendar:true,
+            dateFormat:"H:i"
+        });
+    });
+</script>
+<script>
+  document.body.style.display = "block"
+  document.addEventListener('DOMContentLoaded', function () {
+    const entriesCountInput = document.getElementById('entries-count');
+    const searchInput = document.getElementById('search-input');
+    const tableBody = document.getElementById('division-table-body');
+    const pagination = document.getElementById('pagination');
+    const startEntry = document.getElementById('start-entry');
+    const endEntry = document.getElementById('end-entry');
+    const totalEntries = {{ division_count }};
+    let currentPage = 1;
+    let entriesPerPage = parseInt(entriesCountInput.value);
+
+    function renderTable() {
+        const searchTerm = searchInput.value.toLowerCase();
+        
+        // Jika input pencarian kosong, tampilkan semua baris
+        const filteredDivisions = searchTerm === ''
+            ? [...tableBody.children] // Semua data
+            : [...tableBody.children].filter(row => {
+                const divisionName = row.children[1].textContent.toLowerCase();
+                return divisionName.includes(searchTerm);
+            });
+
+        const totalFiltered = filteredDivisions.length;
+        const totalPages = Math.ceil(totalFiltered / entriesPerPage);
+        const start = (currentPage - 1) * entriesPerPage;
+        const end = start + entriesPerPage;
+
+        // Bersihkan tabel dan tambahkan baris yang difilter
+        tableBody.innerHTML = '';
+        filteredDivisions.slice(start, end).forEach(row => {
+            tableBody.appendChild(row);
+        });
+
+        // Perbarui informasi entri dan render pagination
+        startEntry.textContent = totalFiltered > 0 ? start + 1 : 0;
+        endEntry.textContent = Math.min(end, totalFiltered);
+        renderPagination(totalPages);
+    }
+
+    function renderPagination(totalPages) {
+        pagination.innerHTML = '';
+        for (let i = 1; i <= totalPages; i++) {
+            const pageItem = document.createElement('li');
+            pageItem.className = 'page-item' + (i === currentPage ? ' active' : '');
+            const pageLink = document.createElement('a');
+            pageLink.className = 'page-link';
+            pageLink.href = '#';
+            pageLink.textContent = i;
+            pageLink.addEventListener('click', function (e) {
+                e.preventDefault();
+                currentPage = i;
+                renderTable();
+            });
+            pageItem.appendChild(pageLink);
+            pagination.appendChild(pageItem);
+        }
+    }
+
+    entriesCountInput.addEventListener('change', function () {
+        entriesPerPage = parseInt(entriesCountInput.value);
+        currentPage = 1;
+        renderTable();
+    });
+
+    searchInput.addEventListener('input', function () {
+        currentPage = 1;
+        renderTable();
+    });
+
+    renderTable();
+});
+
+</script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+function loadDivisions() {
+    fetch("{% url 'get_divisions' %}")
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'success') {
+            const tbody = document.getElementById('division-table-body');
+            tbody.innerHTML = '';
+            data.divisions.forEach((division, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td>${division.name}</td>
+                    <td class="text-right">
+                        <span class="dropdown ml-1">
+                        <button class="btn btn-white btn-sm dropdown-toggle align-text-top" data-boundary="viewport" data-toggle="dropdown">Actions</button>
+                        <div class="dropdown-menu dropdown-menu-right">
+                            <a class="dropdown-item" href="#" onclick="showEditDivisionModal(${division.id})">Edit</a>
+                            <a class="dropdown-item" href="#" onclick="deleteDivision(${division.id})">Delete</a>
+                        </div>
+                        </span>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+            document.getElementById('division-count').innerText = data.divisions.length;
+        } else {
+            alert(data.message);
+        }
+    });
+}
+
+function addDivision() {
+    const name = document.getElementById('add-division-name').value;
+    fetch("{% url 'add_division' %}", {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'X-CSRFToken': '{{ csrf_token }}'
+        },
+        body: new URLSearchParams({
+            'name': name
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'success') {
+            $('#modal-tambah').modal('hide');
+            loadDivisions();
+            Swal.fire(
+                'Added!',
+                'Division has been added.',
+                'success'
+            );
+            location.reload();
+        } else {
+            Swal.fire(
+                'Error!',
+                data.message,
+                'error'
+            );
+        }
+    });
+}
+
+function showEditDivisionModal(id) {
+    fetch("{% url 'get_division' id=0 %}".replace('0', id))
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'success') {
+            document.getElementById('edit-division-id').value = data.division.id;
+            document.getElementById('edit-division-name').value = data.division.name;
+            $('#modal-edit').modal('show');
+        } else {
+            Swal.fire(
+                'Error!',
+                data.message,
+                'error'
+            );
+        }
+    });
+}
+
+function editDivision() {
+    const id = document.getElementById('edit-division-id').value;
+    const name = document.getElementById('edit-division-name').value;
+    fetch("{% url 'edit_division' id=0 %}".replace('0', id), {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'X-CSRFToken': '{{ csrf_token }}'
+        },
+        body: new URLSearchParams({
+            'name': name
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'success') {
+            $('#modal-edit').modal('hide');
+            loadDivisions();
+            Swal.fire(
+                'Updated!',
+                'Division has been updated.',
+                'success'
+            );
+            location.reload();
+        } else {
+            Swal.fire(
+                'Error!',
+                data.message,
+                'error'
+            );
+        }
+    });
+}
+
+function deleteDivision(id) {
+    Swal.fire({
+        title: 'Are you sure?',
+        text: "You won't be able to revert this!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, delete it!'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            fetch("{% url 'delete_division' id=0 %}".replace('0', id), {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    loadDivisions();
+                    Swal.fire(
+                        'Deleted!',
+                        'Your division has been deleted.',
+                        'success'
+                    );
+                    location.reload();
+                } else {
+                    Swal.fire(
+                        'Error!',
+                        data.message,
+                        'error'
+                    );
+                }
+            });
+        }
+    })
+}
+
+// Initial load of divisions
+loadDivisions();
+</script>
+{% endblock %}
+
+

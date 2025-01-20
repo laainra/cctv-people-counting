@@ -249,8 +249,7 @@
           />
           </svg>
         {% endif %}
-        <img id="img_stream" src="{% url 'video_feed' %}" style="width: 100%; border-radius: 10px; z-index: 1001; position: relative;" onclick="expandStream(this)"/>
-    </div>
+        <img id="img_stream" src="{% url 'ai_video_feed' %}" style="width: 100%; border-radius: 10px; z-index: 1001; position: relative;" onclick="expandStream(this)"/>
   </div>
   {% else %}
   <div id="camera-stream-loader" class="loader" style="width: 50px; height: 50px; margin: -80px 0 0 -25px;"></div>

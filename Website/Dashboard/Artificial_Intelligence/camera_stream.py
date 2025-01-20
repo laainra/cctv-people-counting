@@ -12,7 +12,6 @@ from ..Artificial_Intelligence.variables import GlobalVariable
 from ..Artificial_Intelligence.freshest_frame import FreshestFrame
 from .. import models
 from datetime import datetime
-from ..Artificial_Intelligence.work_timer import WorkTimer
 
 class CameraStream:
     def __init__(self, camera, ID):
@@ -99,8 +98,7 @@ class CameraStream:
         if not os.path.exists(self.face_folder):
             os.makedirs(self.face_folder)
             
-        self.work_timer = WorkTimer()
-        
+
 
     def check_time_range(self, time_range):
         time_start = int(time_range[0].replace(':', ''))

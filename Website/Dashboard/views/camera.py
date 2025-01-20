@@ -15,6 +15,7 @@ from ..decorators import role_required
 # Artificial Intelligence Library
 from ..Artificial_Intelligence.variables import RecognitionVariable as RV
 from ..Artificial_Intelligence.multi_camera import MultiCamera as MC
+from ..Artificial_Intelligence.work_timer import Work_Timer as WT
 
 # ================================================== CAMERA DASHBOARD ================================================== #
 
@@ -97,11 +98,13 @@ def start_stream(request):
     cam = models.Camera_Settings.objects.get(id=request.session['cam_id'])
     cam.cam_is_active = True
     cam.save()
+    print(f"Camera settings retrieved: {cam}")
 
     poly = np.array([[cam.x1, cam.y1], [cam.x2, cam.y2], [cam.x3, cam.y3], [cam.x4, cam.y4],
                      [cam.x8, cam.y8], [cam.x7, cam.y7], [cam.x6, cam.y6], [cam.x5, cam.y5]])
     poly = poly.astype(int)
-
+    print(f"Attempting to open RTSP stream from: {cam.feed_src}")
+    
     try:
         cap = cv2.VideoCapture(int(cam.feed_src)) 
         if not cap.isOpened():
@@ -112,12 +115,14 @@ def start_stream(request):
             request.session['status'] = 'stream_error'
             return redirect('camera')  
 
-        print("RTSP feed failed, switching to webcam")
+        # print("RTSP feed failed, switching to webcam")
 
 
     # Check if feed source is valid
     if cap.isOpened():
         request.session['stream_running'] = False
+        
+        print(f"Start RTSP stream from: {cam.feed_src}")
 
         # Set known faces for face recognition
         if len(RV.known_features) == 0:
@@ -133,7 +138,9 @@ def start_stream(request):
                     else:
                         if len(RV.known_features[personnel_name]) != len(os.listdir(os.path.join(var.personnel_path, personnel_name))):
                             RV.set_personnel_known_faces(personnel_name)
-
+        # ai_stream = WT(cam.feed_src, cam.id)
+        # print("AI Stream initialized")
+        # ai_stream.start_stream()
         # Add camera
         MC.add_camera(cam.id, cam.feed_src)
 
@@ -153,10 +160,19 @@ def start_stream(request):
         MC.start_cam(cam.id)
 
         request.session['status'] = 'stream_success'
+        print(f"Session status set to 'stream_success'")
+        return JsonResponse({'status': 'success', 'camera_active': cam.cam_is_active})
     else:
         request.session['status'] = 'stream_error'
+        print("Failed to open camera stream")
+        return JsonResponse({'status': 'error', 'message': 'Failed to open stream'})
 
-    return redirect('camera')
+    # if request.path == "/tracking_cam/" or request.path == "/tracking_cam/#":
+    #     return redirect('tracking_cam')
+    # elif request.path == "/presence_cam/" or request.path == "/presence_cam/#":
+    #     return redirect('presence_cam')
+    # else:
+    #     return redirect('camera')
 
 
 @login_required
@@ -174,7 +190,8 @@ def stop_stream(request):
 
     MC.stop_cam(cam.id)
 
-    return redirect('camera')
+    return JsonResponse({'status': 'success', 'camera_active': cam.cam_is_active})
+
 @login_required
 def delete_camera(request, id):
     # Delete camera settings and counted instances associated with the camera
@@ -278,7 +295,6 @@ def edit_camera(request, id):
         # 'delete_camera_url': reverse('delete_camera', args=[id])  # Add this line
     })
 
-
 def generate_stream(request):
     request.session['stream_running'] = True
 
@@ -293,6 +309,7 @@ def generate_stream(request):
 
         yield (b'--frame\r\n'
                b'Content-Type: image/jpeg\r\n\r\n' + pred_frame + b'\r\n\r\n')
+
 
 
 @login_required(login_url='login')
@@ -392,7 +409,7 @@ def add_tracking_camera(request):
 
             request.session['status'] = 'adding_success'
 
-            return redirect('camera')
+            return JsonResponse({'status': 'success'})
         else:
             request.session['status'] = 'adding_error'
 
@@ -430,7 +447,7 @@ def edit_tracking_camera(request, id):
             active_cam.save()
 
             request.session['status'] = 'editing_success'
-            return redirect('camera')
+            return JsonResponse({'status': 'success'})
         else:
             request.session['status'] = 'editing_error'
     else:
@@ -455,7 +472,7 @@ def add_presence_camera(request):
 
             request.session['status'] = 'adding_success'
 
-            return redirect('camera')
+            return JsonResponse({'status': 'success'})
         else:
             request.session['status'] = 'adding_error'
 
@@ -485,7 +502,7 @@ def edit_presence_camera(request, id):
             active_cam.save()
 
             request.session['status'] = 'editing_success'
-            return redirect('camera')
+            return JsonResponse({'status': 'success'})
         else:
             request.session['status'] = 'editing_error'
 
@@ -499,3 +516,28 @@ def get_edit_camera_url(request, camera_id):
         return JsonResponse({'url': f'/edit_presence_camera/{camera.id}/'})
     else:
         return JsonResponse({'url': ''}, status=400)
+    
+@login_required
+def get_camera_data(request, id):
+    try:
+        camera = models.Camera_Settings.objects.get(id=id)
+        camera_data = {
+            'id': camera.id,
+            'cam_name': camera.cam_name,
+            'feed_src': camera.feed_src,
+            'cam_is_active': camera.cam_is_active,
+            'uniform_detection': camera.uniform_detection,
+            'id_card_detection': camera.id_card_detection,
+            'shoe_detection': camera.shoes_detection,
+            'ciggerate_detection': camera.ciggerate_detection,
+            'sit_detection': camera.sit_detection,
+            'attendance_time_start': camera.attendance_time_start,
+            'attendance_time_end': camera.attendance_time_end,
+            'leaving_time_start': camera.leaving_time_start,
+            'leaving_time_end': camera.leaving_time_end,
+            'role_camera': camera.role_camera,
+        }
+        return JsonResponse({'status': 'success', 'data': camera_data})
+    except models.Camera_Settings.DoesNotExist:
+        return JsonResponse({'status': 'error', 'message': 'Camera not found'})
+
