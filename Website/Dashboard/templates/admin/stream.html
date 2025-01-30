@@ -1,0 +1,112 @@
+<!-- filepath: /c:/Users/laila/cctv-people-counting/Website/Dashboard/templates/admin/stream.html -->
+{% extends '../components/base.html' %}
+{% block title %}
+Stream
+{% endblock %}
+
+{% block content %}
+{% csrf_token %}
+<div class="content">
+    <div class="container-xl">
+      <!-- Page title -->
+      <div class="page-header">
+        <div class="row align-items-center">
+          <div class="col-auto">
+            <!-- Page pre-title -->
+            <div class="page-pretitle">
+              Camera
+            </div>
+            <h2 class="page-title">
+                Stream
+            </h2>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <div id="loader" class="spinner-border text-primary" role="status" style="display: none;">
+                        <span class="sr-only">Loading...</span>
+                    </div>
+                    <img id="img_stream" src="{% url 'video_feed' %}" style="width: 100%; border-radius: 10px; z-index: 1001; position: relative; {% if cam.cam_is_active %}display: block;{% else %}display: none;{% endif %}" />
+                </div>
+                <div class="card-footer d-flex justify-content-center">
+                    <button type="button" class="btn btn-primary mr-2" id="start-stream" onclick="toggleStream('start')" {% if cam.cam_is_active %}style="display: none;"{% endif %}>Start Stream</button>
+                    <button type="button" class="btn btn-danger" id="stop-stream" onclick="toggleStream('stop')" {% if cam.cam_is_active %}style="display: inline-block;"{% else %}style="display: none;"{% endif %}>Stop Stream</button>
+                </div>
+            </div>
+        </div>
+      </div>
+    </div>
+</div>
+
+<script>
+    function toggleStream(action) {
+        const startButton = document.getElementById('start-stream');
+        const stopButton = document.getElementById('stop-stream');
+        const loader = document.getElementById('loader');
+        const imgStream = document.getElementById('img_stream');
+        const camId = {{ cam.id }}; // Ensure cam.id is passed to the template context
+
+        if (action === 'start') {
+            // Show loader and start stream
+            loader.style.display = 'block';
+            imgStream.style.display = 'none';
+            startButton.style.display = 'none';
+            stopButton.style.display = 'inline-block';
+
+            // Start stream
+            fetch(`/start_stream/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: JSON.stringify({ cam_id: camId })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        loader.style.display = 'none';
+                        imgStream.style.display = 'block';
+                    } else {
+                        alert('Failed to start stream');
+                        startButton.style.display = 'inline-block';
+                        stopButton.style.display = 'none';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error starting stream:', error);
+                    alert('Failed to start stream');
+                    startButton.style.display = 'inline-block';
+                    stopButton.style.display = 'none';
+                });
+        } else if (action === 'stop') {
+            // Stop stream
+            fetch(`/stop_stream/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: JSON.stringify({ cam_id: camId })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        imgStream.style.display = 'none';
+                        startButton.style.display = 'inline-block';
+                        stopButton.style.display = 'none';
+                    } else {
+                        alert('Failed to stop stream');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error stopping stream:', error);
+                    alert('Failed to stop stream');
+                });
+        }
+    }
+</script>
+{% endblock %}

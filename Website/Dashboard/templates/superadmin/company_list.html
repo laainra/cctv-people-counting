@@ -1,0 +1,333 @@
+
+{% extends '../components/base.html' %}
+{% block title %}
+Company List
+{% endblock %}
+
+{% block content %} {% csrf_token %}
+
+<div class="content">
+    <div class="container-xl">
+      <!-- Page title -->
+      <div class="page-header">
+        <div class="row align-items-center">
+          <div class="col-auto">
+            <!-- Page pre-title -->
+            <div class="page-pretitle">
+              Users
+            </div>
+            <h2 class="page-title">
+              Master User Admin
+            </h2>
+          </div>
+          <!-- Page title actions -->
+          <div class="col-auto ml-auto d-print-none">
+            <a href="#" class="btn btn-primary ml-3 d-none d-sm-inline-block" data-toggle="modal" data-target="#modal-tambah">
+              <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
+              Add
+            </a>
+            <a href="#" class="btn btn-primary ml-3 d-sm-none btn-icon" data-toggle="modal" data-target="#modal-tambah">
+              <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
+            </a>
+          </div>
+        </div>
+      </div>
+      <div class="row row-deck row-cards">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body border-bottom py-3">
+                    <form method="get" class="d-flex">
+                        <div class="text-muted">
+                            Show
+                            <div class="mx-2 d-inline-block">
+                                <input type="number" name="entries" class="form-control form-control-sm" value="{{ entries_per_page }}" size="3" min="1">
+                            </div>
+                            entries
+                        </div>
+                        <div class="ml-auto text-muted">
+                            Search:
+                            <div class="ml-2 d-inline-block">
+                                <input type="text" name="search" class="form-control form-control-sm" value="{{ search_term }}">
+                            </div>
+                        </div>
+                        <div class="ml-2">
+                            <button type="submit" class="btn btn-outline-secondary">
+                                <i class="fas fa-search text-muted"></i>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                <div class="table-responsive">
+                    <table class="table card-table table-vcenter text-nowrap datatable">
+                        <thead>
+                            <tr>
+                                <th class="w-1">No.</th>
+                                <th class="w-1">CompanyID</th>
+                                <th>Company Name</th>
+                                <th>Username</th>
+                                <th>Email</th>
+                                <th>Password</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                          {% for company in companies %}
+                            <tr>
+        
+                                <td>{{ forloop.counter }}</td>
+                                <td>
+                                    <span class="text-muted">{{ company.id }}</span>
+                                </td>
+                                <td>
+                                  {{ company.name }}
+                                </td>
+                                <td>
+                                  {{ company.user.email}}
+                                </td>
+                                <td>
+                                  {{ company.user.username }}
+                                </td>
+                                <td>
+                                    *****
+                                </td>
+                                <td class="text-center">
+                                    <span class="dropdown ml-1">
+                                    <button class="btn btn-white btn-sm dropdown-toggle align-text-top" data-boundary="viewport" data-toggle="dropdown">Actions</button>
+                                    <div class="dropdown-menu dropdown-menu-center">
+                                      <a class="dropdown-item" href="#"  onclick="showEditModal({{ company.id }})">Edit</a>
+                                        <a class="dropdown-item" href="#"  onclick="deleteCompany({{ company.id }})">Delete</a>
+                                    </div>
+                                    </span>
+                                </td>
+                            </tr>
+
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="card-footer d-flex align-items-center">
+                    <p class="m-0 text-muted">Showing <span>{{ companies.start_index }}</span> to <span>{{ companies.end_index }}</span> of <span>{{ company_count }}</span> entries</p>
+                    <ul class="pagination m-0 ml-auto">
+                        {% if companies.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ companies.previous_page_number }}&entries={{ entries_per_page }}&search={{ search_term }}">Previous</a>
+                        </li>
+                        {% endif %}
+                        {% for i in companies.paginator.page_range %}
+                        <li class="page-item {% if companies.number == i %}active{% endif %}">
+                            <a class="page-link" href="?page={{ i }}&entries={{ entries_per_page }}&search={{ search_term }}">{{ i }}</a>
+                        </li>
+                        {% endfor %}
+                        {% if companies.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ companies.next_page_number }}&entries={{ entries_per_page }}&search={{ search_term }}">Next</a>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- MODAL TAMBAH -->
+<div class="modal modal-blur fade" id="modal-tambah" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+          <div class="modal-header">
+              <h5 class="modal-title">Add Company</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
+              </button>
+          </div>
+          <div class="modal-body">
+              <div class="mb-3">
+                  <label class="form-label">Company Name</label>
+                  <input type="text" class="form-control" id="add-company-name">
+              </div>
+              <div class="mb-3">
+                  <label class="form-label">Username</label>
+                  <input type="text" class="form-control" id="add-username">
+              </div>
+              <div class="mb-3">
+                  <label class="form-label">Email</label>
+                  <input type="email" class="form-control" id="add-email">
+              </div>
+              <div class="mb-3">
+                  <label class="form-label">Password</label>
+                  <input type="password" class="form-control" id="add-password">
+              </div>
+          </div>
+          <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+              <button type="button" class="btn btn-primary" onclick="addCompany()">Add</button>
+          </div>
+      </div>
+  </div>
+</div>
+
+<!-- MODAL EDIT -->
+<div class="modal modal-blur fade" id="modal-edit" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+          <div class="modal-header">
+              <h5 class="modal-title">Edit Company</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
+              </button>
+          </div>
+          <div class="modal-body">
+              <input type="hidden" id="edit-company-id">
+              <div class="mb-3">
+                  <label class="form-label">Company Name</label>
+                  <input type="text" class="form-control" id="edit-company-name">
+              </div>
+              <div class="mb-3">
+                  <label class="form-label">Username</label>
+                  <input type="text" class="form-control" id="edit-username">
+              </div>
+              <div class="mb-3">
+                  <label class="form-label">Email</label>
+                  <input type="email" class="form-control" id="edit-email">
+              </div>
+              <div class="mb-3">
+                  <label class="form-label">Password</label>
+                  <input type="password" class="form-control" id="edit-password">
+              </div>
+          </div>
+          <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+              <button type="button" class="btn btn-primary" onclick="editCompany()">Save</button>
+          </div>
+      </div>
+  </div>
+</div>
+
+
+
+
+ <script> 
+          function updateTotal(value) {
+            document.getElementById('total-companies-display').innerText = value;
+          }
+
+            function addCompany() {
+                const companyName = document.getElementById('add-company-name').value;
+                const username = document.getElementById('add-username').value;
+                const email = document.getElementById('add-email').value;
+                const password = document.getElementById('add-password').value;
+            
+                fetch("{% url 'add_company' %}", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'X-CSRFToken': '{{ csrf_token }}'
+                    },
+                    body: new URLSearchParams({
+                        'company_name': companyName,
+                        'username': username,
+                        'email': email,
+                        'password': password
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        location.reload();
+                    } else {
+                        alert(data.message);
+                    }
+                });
+            }
+            
+            function showEditModal(companyId) {
+                fetch("{% url 'get_company' company_id=0 %}".replace('0', companyId))
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('edit-company-id').value = data.id;
+                    document.getElementById('edit-company-name').value = data.company_name;
+                    document.getElementById('edit-username').value = data.username;
+                    document.getElementById('edit-email').value = data.email;
+                    document.getElementById('edit-password').value = '';
+                    $('#modal-edit').modal('show');
+                });
+            }
+            
+            function editCompany() {
+                const companyId = document.getElementById('edit-company-id').value;
+                const companyName = document.getElementById('edit-company-name').value;
+                const username = document.getElementById('edit-username').value;
+                const email = document.getElementById('edit-email').value;
+                const password = document.getElementById('edit-password').value;
+            
+                fetch("{% url 'edit_company' company_id=0 %}".replace('0', companyId), {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'X-CSRFToken': '{{ csrf_token }}'
+                    },
+                    body: new URLSearchParams({
+                        'company_name': companyName,
+                        'username': username,
+                        'email': email,
+                        'password': password
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        location.reload();
+                    } else {
+                        alert(data.message);
+                    }
+                });
+            }
+            
+ 
+              function deleteCompany(companyId) {
+                  Swal.fire({
+                      title: 'Are you sure?',
+                      text: "You won't be able to revert this!",
+                      icon: 'warning',
+                      showCancelButton: true,
+                      confirmButtonColor: '#3085d6',
+                      cancelButtonColor: '#d33',
+                      confirmButtonText: 'Yes, delete it!'
+                  }).then((result) => {
+                      if (result.isConfirmed) {
+                          fetch("{% url 'delete_company' company_id=0 %}".replace('0', companyId), {
+                              method: 'POST',
+                              headers: {
+                                  'Content-Type': 'application/x-www-form-urlencoded',
+                                  'X-CSRFToken': '{{ csrf_token }}'
+                              }
+                          })
+                          .then(response => response.json())
+                          .then(data => {
+                              if (data.success) {
+                                  Swal.fire(
+                                      'Deleted!',
+                                      'The company has been deleted.',
+                                      'success'
+                                  ).then(() => {
+                                      location.reload();
+                                  });
+                              } else {
+                                  Swal.fire(
+                                      'Error!',
+                                      data.message,
+                                      'error'
+                                  );
+                              }
+                          });
+                      }
+                  });
+              }
+        
+
+</script>
+{% endblock %}

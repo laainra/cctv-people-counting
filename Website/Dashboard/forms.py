@@ -22,20 +22,48 @@ class RegisterForm(UserCreationForm):
             'username', 'password1', 'password2'
         ]
 
-
 class PersonnelForm(forms.ModelForm):
-    name = forms.CharField(widget=forms.widgets.TextInput())
-    gender = forms.ChoiceField(
-        choices=models.Personnels.genders, widget=forms.Select())
-    employment_status = forms.ChoiceField(
-        choices=models.Personnels.roles, widget=forms.Select())
+    name = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter name'}))
+    username = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter username'}))
+    password = forms.CharField(widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Enter password'}))
+    email = forms.EmailField(widget=forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Enter email'}))
+
+    division = forms.ModelChoiceField(
+        queryset=models.Divisions.objects.all(),
+        widget=forms.Select(attrs={'class': 'form-control'}),
+        required=True,
+    )
 
     class Meta:
         model = models.Personnels
-        fields = [
-            'name', 'gender', 'employment_status'
-        ]
+        fields = ['name', 'division']
 
+    def save(self, commit=True):
+        personnel = super().save(commit=False)
+
+        # Update or create a related user
+        username = self.cleaned_data.get('username')
+        password = self.cleaned_data.get('password')
+        email = self.cleaned_data.get('email')
+
+        if personnel.user:
+            user = personnel.user
+            user.username = username
+            user.email = email
+            if password:
+                user.set_password(password)
+            user.save()
+        else:
+            user = models.CustomUsers.objects.create_user(
+                username=username,
+                password=password,
+                email=email,
+            )
+            personnel.user = user
+
+        if commit:
+            personnel.save()
+        return personnel
 
 class AddCameraForm(forms.ModelForm):
     cam_name = forms.CharField(widget=forms.widgets.TextInput())
@@ -118,3 +146,103 @@ class UploadFileForm(forms.Form):
 #     class Meta:
 #         model = models.PersonnelImage
 #         fields = ['image']
+
+
+class CompanyAdminForm(forms.ModelForm):
+    username = forms.CharField(max_length=150, required=True)
+    email = forms.EmailField(required=True)
+    password = forms.CharField(widget=forms.PasswordInput, required=True)
+    company_name = forms.CharField(max_length=255, required=True, label="Company Name")
+
+    class Meta:
+        model = models.CustomUsers 
+        fields = ['username', 'email', 'password']
+
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        user.set_password(self.cleaned_data['password'])  
+        if commit:
+            user.save()
+            # Create a related Company instance
+            company_name = self.cleaned_data['company_name']
+            models.Company.objects.create(user=user, name=company_name)
+        return user
+    
+class AddDivisionForm(forms.ModelForm):
+    name = forms.CharField(
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter division name'}),
+        label="Division Name"
+    )
+
+    class Meta:
+        model = models.Divisions
+        fields = ['name']
+class AddPresenceCameraForm(forms.ModelForm):
+    class Meta:
+        model = models.Camera_Settings
+        fields = [
+            'cam_name', 
+            'role_camera', 
+            'feed_src', 
+            'attendance_time_start', 
+            'attendance_time_end', 
+            'leaving_time_start', 
+            'leaving_time_end'
+        ]
+        widgets = {
+            'role_camera': forms.RadioSelect(),
+            'cam_name': forms.TextInput(attrs={'class': 'form-control'}),
+            'feed_src': forms.TextInput(attrs={'class': 'form-control'}),
+            'attendance_time_start': forms.TimeInput(attrs={'class': 'form-control', 'type': 'time'}),
+            'attendance_time_end': forms.TimeInput(attrs={'class': 'form-control', 'type': 'time'}),
+            'leaving_time_start': forms.TimeInput(attrs={'class': 'form-control', 'type': 'time'}),
+            'leaving_time_end': forms.TimeInput(attrs={'class': 'form-control', 'type': 'time'}),
+        }
+class AddTrackingCameraForm(forms.ModelForm):
+    cam_name = forms.CharField(max_length=200, widget=forms.TextInput(attrs={'class': 'form-control'}))
+    feed_src = forms.CharField(max_length=200, widget=forms.TextInput(attrs={'class': 'form-control'}))
+    uniform_detection = forms.BooleanField(required=False, widget=forms.CheckboxInput(attrs={'class': 'form-check-input'}))
+    id_card_detection = forms.BooleanField(required=False, widget=forms.CheckboxInput(attrs={'class': 'form-check-input'}))
+    shoes_detection = forms.BooleanField(required=False, widget=forms.CheckboxInput(attrs={'class': 'form-check-input'}))
+    ciggerate_detection = forms.BooleanField(required=False, widget=forms.CheckboxInput(attrs={'class': 'form-check-input'}))
+    sit_detection = forms.BooleanField(required=False, widget=forms.CheckboxInput(attrs={'class': 'form-check-input'}))
+
+    class Meta:
+        model = models.Camera_Settings
+        fields = [
+            'cam_name', 
+            'feed_src', 
+            'uniform_detection', 
+            'id_card_detection', 
+            'shoes_detection', 
+            'ciggerate_detection',
+            'sit_detection'
+        ]
+
+
+
+class ProfileForm(forms.ModelForm):
+    class Meta:
+        model = models.CustomUsers
+        fields = ['email', 'username']
+        widgets = {
+            'email': forms.EmailInput(attrs={'class': 'form-control'}),
+            'username': forms.TextInput(attrs={'class': 'form-control'}),
+            'password': forms.TextInput(attrs={'class': 'form-control'}),
+        }
+
+class CompanyNameForm(forms.ModelForm):
+    class Meta:
+        model = models.Company
+        fields = ['name']
+        widgets = {
+            'name': forms.TextInput(attrs={'class': 'form-control'}),
+        }
+
+class PersonnelNameForm(forms.ModelForm):
+    class Meta:
+        model = models.Personnels
+        fields = ['name']
+        widgets = {
+            'name': forms.TextInput(attrs={'class': 'form-control'}),
+        }

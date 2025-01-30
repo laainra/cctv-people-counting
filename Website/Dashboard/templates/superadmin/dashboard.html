@@ -1,0 +1,100 @@
+
+{% extends '../components/base.html' %}
+{% block title %}
+Dashboard Superadmin
+{% endblock %}
+<!-- This is comment to prevent Prettifier -->
+{% block content %} {% csrf_token %}
+      <div class="content">
+        <div class="container-xl">
+          <!-- Page title -->
+          <div class="page-header">
+            <div class="row align-items-center">
+              <div class="col-auto">
+                <!-- Page pre-title -->
+                <div class="page-pretitle">
+                  Overview
+                </div>
+                <h2 class="page-title">
+                  Dashboard
+                </h2>
+              </div>
+            </div>
+          </div>
+          <div class="row row-deck row-cards">
+            <div class="col-sm-6 col-lg-3">
+              <div class="card">
+                <div class="card-body">
+                  <div class="d-flex align-items-center">
+                    <div class="subheader">Number of Companies</div>
+                    <div class="ml-auto lh-1">
+                      <div class="dropdown">
+                        <a class="dropdown-toggle text-muted" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                          Last 7 days
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-right">
+                          <a class="dropdown-item" id="last-7-days" onclick="updateTotal('{{ companies_last_7_days }}')">Last 7 days</a>
+                          <a class="dropdown-item" id="last-30-days" onclick="updateTotal('{{ companies_last_30_days }}')">Last 30 days</a>
+                          <a class="dropdown-item" id="all-data" onclick="updateTotal('{{ total_companies }}')">All Data</a>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="h1 mb-1 mt-3" id="total-companies-display">{{ total_companies }}</div>
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-6 col-lg-3">
+              <div class="card">
+                <div class="card-body">
+                  <div class="d-flex align-items-center">
+                    <div class="subheader">Number of Accounts</div>
+                    <div class="ml-auto lh-1">
+                      <div class="dropdown">
+                        <a class="dropdown-toggle text-muted" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                          Last 7 days
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-right">
+                          <a class="dropdown-item" id="last-7-days" onclick="updateTotal('{{ accounts_last_7_days }}')">Last 7 days</a>
+                          <a class="dropdown-item" id="last-30-days" onclick="updateTotal('{{ accounts_last_30_days }}')">Last 30 days</a>
+                          <a class="dropdown-item" id="all-data" onclick="updateTotal('{{ total_accounts }}')">All Data</a>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="h1 mb-1 mt-3" id="total-companies-display">{{ total_accounts }}</div>
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-6 col-lg-3">
+              <div class="card">
+                <div class="card-body">
+                  <div class="d-flex align-items-center">
+                    <div class="subheader">Number of Employees</div>
+                    <div class="ml-auto lh-1">
+                      <div class="dropdown">
+                        <a class="dropdown-toggle text-muted" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                          Last 7 days
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-right">
+                          <a class="dropdown-item" id="last-7-days" onclick="updateTotal('{{ employees_last_7_days }}')">Last 7 days</a>
+                          <a class="dropdown-item" id="last-30-days" onclick="updateTotal('{{ employees_last_30_days }}')">Last 30 days</a>
+                          <a class="dropdown-item" id="all-data" onclick="updateTotal('{{ total_employees }}')">All Data</a>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="h1 mb-1 mt-3" id="total-companies-display">{{ total_employees }}</div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+ <script> 
+          function updateTotal(value) {
+            document.getElementById('total-companies-display').innerText = value;
+          }
+</script>
+{% endblock %}

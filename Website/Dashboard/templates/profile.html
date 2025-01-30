@@ -1,0 +1,69 @@
+<!-- filepath: /c:/Users/laila/cctv-people-counting/Website/Dashboard/templates/edit_profile.html -->
+{% extends 'components/base.html' %}
+{% block title %}
+Edit Profile
+{% endblock %}
+
+{% block content %}
+<div class="content">
+    <div class="container-xl">
+        <div class="page-header">
+            <div class="row align-items-center">
+                <div class="col-auto">
+                    <!-- Page pre-title -->
+                    <div class="page-pretitle">
+                        Setting
+                    </div>
+                    <h2 class="page-title">
+                        Edit Profile
+                    </h2>
+                </div>
+            </div>
+        </div>
+        <div class="row row-deck row-cards">
+            <div class="col-lg-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Edit Profile</h3>
+                    </div>
+                    <div class="card-body">
+                        <form method="post">
+                            {% csrf_token %}
+                            {% if user.role == 'superadmin' %}
+                                <div class="mb-2">
+                                    <label class="form-label">Username</label>
+                                    <input type="text" name="username" class="form-control" value="{{ form.username.value }}" placeholder=""/>
+                                </div>
+                                <div class="mb-2">
+                                    <label class="form-label">Password</label>
+                                    <input type="password" name="password" class="form-control" value="{{ form.password.value }}" placeholder=""/>
+                                </div>
+                            {% else %}
+                                <div class="mb-2">
+                                    <label class="form-label">Name</label>
+                                    <input type="text" name="name" class="form-control" value="{{ form.name.value }}" placeholder=""/>
+                                </div>
+                                <div class="mb-2">
+                                    <label class="form-label">Email</label>
+                                    <input type="email" name="email" class="form-control" value="{{ form.email.value }}" placeholder=""/>
+                                </div>
+                                <div class="mb-2">
+                                    <label class="form-label">Username</label>
+                                    <input type="text" name="username" class="form-control" value="{{ form.username.value }}" placeholder=""/>
+                                </div>
+                                <div class="mb-2">
+                                    <label class="form-label">Password</label>
+                                    <input type="password" name="password" class="form-control" value="{{ form.password.value }}" placeholder=""/>
+                                </div>
+                            {% endif %}
+                            <div class="form-footer">
+                                <button type="submit" class="btn btn-primary">Save Changes</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
