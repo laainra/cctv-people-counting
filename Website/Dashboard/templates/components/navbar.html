@@ -31,7 +31,7 @@
             </div>
           </a>
           <div class="dropdown-menu dropdown-menu-right">
-            <a class="dropdown-item" href="profile.html">
+            <a class="dropdown-item" href="{% url 'profile' %}">
               <svg xmlns="http://www.w3.org/2000/svg" class="icon dropdown-item-icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"></path><circle cx="12" cy="7" r="4"></circle><path d="M5.5 21v-2a4 4 0 0 1 4 -4h5a4 4 0 0 1 4 4v2"></path></svg>
               Profile
             </a>
@@ -71,7 +71,7 @@
               </a>
             </li>
           </ul>
-          <div class="my-2 my-md-0 flex-grow-1 flex-md-grow-0 order-first order-md-last">
+          {% comment %} <div class="my-2 my-md-0 flex-grow-1 flex-md-grow-0 order-first order-md-last">
             <form action="." method="get">
               <div class="input-icon">
                 <span class="input-icon-addon">
@@ -80,7 +80,7 @@
                 <input type="text" class="form-control" placeholder="Search…">
               </div>
             </form>
-          </div>
+          </div> {% endcomment %}
         </div>
       </div>
     </div>
@@ -150,7 +150,7 @@
                   </ul>
                 </li>
               </ul>
-              <div class="my-2 my-md-0 flex-grow-1 flex-md-grow-0 order-first order-md-last">
+              {% comment %} <div class="my-2 my-md-0 flex-grow-1 flex-md-grow-0 order-first order-md-last">
                 <form action="." method="get">
                   <div class="input-icon">
                     <span class="input-icon-addon">
@@ -159,7 +159,7 @@
                     <input type="text" class="form-control" placeholder="Search…">
                   </div>
                 </form>
-              </div>
+              </div> {% endcomment %}
             </div>
           </div>
         </div>
@@ -189,8 +189,18 @@
                 </span>
               </a>
             </li>
+            <li class="nav-item  {% if request.path == 'employee/take_image/' %}active{% endif %}">
+              <a class="nav-link" href="{% url 'take_image' %}" >
+                <span class="nav-link-icon d-md-none d-lg-inline-block">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"></path><circle cx="12" cy="7" r="4"></circle><path d="M5.5 21v-2a4 4 0 0 1 4 -4h5a4 4 0 0 1 4 4v2"></path></svg>
+                </span>
+                <span class="nav-link-title">
+                  Take Image
+                </span>
+              </a>
+            </li>
           </ul>
-          <div class="my-2 my-md-0 flex-grow-1 flex-md-grow-0 order-first order-md-last">
+          {% comment %} <div class="my-2 my-md-0 flex-grow-1 flex-md-grow-0 order-first order-md-last">
             <form action="." method="get">
               <div class="input-icon">
                 <span class="input-icon-addon">
@@ -199,7 +209,7 @@
                 <input type="text" class="form-control" placeholder="Search…">
               </div>
             </form>
-          </div>
+          </div> {% endcomment %}
         </div>
       </div>
     </div>

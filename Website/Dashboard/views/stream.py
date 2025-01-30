@@ -78,7 +78,7 @@ def start_ai_stream(request):
 
         ai_stream = WT(cam.feed_src, cam.id)
         print("AI Stream initialized")
-        # ai_stream.start_stream()
+        ai_stream.start_stream()
         # print("AI Stream started")
         
         MC.add_camera(cam.id, cam.feed_src)

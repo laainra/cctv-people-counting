@@ -7,11 +7,17 @@ from .. import models, forms
 @login_required(login_url='login')
 @role_required('employee')
 def employee_home(request):
-    current_employee = models.Employee.objects.get(user=request.user)
+    user = models.Personnels.objects.get(user=request.user)
     return render(request, 'employee/dashboard.html')
 
 @login_required(login_url='login')
 @role_required('employee')
 def presence_history(request):
-    current_employee = models.Employee.objects.get(user=request.user)
+    user = models.Personnels.objects.get(user=request.user)
     return render(request, 'employee/presence_history.html')
+
+@login_required(login_url='login')
+@role_required('employee')
+def take_image(request):
+    user = models.Personnels.objects.get(user=request.user)
+    return render(request, 'employee/take_image.html', {"user": user})

@@ -113,7 +113,7 @@ def start_stream(request):
         cap = cv2.VideoCapture(0) 
         if not cap.isOpened():
             request.session['status'] = 'stream_error'
-            return redirect('camera')  
+            return redirect('stream')  
 
         # print("RTSP feed failed, switching to webcam")
 
@@ -167,30 +167,23 @@ def start_stream(request):
         print("Failed to open camera stream")
         return JsonResponse({'status': 'error', 'message': 'Failed to open stream'})
 
-    # if request.path == "/tracking_cam/" or request.path == "/tracking_cam/#":
-    #     return redirect('tracking_cam')
-    # elif request.path == "/presence_cam/" or request.path == "/presence_cam/#":
-    #     return redirect('presence_cam')
-    # else:
-    #     return redirect('camera')
-
-
 @login_required
 def change_camera(request):
     request.session['cam_id'] = int(request.POST['cam_number'])
-
     return redirect('camera')
 
-
-@login_required
+@login_required(login_url='login')
 def stop_stream(request):
-    cam = models.Camera_Settings.objects.get(id=request.session['cam_id'])
-    cam.cam_is_active = False
-    cam.save()
+    try:
+        cam = models.Camera_Settings.objects.get(id=request.session['cam_id'])
+        cam.cam_is_active = False
+        cam.save()
 
-    MC.stop_cam(cam.id)
+        MC.stop_cam(cam.id)
 
-    return JsonResponse({'status': 'success', 'camera_active': cam.cam_is_active})
+        return JsonResponse({'status': 'success', 'camera_active': cam.cam_is_active})
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': str(e)})
 
 @login_required
 def delete_camera(request, id):
@@ -248,7 +241,6 @@ def add_camera(request):
 
     return render(request, 'add_camera.html', {'Active_Cam': None})
 
-
 @login_required
 def edit_camera(request, id):
     form = forms.AddCameraForm()
@@ -298,24 +290,39 @@ def edit_camera(request, id):
 def generate_stream(request):
     request.session['stream_running'] = True
 
+    cam_id = request.session.get('cam_id')
+    if not cam_id:
+        print("Error: 'cam_id' not found in session")
+        return
+
+    print(f"Starting stream for cam_id: {cam_id}")
+
     while request.session['stream_running']:
         try:
-            frame, pred_frame = MC.get_frame(request.session['cam_id'])
-        except:
+            frame, pred_frame = MC.get_frame(cam_id)
+            if pred_frame is None:
+                print("No predicted frame available")
+                continue
+
+            if not isinstance(pred_frame, (np.ndarray, np.generic)):
+                print(f"Invalid frame type: {type(pred_frame)}")
+                continue
+
+            buffer = cv2.imencode('.jpg', pred_frame)[1]
+            pred_frame = buffer.tobytes()
+
+            yield (b'--frame\r\n'
+                   b'Content-Type: image/jpeg\r\n\r\n' + pred_frame + b'\r\n\r\n')
+            # print("Frame sent")
+        except Exception as e:
+            # print(f"Error getting frame: {e}")
             continue
-
-        buffer = cv2.imencode('.jpg', pred_frame)[1]
-        pred_frame = buffer.tobytes()
-
-        yield (b'--frame\r\n'
-               b'Content-Type: image/jpeg\r\n\r\n' + pred_frame + b'\r\n\r\n')
-
-
-
+    
+        
+    
 @login_required(login_url='login')
 def video_feed(request):
     return StreamingHttpResponse(generate_stream(request), content_type='multipart/x-mixed-replace; boundary=frame')
-
 
 @login_required
 def save_coordinates(request):
@@ -540,4 +547,3 @@ def get_camera_data(request, id):
         return JsonResponse({'status': 'success', 'data': camera_data})
     except models.Camera_Settings.DoesNotExist:
         return JsonResponse({'status': 'error', 'message': 'Camera not found'})
-

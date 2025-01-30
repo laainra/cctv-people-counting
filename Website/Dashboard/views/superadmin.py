@@ -5,7 +5,7 @@ from django.contrib.auth.decorators import login_required
 from ..decorators import role_required
 from django.contrib.auth.hashers import make_password
 from django.utils.timezone import now, timedelta
-
+from django.core.paginator import Paginator
 
 @login_required(login_url='login')
 @role_required('superadmin')
@@ -18,10 +18,24 @@ def superadmin_home(request):
     companies_last_7_days = models.Company.objects.filter(createdAt__gte=last_7_days).count()
     companies_last_30_days = models.Company.objects.filter(createdAt__gte=last_30_days).count()
 
+    total_accounts = models.CustomUsers.objects.count()
+    accounts_last_7_days = models.CustomUsers.objects.filter(date_joined__gte=last_7_days).count()
+    accounts_last_30_days = models.CustomUsers.objects.filter(date_joined__gte=last_30_days).count()
+
+    total_employees = models.Personnels.objects.count()
+    employees_last_7_days = models.Personnels.objects.filter(createdAt__gte=last_7_days).count()
+    employees_last_30_days = models.Personnels.objects.filter(createdAt__gte=last_30_days).count()
+
     context = {
         'total_companies': total_companies,
         'companies_last_7_days': companies_last_7_days,
         'companies_last_30_days': companies_last_30_days,
+        'total_accounts': total_accounts,
+        'accounts_last_7_days': accounts_last_7_days,
+        'accounts_last_30_days': accounts_last_30_days,
+        'total_employees': total_employees,
+        'employees_last_7_days': employees_last_7_days,
+        'employees_last_30_days': employees_last_30_days,
         'companies': models.Company.objects.all(),
     }
     return render(request, 'superadmin/dashboard.html', context)
@@ -29,7 +43,26 @@ def superadmin_home(request):
 @login_required(login_url='login')
 @role_required('superadmin')
 def company(request):
-    return render(request, 'superadmin/company_list.html', {'companies': models.Company.objects.all()})
+    search_term = request.GET.get('search', '').lower()
+    entries_per_page = int(request.GET.get('entries', 10))
+    page = int(request.GET.get('page', 1))
+
+    companies = models.Company.objects.all()
+    if search_term:
+        companies = companies.filter(name__icontains=search_term)
+
+    paginator = Paginator(companies, entries_per_page)
+    paginated_companies = paginator.get_page(page)
+
+    context = {
+        'companies': paginated_companies,
+        'company_count': paginator.count,
+        'entries_per_page': entries_per_page,
+        'search_term': search_term,
+        'page': page,
+        'total_pages': paginator.num_pages,
+    }
+    return render(request, 'superadmin/company_list.html', context)
 
 @login_required(login_url='login')
 @role_required('superadmin')

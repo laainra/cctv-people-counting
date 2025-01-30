@@ -11,7 +11,7 @@ from ..Artificial_Intelligence.people_counting import PeopleCounting
 from ..Artificial_Intelligence.variables import GlobalVariable
 from ..Artificial_Intelligence.freshest_frame import FreshestFrame
 from .. import models
-from datetime import datetime
+from datetime import datetime, timedelta
 
 class CameraStream:
     def __init__(self, camera, ID):
@@ -164,7 +164,10 @@ class CameraStream:
                         )
                         
                         if not created:
-                            work_timer.timer += duration.total_seconds()
+                            if isinstance(duration, timedelta):
+                                work_timer.timer += duration.total_seconds()
+                            else:
+                                print(f"Error: duration is not a timedelta object for {name}")
                             work_timer.datetime = datetime.now()
                             work_timer.save()
                     except models.Personnels.DoesNotExist:

@@ -60,7 +60,7 @@ Tracking Camera
                                 <th>Camera Name</th>
                                 <th>RTSP IP</th>
                                 <th>Status</th>
-                                <th>View Stream</th>
+                                <th>Stream</th>
                                 <th width="100">Uniform Detection Feature</th>
                                 <th width="100">ID Card Detection Feature</th>
                                 <th width="100">Shoe Detection Feature</th>
@@ -305,31 +305,31 @@ Tracking Camera
 
 
 <script>
-  function openStreamModal(camId) {
-    console.log("Camera ID:", camId); 
-    // Set session cam_id
-    fetch("{% url 'set_cam_id' %}", {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-CSRFToken': '{{ csrf_token }}'
-      },
-      body: JSON.stringify({ cam_id: camId })
-    })
+  
+  function openEditModal(camId) {
+    fetch(`/get_camera_data/${camId}/`)
     .then(response => response.json())
     .then(data => {
-      console.log(data)
-      if (data.status === 'success') {
-        $('#modal-view-stream').modal('show');
-      } else {
-        console.error('Error setting cam_id:', data.message);
-      }
+        if (data.status === 'success') {
+            const camera = data.data;
+            document.getElementById('edit-camera-id').value = camera.id;
+            document.getElementById('edit-camera-name').value = camera.cam_name;
+            document.getElementById('edit-camera-role').value = camera.role_camera;
+            document.getElementById('edit-camera-feed-src').value = camera.feed_src;
+            document.getElementById('edit-uniform-detection').checked = camera.uniform_detection;
+            document.getElementById('edit-id-card-detection').checked = camera.id_card_detection;
+            document.getElementById('edit-shoes-detection').checked = camera.shoes_detection;
+            document.getElementById('edit-ciggerate-detection').checked = camera.ciggerate_detection;
+            document.getElementById('edit-sit-detection').checked = camera.sit_detection;
+            $('#modal-edit').modal('show'); // Menampilkan modal
+        } else {
+            console.error('Error fetching camera data:', data.message);
+        }
     })
     .catch(error => {
-      console.error('Error setting cam_id:', error);
+        console.error('Error fetching camera data:', error);
     });
-  }
-
+}
   function toggleStream() {
     const streamButton = document.getElementById('stream-button');
     const loader = document.getElementById('loader');
@@ -358,7 +358,6 @@ Tracking Camera
           if (data.status === 'success') {
             loader.style.display = 'none';
             imgStream.style.display = 'block';
-            imgStream.src = data.stream_url;  // Ensure the stream URL is sent back by the server
           } else {
             alert('Failed to start stream');
             streamButton.textContent = 'Start Stream';

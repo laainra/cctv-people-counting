@@ -44,21 +44,28 @@ class MultiCamera:
 
     # Function to start specific camera
     def start_cam(cam_id):
-        if MultiCamera.obj_list.get(str(cam_id)) != None:
+        if MultiCamera.obj_list.get(str(cam_id)) is not None:
             obj = MultiCamera.obj_list[str(cam_id)]['class']
 
-            if not MultiCamera.obj_list[str(cam_id)]['thread'].is_alive():
+            if MultiCamera.obj_list[str(cam_id)]['thread'] is None or not MultiCamera.obj_list[str(cam_id)]['thread'].is_alive():
                 MultiCamera.obj_list[str(cam_id)]['thread'] = threading.Thread(target=obj.start_stream, daemon=True)
                 MultiCamera.obj_list[str(cam_id)]['thread'].start()
 
-    # Function to stop specific camera
+    # # Function to stop specific camera
+    # def stop_cam(cam_id):
+    #     if MultiCamera.obj_list.get(str(cam_id)) != None:
+    #         obj = MultiCamera.obj_list[str(cam_id)]['class']
+    #         obj.stop_stream()
+
+    #         MultiCamera.obj_list[str(cam_id)]['thread'] = threading.Thread(target=obj.start_stream, daemon=True)
     def stop_cam(cam_id):
-        if MultiCamera.obj_list.get(str(cam_id)) != None:
+        if MultiCamera.obj_list.get(str(cam_id)) is not None:
             obj = MultiCamera.obj_list[str(cam_id)]['class']
             obj.stop_stream()
 
-            MultiCamera.obj_list[str(cam_id)]['thread'] = threading.Thread(target=obj.start_stream, daemon=True)
-
+            # Remove the thread from the obj_list to ensure it does not restart
+            MultiCamera.obj_list[str(cam_id)]['thread'] = None
+            
     # Function to delete specific camera
     def delete_cam(cam_id):
         if MultiCamera.obj_list.get(str(cam_id)) != None:

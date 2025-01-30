@@ -271,7 +271,7 @@ Presence Camera
         <div id="loader" class="spinner-border text-primary" role="status" style="display: none;">
           <span class="sr-only">Loading...</span>
         </div>
-        <img id="img_stream" src="{% url 'ai_video_feed' %}" style="width: 100%; border-radius: 10px; z-index: 1001; position: relative; display: none;" onclick="expandStream(this)"/></div>
+        <img id="img_stream" src="{% url 'video_feed' %}" style="width: 100%; border-radius: 10px; z-index: 1001; position: relative; display: none;" onclick="expandStream(this)"/></div>
       <div class="modal-footer">
         <button type="button" class="btn btn-primary" id="stream-button" onclick="toggleStream()">Start Stream</button>
       </div>

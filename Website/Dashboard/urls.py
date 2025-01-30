@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import presence, authentication, camera, home, personnel, settings, superadmin, stream, admin, employee
+from .views import profile, presence, authentication, camera, home, personnel, settings, superadmin, stream, admin, employee
 # from .views.presence import presence
 
 urlpatterns = [
@@ -66,6 +66,7 @@ urlpatterns = [
 
     path('employee/', employee.employee_home, name='employee_home'),
     path('employee/presence_history/', employee.presence_history, name='presence_history'),
+    path('employee/take_image/', employee.take_image, name='take_image'),
 
     # URL lainnya...
     path('start_ai_stream/', stream.start_ai_stream, name='start_ai_stream'),
@@ -73,5 +74,8 @@ urlpatterns = [
     path('ai_video_feed/', stream.ai_video_feed, name='ai_video_feed'),
     path('set_cam_id/', stream.set_cam_id, name='set_cam_id'),
     path('stream/', stream.stream, name='stream'),
+    
+    path('profile/', profile.profile, name='profile'),
+    path('profile/edit/', profile.edit_profile, name='edit_profile'),
 
 ]

@@ -218,3 +218,31 @@ class AddTrackingCameraForm(forms.ModelForm):
             'ciggerate_detection',
             'sit_detection'
         ]
+
+
+
+class ProfileForm(forms.ModelForm):
+    class Meta:
+        model = models.CustomUsers
+        fields = ['email', 'username']
+        widgets = {
+            'email': forms.EmailInput(attrs={'class': 'form-control'}),
+            'username': forms.TextInput(attrs={'class': 'form-control'}),
+            'password': forms.TextInput(attrs={'class': 'form-control'}),
+        }
+
+class CompanyNameForm(forms.ModelForm):
+    class Meta:
+        model = models.Company
+        fields = ['name']
+        widgets = {
+            'name': forms.TextInput(attrs={'class': 'form-control'}),
+        }
+
+class PersonnelNameForm(forms.ModelForm):
+    class Meta:
+        model = models.Personnels
+        fields = ['name']
+        widgets = {
+            'name': forms.TextInput(attrs={'class': 'form-control'}),
+        }

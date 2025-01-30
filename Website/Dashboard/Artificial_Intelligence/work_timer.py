@@ -9,7 +9,6 @@ from django.http.response import StreamingHttpResponse, JsonResponse
 from face_recognition import face_encodings, compare_faces, face_locations, load_image_file
 from ..models import Camera_Settings, Personnels, Work_Timer, Counted_Instances
 
-
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 CAPTURED_IMG_DIR = os.path.join(BASE_DIR, 'static', 'img', 'extracted_faces', 'raw')
 PERSONNEL_PICS_DIR = os.path.join(BASE_DIR, 'static', 'img', 'personnel_pics')

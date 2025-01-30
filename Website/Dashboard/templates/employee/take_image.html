@@ -4,7 +4,7 @@
 Stream
 {% endblock %}
 
-{% block content %}
+{% block content %} 
 {% csrf_token %}
 <div class="content">
     <div class="container-xl">
@@ -14,10 +14,10 @@ Stream
           <div class="col-auto">
             <!-- Page pre-title -->
             <div class="page-pretitle">
-              Camera
+              Take
             </div>
             <h2 class="page-title">
-                Stream
+                {{user.name}}'s Image
             </h2>
           </div>
         </div>
@@ -29,11 +29,11 @@ Stream
                     <div id="loader" class="spinner-border text-primary" role="status" style="display: none;">
                         <span class="sr-only">Loading...</span>
                     </div>
-                    <img id="img_stream" src="{% url 'video_feed' %}" style="width: 100%; border-radius: 10px; z-index: 1001; position: relative; {% if cam.cam_is_active %}display: block;{% else %}display: none;{% endif %}" />
+                    {% comment %} <img id="img_stream" src="{% url 'take_video_feed' %}" style="width: 100%; border-radius: 10px; z-index: 1001; position: relative; display: none;" /> {% endcomment %}
                 </div>
                 <div class="card-footer d-flex justify-content-center">
-                    <button type="button" class="btn btn-primary mr-2" id="start-stream" onclick="toggleStream('start')" {% if cam.cam_is_active %}style="display: none;"{% endif %}>Start Stream</button>
-                    <button type="button" class="btn btn-danger" id="stop-stream" onclick="toggleStream('stop')" {% if cam.cam_is_active %}style="display: inline-block;"{% else %}style="display: none;"{% endif %}>Stop Stream</button>
+                    <button type="button" class="btn btn-primary mr-2" id="start-stream" onclick="toggleStream('start')">Start Stream</button>
+                    <button type="button" class="btn btn-danger" id="stop-stream" onclick="toggleStream('stop')" style="display: none;">Stop Stream</button>
                 </div>
             </div>
         </div>
@@ -57,18 +57,12 @@ Stream
             stopButton.style.display = 'inline-block';
 
             // Start stream
-            fetch(`/start_stream/`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': '{{ csrf_token }}'
-                },
-                body: JSON.stringify({ cam_id: camId })
-            })
+            fetch(`/start_stream/`)
                 .then(response => response.json())
                 .then(data => {
                     if (data.status === 'success') {
                         loader.style.display = 'none';
+
                         imgStream.style.display = 'block';
                     } else {
                         alert('Failed to start stream');
@@ -84,14 +78,7 @@ Stream
                 });
         } else if (action === 'stop') {
             // Stop stream
-            fetch(`/stop_stream/`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': '{{ csrf_token }}'
-                },
-                body: JSON.stringify({ cam_id: camId })
-            })
+            fetch(`/stop_stream/`)
                 .then(response => response.json())
                 .then(data => {
                     if (data.status === 'success') {
