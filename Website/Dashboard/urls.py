@@ -76,11 +76,6 @@ urlpatterns = [
     path('stream/', stream.stream, name='stream'),
     
     path('profile/', profile.profile, name='profile'),
-    path('profile/edit/', profile.edit_profile, name='edit_profile'),
-    
-    path('capture/', kamera_train.capture_faces, name='capture_faces'),
-     path('train/', kamera_train.train_model, name='train_model'),
-    path('recognize/', kamera_train.predict_video, name='predict_video'),
-    path('dataset/', kamera_train.dataset, name='dataset'),
+
 
 ]

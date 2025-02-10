@@ -51,7 +51,6 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'Dashboard.middleware.CamIdMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -60,6 +59,8 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     "django_browser_reload.middleware.BrowserReloadMiddleware",
+    'Dashboard.middleware.CamIdMiddleware',
+    'Dashboard.middleware.RedirectIfLoggedInMiddleware',
 ]
 
 ROOT_URLCONF = 'Website.urls'

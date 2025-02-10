@@ -1,8 +1,9 @@
+
 {% extends '../components/base.html' %}
 {% block title %}
-Employee Dashboard
+Dashboard
 {% endblock %}
-<!-- This is a comment to prevent Prettifier -->
+<!-- This is comment to prevent Prettifier -->
 {% block content %} {% csrf_token %}
 
 <div class="content">
@@ -42,7 +43,7 @@ Employee Dashboard
                           <div class="d-flex align-items-center">
                             <div class="subheader">Total Ontime</div>
                           </div>
-                          <div class="h1 mb-1 mt-3">2189</div>
+                          <div class="h1 mb-1 mt-3">{{ summary.ontime|default:0 }}</div>
                         </div>
                     </div>
                 </div>
@@ -52,7 +53,7 @@ Employee Dashboard
                           <div class="d-flex align-items-center">
                             <div class="subheader">Total Late</div>
                           </div>
-                          <div class="h1 mb-1 mt-3">112</div>
+                          <div class="h1 mb-1 mt-3">{{ summary.late|default:0 }}</div>
                         </div>
                     </div>
                 </div>
@@ -62,7 +63,7 @@ Employee Dashboard
                           <div class="d-flex align-items-center">
                             <div class="subheader">Total Absence</div>
                           </div>
-                          <div class="h1 mb-1 mt-3">27</div>
+                          <div class="h1 mb-1 mt-3">{{ summary.unknown|default:0 }}</div>
                         </div>
                     </div>
                 </div>
@@ -80,17 +81,29 @@ Employee Dashboard
                             <table class="table card-table table-vcenter text-nowrap datatable">
                                 <thead>
                                     <tr>
-                                        <th class="w-1">
-                                            No.
-                                        </th>
+                                        <th class="w-1">No.</th>
                                         <th>Date</th>
+                                        <th>Time</th>
+                                        <th>Status</th>
+                                        <th>Image</th>
                                     </tr>
                                 </thead>
                                 <tbody>
+                                    {% for entry in entries_today %}
                                     <tr>
-                                        <td>1</td>
-                                        <td>6/12/2024</td>
+                                        <td>{{ forloop.counter }}</td>
+                                        <td>{{ entry.timestamp|date:"d/m/Y" }}</td>
+                                        <td>{{ entry.timestamp|time:"H:i:s" }}</td>
+                                        <td>{{ entry.presence_status }}</td>
+                                        <td>
+                                            {% if entry.image %}
+                                            <img src="{{ entry.image }}" alt="Image" width="50">
+                                            {% else %}
+                                            No Image
+                                            {% endif %}
+                                        </td>
                                     </tr>
+                                    {% endfor %}
                                 </tbody>
                             </table>
                         </div>
