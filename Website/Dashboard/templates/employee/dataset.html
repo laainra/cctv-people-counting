@@ -1,0 +1,52 @@
+{% extends '../components/base.html' %}
+{% block title %}
+Dataset Wajah
+{% endblock %}
+{% block content %} {% csrf_token %}
+
+<div class="content">
+    <div class="container-xl">
+      <div class="page-header">
+        <div class="row align-items-center">
+          <div class="col-auto">
+            <div class="page-pretitle">
+              Data
+            </div>
+            <h2 class="page-title">
+              Dataset Wajah
+            </h2>
+          </div>
+        </div>
+      </div>
+      <div class="row row-deck row-cards">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="table-responsive w-100">
+                        <table class="table card-table table-vcenter text-nowrap datatable">
+                            <thead>
+                                <tr>
+                                    <th class="w-1">No</th>
+                                    <th>Gambar</th>
+                                    <th>ID Wajah</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for image in images %}
+                                <tr>
+                                    <td>{{ forloop.counter }}</td>
+                                    <td><img src="{{ image.url }}" alt="Face Image" class="img-thumbnail" style="width: 100px; height: 100px; object-fit: cover;"></td>
+                                    <td>{{ image.face_id }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+      </div>
+    </div>
+</div>
+
+{% endblock %}

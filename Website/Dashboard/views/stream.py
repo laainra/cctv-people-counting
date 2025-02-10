@@ -15,7 +15,7 @@ from .. import forms, models
 from ..decorators import role_required
 
 # Artificial Intelligence Library
-from ..Artificial_Intelligence.work_timer import Work_Timer as WT
+# from ..Artificial_Intelligence.work_timer import Work_Timer as WT
 from ..Artificial_Intelligence.multi_camera import MultiCamera as MC
 from ..Artificial_Intelligence.variables import RecognitionVariable as RV
 

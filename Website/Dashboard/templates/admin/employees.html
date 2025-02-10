@@ -55,19 +55,19 @@ Employees
                         </div>
                     </div>
                     <div class="d-flex">
-                      <div class="text-muted">
-                        Show
-                        <div class="mx-2 d-inline-block">
-                        <input type="number" id="entries-count" class="form-control form-control-sm" value="{{ division_count }}" size="3">
+                        <div class="text-muted">
+                            Show
+                            <div class="mx-2 d-inline-block">
+                            <input type="text" class="form-control form-control-sm" value="8" size="3">
+                            </div>
+                            entries
                         </div>
-                        entries
-                    </div>
-                    <div class="ml-auto text-muted">
-                        Search:
-                        <div class="ml-2 d-inline-block">
-                        <input type="text"  id="search-input" class="form-control form-control-sm">
+                        <div class="ml-auto text-muted">
+                            Search:
+                            <div class="ml-2 d-inline-block">
+                            <input type="text" class="form-control form-control-sm">
+                            </div>
                         </div>
-                    </div>
                     </div>
                 </div>
                 <div class="table-responsive">
@@ -93,7 +93,7 @@ Employees
                                 <td>{{forloop.counter}}</td>
                                 <a onclick="openPersonnelDetailModal({{ employee.id }}, '{{ employee.name }}')">
                                 <td>
-                                    <span class="text-muted">{{employee.id}}</span>
+                                    <span class="text-muted">{{employee.employeeid}}</span>
                                 </td>
                                 <td>{{employee.name}}</td>
                                 <td>{{employee.division.name}}</td>
@@ -128,11 +128,26 @@ Employees
                     </table>
                 </div>
                 <div class="card-footer d-flex align-items-center">
-                  <p class="m-0 text-muted">Showing <span id="start-entry">1</span> to <span id="end-entry">{{ divisions|length }}</span> of <span>{{ division_count }}</span> entries</p>
-                  <ul class="pagination m-0 ml-auto" id="pagination">
-                      <!-- Pagination will be dynamically generated -->
-                  </ul>
-              </div>
+                    <p class="m-0 text-muted">Showing <span>1</span> to <span>8</span> of <span>16</span> entries</p>
+                    <ul class="pagination m-0 ml-auto">
+                    <li class="page-item disabled">
+                        <a class="page-link" href="#" tabindex="-1">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><polyline points="15 6 9 12 15 18" /></svg>
+                        prev
+                        </a>
+                    </li>
+                    <li class="page-item"><a class="page-link" href="#">1</a></li>
+                    <li class="page-item active"><a class="page-link" href="#">2</a></li>
+                    <li class="page-item"><a class="page-link" href="#">3</a></li>
+                    <li class="page-item"><a class="page-link" href="#">4</a></li>
+                    <li class="page-item"><a class="page-link" href="#">5</a></li>
+                    <li class="page-item">
+                        <a class="page-link" href="#">
+                        next <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><polyline points="9 6 15 12 9 18" /></svg>
+                        </a>
+                    </li>
+                    </ul>
+                </div>
             </div>
         </div>
 
@@ -142,6 +157,7 @@ Employees
   </div>
 </div>
 
+<!-- MODAL ADD EMPLOYEE -->
 <div class="modal modal-blur fade" id="modal-add-employee" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
@@ -380,83 +396,10 @@ Employees
     </div>
 </div>
 
-
-
 <script>
     document.addEventListener('DOMContentLoaded', function() {
 
-      document.addEventListener('DOMContentLoaded', function () {
-        const entriesCountInput = document.getElementById('entries-count');
-        const searchInput = document.getElementById('search-input');
-        const tableBody = document.getElementById('division-table-body');
-        const pagination = document.getElementById('pagination');
-        const startEntry = document.getElementById('start-entry');
-        const endEntry = document.getElementById('end-entry');
-        const totalEntries = {{ division_count }};
-        let currentPage = 1;
-        let entriesPerPage = parseInt(entriesCountInput.value);
-    
-        function renderTable() {
-            const searchTerm = searchInput.value.toLowerCase();
-            
-            // Jika input pencarian kosong, tampilkan semua baris
-            const filteredDivisions = searchTerm === ''
-                ? [...tableBody.children] // Semua data
-                : [...tableBody.children].filter(row => {
-                    const divisionName = row.children[1].textContent.toLowerCase();
-                    return divisionName.includes(searchTerm);
-                });
-    
-            const totalFiltered = filteredDivisions.length;
-            const totalPages = Math.ceil(totalFiltered / entriesPerPage);
-            const start = (currentPage - 1) * entriesPerPage;
-            const end = start + entriesPerPage;
-    
-            // Bersihkan tabel dan tambahkan baris yang difilter
-            tableBody.innerHTML = '';
-            filteredDivisions.slice(start, end).forEach(row => {
-                tableBody.appendChild(row);
-            });
-    
-            // Perbarui informasi entri dan render pagination
-            startEntry.textContent = totalFiltered > 0 ? start + 1 : 0;
-            endEntry.textContent = Math.min(end, totalFiltered);
-            renderPagination(totalPages);
-        }
-    
-        function renderPagination(totalPages) {
-            pagination.innerHTML = '';
-            for (let i = 1; i <= totalPages; i++) {
-                const pageItem = document.createElement('li');
-                pageItem.className = 'page-item' + (i === currentPage ? ' active' : '');
-                const pageLink = document.createElement('a');
-                pageLink.className = 'page-link';
-                pageLink.href = '#';
-                pageLink.textContent = i;
-                pageLink.addEventListener('click', function (e) {
-                    e.preventDefault();
-                    currentPage = i;
-                    renderTable();
-                });
-                pageItem.appendChild(pageLink);
-                pagination.appendChild(pageItem);
-            }
-        }
-    
-        entriesCountInput.addEventListener('change', function () {
-            entriesPerPage = parseInt(entriesCountInput.value);
-            currentPage = 1;
-            renderTable();
-        });
-    
-        searchInput.addEventListener('input', function () {
-            currentPage = 1;
-            renderTable();
-        });
-    
-        renderTable();
-    });
-    
+     
         // Event listener untuk tombol "Detail Employee"
         document.querySelectorAll('.detailEmployeeBtn').forEach(button => {
           button.addEventListener('click', function() {
