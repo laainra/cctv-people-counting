@@ -1,0 +1,40 @@
+{% extends '../components/base.html' %}
+{% block title %}
+Capture Faces
+{% endblock %}
+{% block content %} {% csrf_token %}
+
+<div class="content">
+    <div class="container-xl">
+      <div class="page-header">
+        <div class="row align-items-center">
+          <div class="col-auto">
+            <div class="page-pretitle">
+              Data
+            </div>
+            <h2 class="page-title">
+              Capture Faces
+            </h2>
+          </div>
+        </div>
+      </div>
+      <div class="row row-deck row-cards">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="face_id" class="form-label">Masukkan ID Anda:</label>
+                            <input type="text" id="face_id" name="face_id" class="form-control" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Capture</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+      </div>
+    </div>
+</div>
+
+{% endblock %}

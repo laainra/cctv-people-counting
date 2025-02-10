@@ -192,13 +192,48 @@
             <li class="nav-item  {% if request.path == 'employee/take_image/' %}active{% endif %}">
               <a class="nav-link" href="{% url 'take_image' %}" >
                 <span class="nav-link-icon d-md-none d-lg-inline-block">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"></path><circle cx="12" cy="7" r="4"></circle><path d="M5.5 21v-2a4 4 0 0 1 4 -4h5a4 4 0 0 1 4 4v2"></path></svg>
+                  <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                    <path stroke="none" d="M0 0h24v24H0z"></path>
+                    <path d="M3 11l2 -2h4l3 -3h4l2 2h3v10h-18z"></path>
+                    <circle cx="12" cy="13" r="3"></circle>
+                  </svg>
+                </span>
+                <span class="nav-link-title">
+                  Predict
+                </span>
+              </a>
+            </li>
+            <li class="nav-item  {% if request.path == 'capture/' %}active{% endif %}">
+              <a class="nav-link" href="{% url 'capture_faces' %}" >
+                <span class="nav-link-icon d-md-none d-lg-inline-block">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                    <path stroke="none" d="M0 0h24v24H0z"></path>
+                    <path d="M4 8v-2a2 2 0 0 1 2 -2h3l2 -2h2l2 2h3a2 2 0 0 1 2 2v2"></path>
+                    <circle cx="12" cy="13" r="3"></circle>
+                    <path d="M9 21h6"></path>
+                  </svg>
                 </span>
                 <span class="nav-link-title">
                   Take Image
                 </span>
               </a>
             </li>
+            <li class="nav-item  {% if request.path == 'dataset/' %}active{% endif %}">
+              <a class="nav-link" href="{% url 'dataset' %}">
+                <span class="nav-link-icon d-md-none d-lg-inline-block">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                    <path stroke="none" d="M0 0h24v24H0z"></path>
+                    <ellipse cx="12" cy="6" rx="6" ry="3"></ellipse>
+                    <path d="M6 6v6a6 3 0 0 0 12 0v-6"></path>
+                    <path d="M6 12v6a6 3 0 0 0 12 0v-6"></path>
+                  </svg>
+                </span>
+                <span class="nav-link-title">
+                  View Dataset
+                </span>
+              </a>
+            </li>
+            
           </ul>
           {% comment %} <div class="my-2 my-md-0 flex-grow-1 flex-md-grow-0 order-first order-md-last">
             <form action="." method="get">

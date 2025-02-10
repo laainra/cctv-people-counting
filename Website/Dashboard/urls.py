@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import profile, presence, authentication, camera, home, personnel, settings, superadmin, stream, admin, employee
+from .views import profile, presence, authentication, camera, home, personnel, settings, superadmin, stream, admin, employee, kamera_train
 # from .views.presence import presence
 
 urlpatterns = [
@@ -76,6 +76,6 @@ urlpatterns = [
     path('stream/', stream.stream, name='stream'),
     
     path('profile/', profile.profile, name='profile'),
-    # path('profile/edit/', profile.edit_profile, name='edit_profile'),
+
 
 ]

@@ -156,20 +156,20 @@ class CameraStream:
                 for name, duration in self.FR.detection_times.items():
                     try:
                         personnel = models.Personnels.objects.get(name=name)
-                        work_timer, created = models.Work_Timer.objects.get_or_create(
-                            personnel=personnel,
-                            camera=self.ID,
-                            type='FACE_DETECTED',
-                            defaults={'datetime': datetime.now(), 'timer': 0}
-                        )
+                        # work_timer, created = models.Work_Timer.objects.get_or_create(
+                        #     personnel=personnel,
+                        #     camera=self.ID,
+                        #     type='FACE_DETECTED',
+                        #     defaults={'datetime': datetime.now(), 'timer': 0}
+                        # )
                         
-                        if not created:
-                            if isinstance(duration, timedelta):
-                                work_timer.timer += duration.total_seconds()
-                            else:
-                                print(f"Error: duration is not a timedelta object for {name}")
-                            work_timer.datetime = datetime.now()
-                            work_timer.save()
+                        # if not created:
+                        #     if isinstance(duration, timedelta):
+                        #         work_timer.timer += duration.total_seconds()
+                        #     else:
+                        #         print(f"Error: duration is not a timedelta object for {name}")
+                        #     work_timer.datetime = datetime.now()
+                        #     work_timer.save()
                     except models.Personnels.DoesNotExist:
                         print(f"Personnel '{name}' not found in the database. Marking as 'Unknown'.")
                         # Assign "Unknown" to bounding box or handle the detection accordingly
