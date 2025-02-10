@@ -51,7 +51,6 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'Dashboard.middleware.CamIdMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -60,6 +59,8 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     "django_browser_reload.middleware.BrowserReloadMiddleware",
+    'Dashboard.middleware.CamIdMiddleware',
+    'Dashboard.middleware.RedirectIfLoggedInMiddleware',
 ]
 
 ROOT_URLCONF = 'Website.urls'
@@ -89,7 +90,7 @@ WSGI_APPLICATION = 'Website.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'cctv_db',
+        'NAME': 'db_cctvproject',
         'USER': 'root',
         'PASSWORD': '',
         'HOST': '127.0.0.1',
@@ -179,3 +180,5 @@ LOGGING = {
         'level': 'DEBUG',  
     },
 }
+
+AUTH_USER_MODEL = 'Dashboard.CustomUsers'
