@@ -76,6 +76,6 @@ urlpatterns = [
     path('stream/', stream.stream, name='stream'),
     
     path('profile/', profile.profile, name='profile'),
-    path('profile/edit/', profile.edit_profile, name='edit_profile'),
+    # path('profile/edit/', profile.edit_profile, name='edit_profile'),
 
 ]

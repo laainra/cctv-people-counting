@@ -1,7 +1,8 @@
-<!-- filepath: /c:/Users/laila/cctv-people-counting/Website/Dashboard/templates/edit_profile.html -->
+<!-- filepath: /c:/Users/laila/cctv-people-counting/Website/Dashboard/templates/profile.html -->
 {% extends 'components/base.html' %}
+
 {% block title %}
-Edit Profile
+Profile
 {% endblock %}
 
 {% block content %}
@@ -15,7 +16,7 @@ Edit Profile
                         Setting
                     </div>
                     <h2 class="page-title">
-                        Edit Profile
+                        Profile
                     </h2>
                 </div>
             </div>
@@ -23,47 +24,58 @@ Edit Profile
         <div class="row row-deck row-cards">
             <div class="col-lg-4">
                 <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title">Edit Profile</h3>
-                    </div>
                     <div class="card-body">
-                        <form method="post">
-                            {% csrf_token %}
-                            {% if user.role == 'superadmin' %}
-                                <div class="mb-2">
-                                    <label class="form-label">Username</label>
-                                    <input type="text" name="username" class="form-control" value="{{ form.username.value }}" placeholder=""/>
-                                </div>
-                                <div class="mb-2">
-                                    <label class="form-label">Password</label>
-                                    <input type="password" name="password" class="form-control" value="{{ form.password.value }}" placeholder=""/>
-                                </div>
-                            {% else %}
-                                <div class="mb-2">
-                                    <label class="form-label">Name</label>
-                                    <input type="text" name="name" class="form-control" value="{{ form.name.value }}" placeholder=""/>
-                                </div>
-                                <div class="mb-2">
-                                    <label class="form-label">Email</label>
-                                    <input type="email" name="email" class="form-control" value="{{ form.email.value }}" placeholder=""/>
-                                </div>
-                                <div class="mb-2">
-                                    <label class="form-label">Username</label>
-                                    <input type="text" name="username" class="form-control" value="{{ form.username.value }}" placeholder=""/>
-                                </div>
-                                <div class="mb-2">
-                                    <label class="form-label">Password</label>
-                                    <input type="password" name="password" class="form-control" value="{{ form.password.value }}" placeholder=""/>
-                                </div>
-                            {% endif %}
-                            <div class="form-footer">
-                                <button type="submit" class="btn btn-primary">Save Changes</button>
+                        <div id="profile-info">
+                            <div class="mb-2">
+                                <label class="form-label">Name</label>
+                                <input type="text" class="form-control" value="{{ name }}" readonly>
                             </div>
-                        </form>
+                            <div class="mb-2">
+                                <label class="form-label">Email</label>
+                                <input type="email" class="form-control" value="{{ user.email }}" readonly>
+                            </div>
+                            <div class="mb-2">
+                                <label class="form-label">Username</label>
+                                <input type="text" class="form-control" value="{{ user.username }}" readonly>
+                            </div>
+                            <button class="btn btn-primary" onclick="toggleEditForm()">Edit Profile</button>
+                        </div>
+
+                        <div id="edit-profile-form" style="display: none;">
+                            <h2>Edit Profile</h2>
+                            <form method="post">
+                                {% csrf_token %}
+                                {% if user.role == 'superadmin' %}
+                                    {{ form.as_p }}
+                                {% elif user.role == 'admin' %}
+                                    {{ form.0.as_p }}
+                                    {{ form.1.as_p }}
+                                {% elif user.role == 'employee' %}
+                                    {{ form.0.as_p }}
+                                    {{ form.1.as_p }}
+                                {% endif %}
+                                <button type="submit" class="btn btn-primary">Save Changes</button>
+                                <button type="button" class="btn btn-secondary" onclick="toggleEditForm()">Cancel</button>
+                            </form>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+<script>
+    function toggleEditForm() {
+        var profileInfo = document.getElementById('profile-info');
+        var editProfileForm = document.getElementById('edit-profile-form');
+        if (profileInfo.style.display === 'none') {
+            profileInfo.style.display = 'block';
+            editProfileForm.style.display = 'none';
+        } else {
+            profileInfo.style.display = 'none';
+            editProfileForm.style.display = 'block';
+        }
+    }
+</script>
 {% endblock %}
