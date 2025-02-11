@@ -8,6 +8,7 @@ class CustomUsers(AbstractUser):
         ('admin', 'Admin'),
         ('employee', 'Employee'),
     ]
+    id = models.AutoField(primary_key=True)
     role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='employee')
     email = models.EmailField(unique=True, null=True)
     username = models.CharField(max_length=255, unique=True)
@@ -15,6 +16,7 @@ class CustomUsers(AbstractUser):
     is_superadmin = models.BooleanField(default=False)
     is_admin = models.BooleanField(default=False)
     is_employee = models.BooleanField(default=False)
+    
     
     
     def save(self, *args, **kwargs):
@@ -152,7 +154,7 @@ class Work_Timer(models.Model):
         ('FACE_DETECTED', 'Face Detected'),
     ]
     id = models.AutoField(primary_key=True)
-    camera = models.ForeignKey(Camera_Settings, on_delete=models.CASCADE)
+    camera = models.ForeignKey(Camera_Settings, on_delete=models.CASCADE, null=True)
     datetime = models.DateTimeField()
     type = models.CharField(max_length=15, choices=type_choices)
     timer = models.IntegerField(default=0) 

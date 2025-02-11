@@ -236,7 +236,7 @@ class CompanyNameForm(forms.ModelForm):
         model = models.Company
         fields = ['name']
         widgets = {
-            'name': forms.TextInput(attrs={'class': 'form-control'}),
+            'name': forms.TextInput(attrs={'class': 'form-control', 'readonly': 'readonly'}),
         }
 
 class PersonnelNameForm(forms.ModelForm):
@@ -244,5 +244,5 @@ class PersonnelNameForm(forms.ModelForm):
         model = models.Personnels
         fields = ['name']
         widgets = {
-            'name': forms.TextInput(attrs={'class': 'form-control'}),
+            'name': forms.TextInput(attrs={'class': 'form-control', 'readonly': 'readonly'}),
         }

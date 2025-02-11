@@ -61,6 +61,7 @@ MIDDLEWARE = [
     "django_browser_reload.middleware.BrowserReloadMiddleware",
     'Dashboard.middleware.CamIdMiddleware',
     'Dashboard.middleware.RedirectIfLoggedInMiddleware',
+    'Dashboard.middleware.RoleRedirectMiddleware',
 ]
 
 ROOT_URLCONF = 'Website.urls'

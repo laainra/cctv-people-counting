@@ -40,5 +40,5 @@ def presence_history(request):
 @login_required(login_url='login')
 @role_required('employee')
 def take_image(request):
-    user = models.Personnels.objects.get(user=request.user)
+    user = models.Personnels.objects.filter(user=request.user)
     return render(request, 'employee/take_image.html')

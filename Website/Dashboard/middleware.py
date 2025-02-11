@@ -19,7 +19,19 @@ class RedirectIfLoggedInMiddleware:
         
         response = self.get_response(request)
         return response
-
+class RoleRedirectMiddleware(MiddlewareMixin):
+    def process_request(self, request):
+        # Check if the user is authenticated
+        if request.user.is_authenticated:
+            # Only redirect if the user is accessing the root URL
+            if request.path == '/' or request.path == '':
+                # Check the user's role and redirect accordingly
+                if request.user.role == 'employee':
+                    return redirect('employee_home')  # Redirect to employee home
+                elif request.user.role == 'superadmin':
+                    return redirect('superadmin_home')  # Redirect to superadmin home
+                # If the role is 'admin', do not redirect
+        return None 
 class CamIdMiddleware(MiddlewareMixin):
     def process_request(self, request, *args):
         if hasattr(request, 'session'):

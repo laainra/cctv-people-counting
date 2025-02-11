@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import profile, presence, authentication, camera, home, personnel, settings, superadmin, stream, admin, employee, kamera_train
+from .views import face_rec, profile, presence, authentication, camera, home, personnel, settings, superadmin, stream, admin, employee
 # from .views.presence import presence
 
 urlpatterns = [
@@ -77,5 +77,10 @@ urlpatterns = [
     
     path('profile/', profile.profile, name='profile'),
 
-
+    path('capture/', face_rec.capture_page, name='capture_page'),
+    path('capture_data/', face_rec.capture_faces, name='capture_faces'),
+    path('capture_video/', face_rec.capture_video, name='capture_video'),
+    path('train/', face_rec.train_model, name='train_model'),
+    path('recognize/', face_rec.predict_video, name='predict_video'),
+    path('dataset/', face_rec.dataset, name='dataset'),
 ]
