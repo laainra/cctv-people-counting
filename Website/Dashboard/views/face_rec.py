@@ -62,7 +62,12 @@ def capture_faces(request):
         if not face_id:
             return JsonResponse({'status': 'error', 'message': 'Face ID is required.'})
 
-        cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)  # Initialize camera
+        cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)  # DirectShow (Windows)
+        if not cap.isOpened():
+            cap = cv2.VideoCapture(0, cv2.CAP_MSMF)  # Media Foundation (Windows)
+        if not cap.isOpened():
+            cap = cv2.VideoCapture(0, cv2.CAP_V4L2)  # Video4Linux (Linux)
+    
         if not cap.isOpened():
             return JsonResponse({'status': 'error', 'message': 'Failed to open camera.'})
 
