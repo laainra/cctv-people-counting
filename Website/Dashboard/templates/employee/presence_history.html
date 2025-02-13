@@ -1,0 +1,171 @@
+
+{% extends '../components/base.html' %}
+{% block title %}
+Presence History
+{% endblock %}
+<!-- This is comment to prevent Prettifier -->
+{% block content %} {% csrf_token %}
+
+<div class="content">
+    <div class="container-xl">
+      <!-- Page title -->
+      <div class="page-header">
+        <div class="row align-items-center">
+          <div class="col-auto">
+            <!-- Page pre-title -->
+            <div class="page-pretitle">
+              Employee
+            </div>
+            <h2 class="page-title">
+                Presence History
+            </h2>
+          </div>
+        </div>
+      </div>
+      <div class="row row-deck row-cards">
+
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex mb-3">
+                        <div style="max-width: 250px;" class="mr-2">
+                            <div class="input-icon">
+                                <form method="GET" id="filterForm">
+                                    <input id="calendar-range" type="date" name="date" class="form-control" onchange="this.form.submit()" />
+                                </form>
+                                
+                                <!-- Menampilkan tanggal yang dipilih -->
+                                <p>Tanggal yang dipilih: <span id="selected-date">{{ selected_date|default:"-" }}</span></p>
+                                
+                                
+                            </div>
+                        </div>
+                    </div>
+                    <div class="d-flex mb-3">
+                        <div class="table-responsive w-100">
+                            <table class="table card-table table-vcenter text-nowrap datatable text-center">
+                                <thead>
+                                    <tr>
+                                        <th class="w-1">
+                                            No.
+                                        </th>
+                                        <th>Date</th>
+                                        <th>Attendance Time</th>
+                                        <th>Attendance Image</th>
+                                        <th>Leaving Time</th>
+                                        <th>Leaving Image</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {%load static%}
+                                    {% for entry in presence_data %}
+                                    <tr>
+                                        <td>{{ forloop.counter }}</td>
+                                        <td>{{ entry.date }}</td>
+                                        <td>{{ entry.attended }}</td>
+                                        <td>
+                                            {% if entry.attendance_image_path %}
+                                            {% load static %}
+                                            <img src="{% static entry.attendance_image_path %}" class="img-fluid" width="35"/>
+                                            {% else %}
+                                            No image
+                                            {% endif %}
+                                        </td>
+                                        <td>{{ entry.leave }}</td>
+                                        <td>
+                                            {% if entry.leaving_image_path %}
+                                            {% load static %}
+                                            <img src="{% static entry.leaving_image_path %}" class="img-fluid" width="35"/>
+                                            {% else %}
+                                            No image
+                                            {% endif %}
+                                        </td>
+                                        <td>{{ entry.status }}</td>
+                                    </tr>
+                                    {% empty %}
+                                    <tr>
+                                        <td colspan="7" class="text-center">No presence records found.</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                                
+                                
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Libs JS -->
+<script src="../dist/libs/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+<script src="../dist/libs/jquery/dist/jquery.slim.min.js"></script>
+<script src="../dist/libs/peity/jquery.peity.min.js"></script>
+<script src="../dist/libs/apexcharts/dist/apexcharts.min.js"></script>
+<script src="../dist/libs/flatpickr/dist/flatpickr.min.js"></script>
+<!-- Tabler Core -->
+<script src="../dist/js/tabler.min.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        flatpickr(document.getElementById('calendar-range'), {
+            mode:"range"
+        });
+    });
+</script>
+
+<script>
+  document.body.style.display = "block"
+  document.addEventListener("DOMContentLoaded", function () {
+    const dateInput = document.getElementById("calendar-range");
+    const tableBody = document.querySelector("#presence-table tbody");
+
+    // Set default date to today
+    const today = new Date().toISOString().split("T")[0];
+    dateInput.value = today;
+
+    function fetchData(date) {
+        fetch(`/presence_history/?date=${date}`)
+            .then(response => response.json())
+            .then(data => {
+                tableBody.innerHTML = ""; // Clear existing data
+                if (data.length === 0) {
+                    tableBody.innerHTML = "<tr><td colspan='6'>No data available</td></tr>";
+                    return;
+                }
+                data.forEach(entry => {
+                    const row = `<tr>
+                        <td>${entry.name}</td>
+                        <td>${entry.attended || '-'}</td>
+                        <td>${entry.leave || '-'}</td>
+                        <td>${entry.status || '-'}</td>
+                        <td>${entry.work_hours || '-'}</td>
+                        <td>${entry.notes || '-'}</td>
+                    </tr>`;
+                    tableBody.innerHTML += row;
+                });
+            })
+            .catch(error => console.error("Error fetching presence data:", error));
+    }
+
+    // Fetch data for the default date
+    fetchData(today);
+
+    // Event listener to fetch data when date is changed
+    dateInput.addEventListener("change", function () {
+        fetchData(this.value);
+    });
+});
+document.getElementById("calendar-range").addEventListener("change", function() {
+    let selectedDate = this.value;
+    document.getElementById("selected-date").innerText = selectedDate || "-";
+});
+
+</script>
+{% endblock %}

@@ -13,6 +13,8 @@ from django.shortcuts import render
 from django.http import HttpRequest, HttpResponse, JsonResponse
 from xlsxwriter.workbook import Workbook
 from io import BytesIO
+from django.contrib.auth.decorators import login_required
+from ..decorators import role_required
 
 
 
@@ -24,6 +26,7 @@ JSON_PATH = os.path.join(DIR, 'static', 'attendance' , 'attendance.json')
 
 
 def read_attendance_data():
+    print("Starting Read Attendance JSON data...")
     # Mendapatkan tanggal kemarin dan hari ini
     attendance_date_yesterday = (datetime.now() - timedelta(days=1)).date()
     attendance_date_today = datetime.now().date()
@@ -59,6 +62,7 @@ def read_attendance_data():
                 return []
             data_list = json.loads(data)
         
+        print("Attendance JSON data read successfully.")
         return data_list
 
     except json.JSONDecodeError as e:
@@ -71,6 +75,7 @@ def read_attendance_data():
 
 # Insert presence data into the database
 def insert_presence(cam_id, personnel_id, detected_time, status, image_path):
+    print(f"Starting insert presence data for {personnel_id}...")
 
     if not cam_id or not personnel_id or not detected_time or not status:
         # print("Invalid data detected, skipping insertion.")
@@ -84,127 +89,11 @@ def insert_presence(cam_id, personnel_id, detected_time, status, image_path):
             ''',
             [cam_id, personnel_id, detected_time, status, image_path]
         )
+        
     print(f"Presence saved as {status} for personnel ID {personnel_id} at {detected_time}")
 
-
-       
-def get_presence_data(date):
-    query = '''
-        SELECT 
-            p.id AS personnel_id,
-            p.name,
-            MIN(CASE WHEN presence_status IN ('ONTIME', 'LATE') THEN timestamp END) AS attended_time,
-            MAX(CASE WHEN presence_status = 'LEAVE' THEN timestamp END) AS leaving_time,
-            CASE 
-                WHEN EXISTS (
-                    SELECT 1 
-                    FROM dashboard_personnel_entries AS sub 
-                    WHERE sub.personnel_id = p.id 
-                    AND DATE(sub.timestamp) = %s 
-                    AND presence_status = 'LEAVE'
-                ) THEN 'LEAVING'
-                ELSE MAX(CASE WHEN presence_status IN ('ONTIME', 'LATE') THEN presence_status END)
-            END AS latest_status,
-            TIMESTAMPDIFF(HOUR, 
-                MIN(CASE WHEN presence_status IN ('ONTIME', 'LATE') THEN timestamp END),
-                MAX(CASE WHEN presence_status = 'LEAVE' THEN timestamp END)
-            ) AS work_hours,
-            CASE 
-                WHEN TIMESTAMPDIFF(HOUR, 
-                    MIN(CASE WHEN presence_status IN ('ONTIME', 'LATE') THEN timestamp END),
-                    MAX(CASE WHEN presence_status = 'LEAVE' THEN timestamp END)
-                ) > 8 THEN CONCAT('Overtime ', TIMESTAMPDIFF(HOUR, 
-                    MIN(CASE WHEN presence_status IN ('ONTIME', 'LATE') THEN timestamp END),
-                    MAX(CASE WHEN presence_status = 'LEAVE' THEN timestamp END)
-                ) - 8, ' hours')
-                WHEN TIMESTAMPDIFF(HOUR, 
-                    MIN(CASE WHEN presence_status IN ('ONTIME', 'LATE') THEN timestamp END),
-                    MAX(CASE WHEN presence_status = 'LEAVE' THEN timestamp END)
-                ) < 8 THEN CONCAT('Less time ', 8 - TIMESTAMPDIFF(HOUR, 
-                    MIN(CASE WHEN presence_status IN ('ONTIME', 'LATE') THEN timestamp END),
-                    MAX(CASE WHEN presence_status = 'LEAVE' THEN timestamp END)
-                ), ' hours')
-                ELSE 'Standard Time'
-            END AS notes,
-            (SELECT d.image 
-            FROM dashboard_personnel_entries AS d 
-            WHERE d.personnel_id = p.id 
-            AND DATE(d.timestamp) = %s
-            AND (
-                (presence_status = 'LEAVE') OR
-                (presence_status IN ('ONTIME', 'LATE') 
-                    AND NOT EXISTS (
-                        SELECT 1
-                        FROM dashboard_personnel_entries AS sub
-                        WHERE sub.personnel_id = p.id
-                        AND DATE(sub.timestamp) = %s
-                        AND sub.presence_status = 'LEAVE'
-                    ))
-            )
-            ORDER BY timestamp DESC 
-            LIMIT 1
-            ) AS image_path
-        FROM 
-            dashboard_personnel_entries AS d
-        JOIN 
-            dashboard_personnels AS p ON p.id = d.personnel_id
-        WHERE 
-            DATE(d.timestamp) = %s
-        GROUP BY 
-            p.id
-    '''
-    params = [date, date, date, date]
-
-    with connection.cursor() as cursor:
-        cursor.execute(query, params)
-        entries = cursor.fetchall()
-
-    presence_data = []
-    for entry in entries:
-        attended_time = entry[2].strftime('%H:%M:%S') if entry[2] else '-'
-        leaving_time = entry[3].strftime('%H:%M:%S') if entry[3] else '-'
-
-        work_hours = entry[5] or 'Still Working'
-        relative_image_path = os.path.relpath(entry[7], start=DIR) if entry[7] else 'No image'
-
-        presence_data.append({
-            'id': entry[0],
-            'name': entry[1],
-            'attended': attended_time,
-            'leave': leaving_time,
-            'status': entry[4],
-            'work_hours': work_hours,
-            'notes': entry[6] or 'No notes',
-            'image_path': relative_image_path,
-        })
-    return presence_data
-
-def get_presence_by_status(date, status=None):
-    query = '''
-        SELECT 
-            p.id AS personnel_id,
-            p.name,
-            MIN(CASE WHEN presence_status IN ('ONTIME', 'LATE') THEN timestamp END) AS attended_time,
-            MAX(CASE WHEN presence_status = 'LEAVE' THEN timestamp END) AS leaving_time
-        FROM 
-            dashboard_personnel_entries AS d
-        JOIN 
-            dashboard_personnels AS p ON p.id = d.personnel_id
-        WHERE 
-            DATE(d.timestamp) = %s
-    '''
-    params = [date]
-    if status:
-        query += " AND d.presence_status = %s"
-        params.append(status)
-
-    query += " GROUP BY p.id"
-
-    with connection.cursor() as cursor:
-        cursor.execute(query, params)
-        return cursor.fetchall()
-
 def process_attendance_entry(data, cam_id):
+    print("Starting proccess attendance entry...")
     name = data.get('name')
     datetime_str = data.get('datetime')
     image_path = data.get('image_path')
@@ -271,35 +160,178 @@ def process_attendance_entry(data, cam_id):
     # Fungsi untuk menyimpan entri ke database
     insert_presence(cam_id, personnel_id, detected_time, status, image_path)
     print(f"Inserted {status} entry for {name} at {detected_time}")
-
-
     
 # Main function to process presence
 def presence_process(cam_id):
+    print(f"Starting Process Presence for {cam_id}...")
     data_list = read_attendance_data()
     
     # Process each entry
     for data in data_list:
         process_attendance_entry(data, cam_id)
-    
+        
+    print("Presence data processed successfully.")
     # delete_attendance_file()
     return {'status': 'success', 'message': 'Attendance data processed successfully'}
 
-def get_active_cam_id():
-    with connection.cursor() as cursor:
-        cursor.execute("SELECT id FROM dashboard_camera_settings WHERE cam_is_active = 1")
-        result = cursor.fetchone()
-        if result:
-            return result[0]
-        else:
-            return None
+def get_presence_data(date, personnel_id=None):
+    query = '''
+        SELECT 
+            p.id AS personnel_id,
+            p.name,
+            MIN(CASE WHEN presence_status IN ('ONTIME', 'LATE') THEN timestamp END) AS attended_time,
+            MAX(CASE WHEN presence_status = 'LEAVE' THEN timestamp END) AS leaving_time,
+            CASE 
+                WHEN EXISTS (
+                    SELECT 1 
+                    FROM dashboard_personnel_entries AS sub 
+                    WHERE sub.personnel_id = p.id 
+                    AND DATE(sub.timestamp) = %s 
+                    AND presence_status = 'LEAVE'
+                ) THEN 'LEAVING'
+                ELSE MAX(CASE WHEN presence_status IN ('ONTIME', 'LATE') THEN presence_status END)
+            END AS latest_status,
+            TIMESTAMPDIFF(HOUR, 
+                MIN(CASE WHEN presence_status IN ('ONTIME', 'LATE') THEN timestamp END),
+                MAX(CASE WHEN presence_status = 'LEAVE' THEN timestamp END)
+            ) AS work_hours,
+            CASE 
+                WHEN TIMESTAMPDIFF(HOUR, 
+                    MIN(CASE WHEN presence_status IN ('ONTIME', 'LATE') THEN timestamp END),
+                    MAX(CASE WHEN presence_status = 'LEAVE' THEN timestamp END)
+                ) > 8 THEN CONCAT('Overtime ', TIMESTAMPDIFF(HOUR, 
+                    MIN(CASE WHEN presence_status IN ('ONTIME', 'LATE') THEN timestamp END),
+                    MAX(CASE WHEN presence_status = 'LEAVE' THEN timestamp END)
+                ) - 8, ' hours')
+                WHEN TIMESTAMPDIFF(HOUR, 
+                    MIN(CASE WHEN presence_status IN ('ONTIME', 'LATE') THEN timestamp END),
+                    MAX(CASE WHEN presence_status = 'LEAVE' THEN timestamp END)
+                ) < 8 THEN CONCAT('Less time ', 8 - TIMESTAMPDIFF(HOUR, 
+                    MIN(CASE WHEN presence_status IN ('ONTIME', 'LATE') THEN timestamp END),
+                    MAX(CASE WHEN presence_status = 'LEAVE' THEN timestamp END)
+                ), ' hours')
+                ELSE 'Standard Time'
+            END AS notes,
+            (SELECT d.image 
+            FROM dashboard_personnel_entries AS d 
+            WHERE d.personnel_id = p.id 
+            AND DATE(d.timestamp) = %s
+            AND presence_status IN ('ONTIME', 'LATE')
+            ORDER BY timestamp DESC 
+            LIMIT 1
+            ) AS attendance_image_path,
+            (SELECT d.image 
+            FROM dashboard_personnel_entries AS d 
+            WHERE d.personnel_id = p.id 
+            AND DATE(d.timestamp) = %s
+            AND presence_status = 'LEAVE'
+            ORDER BY timestamp DESC 
+            LIMIT 1
+            ) AS leaving_image_path
+        FROM 
+            dashboard_personnel_entries AS d
+        JOIN 
+            dashboard_personnels AS p ON p.id = d.personnel_id
+        WHERE 
+            DATE(d.timestamp) = %s
+    '''
+    params = [date, date, date, date]
 
+    if personnel_id:
+        query += " AND p.id = %s"
+        params.append(personnel_id)
+
+    query += " GROUP BY p.id"
+
+    with connection.cursor() as cursor:
+        cursor.execute(query, params)
+        entries = cursor.fetchall()
+
+    presence_data = []
+    for entry in entries:
+        attended_time = entry[2].strftime('%H:%M:%S') if entry[2] else '-'
+        leaving_time = entry[3].strftime('%H:%M:%S') if entry[3] else '-'
+
+        work_hours = entry[5] or 'Still Working'
+        attendance_image_path = os.path.relpath(entry[7], start=DIR) if entry[7] else 'No image'
+        leaving_image_path = os.path.relpath(entry[8], start=DIR) if entry[8] else 'No image'
+
+        presence_data.append({
+            'id': entry[0],
+            'name': entry[1],
+            'attended': attended_time,
+            'leave': leaving_time,
+            'status': entry[4],
+            'work_hours': work_hours,
+            'notes': entry[6] or 'No notes',
+            'attendance_image_path': attendance_image_path,
+            'leaving_image_path': leaving_image_path,
+        })
+    print("Presence data retrieved successfully.: ", presence_data)
+    return presence_data
+
+def get_presence_by_status(date, status=None):
+    query = '''
+        SELECT 
+            p.id AS personnel_id,
+            p.name,
+            MIN(CASE WHEN presence_status IN ('ONTIME', 'LATE') THEN timestamp END) AS attended_time,
+            MAX(CASE WHEN presence_status = 'LEAVE' THEN timestamp END) AS leaving_time
+        FROM 
+            dashboard_personnel_entries AS d
+        JOIN 
+            dashboard_personnels AS p ON p.id = d.personnel_id
+        WHERE 
+            DATE(d.timestamp) = %s
+    '''
+    params = [date]
+    if status:
+        query += " AND d.presence_status = %s"
+        params.append(status)
+
+    query += " GROUP BY p.id"
+
+    with connection.cursor() as cursor:
+        cursor.execute(query, params)
+        return cursor.fetchall()
+
+
+
+def get_active_cam_ids():
+    with connection.cursor() as cursor:
+        cursor.execute("""
+            SELECT id FROM dashboard_camera_settings 
+            WHERE cam_is_active = 1 
+            AND role_camera IN ('p_in', 'p_out')
+        """)
+        active_cam_ids = cursor.fetchall()
+        return [cam_id[0] for cam_id in active_cam_ids] 
+
+# @csrf_exempt
+# @login_required(login_url='login')
+# @role_required('admin')
+# def presence(request):
+#     try:
+#         today = request.GET.get('date', timezone.now().date().strftime('%Y-%m-%d'))
+#         personnel_id = request.GET.get('personnel_id')
+#         presence_data = get_presence_data(today, personnel_id)
+#         status = get_presence_by_status(today)
+#         personnel_list = models.Personnels.objects.all()
+#         print(presence_data)  # Debugging line
+#         return JsonResponse({'presence_data': presence_data, 'date': today, 'status': status, 'personnel_list': list(personnel_list.values())})
+
+
+#     except Exception as e:
+#         print(f"Error: {str(e)}")  # Debugging line
+#         return JsonResponse({'status': 'error', 'message': str(e)})
 @csrf_exempt
+@login_required(login_url='login')
+@role_required('admin')
 def presence(request):
     if request.method == "POST":
         cam_id = request.POST.get("cam_id")  # Mengambil `cam_id` dari POST request
         if not cam_id:
-            cam_id = get_active_cam_id()
+            cam_id = get_active_cam_ids()
             if not cam_id:
                 return JsonResponse({'status': 'error', 'message': 'No active camera found'})
 
@@ -317,12 +349,16 @@ def presence(request):
     elif request.method == 'GET':
         try:
             today = request.GET.get('date', timezone.now().date().strftime('%Y-%m-%d'))
-            presence_data = get_presence_data(today)
+            personnel_id = request.GET.get('personnel_id')
+            presence_data = get_presence_data(today, personnel_id)
             status = get_presence_by_status(today)
-            return render(request, 'presence.html', {
+            personnel_list = models.Personnels.objects.all()
+            print(presence_data)
+            return render(request, 'admin/presence.html', {
                 'presence_data': presence_data,
                 'date': today,
                 'status': status,
+                'personnel_list': personnel_list,
             })
 
         except Exception as e:
@@ -352,15 +388,21 @@ class AttendanceHandler(FileSystemEventHandler):
         super().__init__()
     
     def on_created(self, event):
-        cam_id = 1 
-        print("File created, running presence process.")
-        presence_process(cam_id)
+        
+        # Retrieve active camera IDs with role 'p_in' and 'p_out'
+        active_cam_ids = get_active_cam_ids()
+        for cam_id in active_cam_ids:
+            print(f"File created, running presence process for camera ID: {cam_id}")
+            presence_process(cam_id)
+            print(f"Presence Proccess Executed Successfully  for camera ID: {cam_id}")
 
     def on_modified(self, event):
-        cam_id = 1 
-        print("File modified, running presence process.")
-        presence_process(cam_id)
-
+        # Retrieve active camera IDs with role 'p_in' and 'p_out'
+        active_cam_ids = get_active_cam_ids()
+        for cam_id in active_cam_ids:
+            print(f"File modified, running presence process for camera ID: {cam_id}")
+            presence_process(cam_id)
+            print(f"Presence Proccess Executed Successfully  for camera ID: {cam_id}")
 
 # Watchdog observer setup
 def start_watching():

@@ -1,0 +1,268 @@
+
+{% extends '../components/base.html' %}
+{% block title %}
+Dashboard
+{% endblock %}
+<!-- This is comment to prevent Prettifier -->
+{% block content %} {% csrf_token %}
+
+<div class="content">
+    <div class="container-xl">
+      <!-- Page title -->
+      <div class="page-header">
+        <div class="row align-items-center">
+          <div class="col-auto">
+            <!-- Page pre-title -->
+            <div class="page-pretitle">
+              Overview
+            </div>
+            <h2 class="page-title">
+              Dashboard
+            </h2>
+          </div>
+        </div>
+      </div>
+      <div class="row row-deck row-cards">
+
+        <div class="col-sm-5">
+          <div class="card">
+            <div class="card-header border-0">
+                <h3 class="card-title">Employee Stats This Month</h3>
+            </div>
+            <div class="card-body">
+                <div id="chart-donut"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-sm-7">
+            <div class="row row-deck row-cards">
+                <div class="col-sm-6">
+                    <div class="card">
+                        <div class="card-body">
+                          <div class="d-flex align-items-center">
+                            <div class="subheader">Total Ontime</div>
+                          </div>
+                          <div class="h1 mb-1 mt-3">{{ summary.ontime|default:0 }}</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="card">
+                        <div class="card-body">
+                          <div class="d-flex align-items-center">
+                            <div class="subheader">Total Late</div>
+                          </div>
+                          <div class="h1 mb-1 mt-3">{{ summary.late|default:0 }}</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="card">
+                        <div class="card-body">
+                          <div class="d-flex align-items-center">
+                            <div class="subheader">Total Absence</div>
+                          </div>
+                          <div class="h1 mb-1 mt-3">{{ summary.unknown|default:0 }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header border-0">
+                    <h3 class="card-title">Attendance History Today</h3>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex mb-3">
+                        <div class="table-responsive w-100">
+                            <table class="table card-table table-vcenter text-nowrap datatable">
+                                <table class="table card-table table-vcenter text-nowrap datatable text-center">
+                                    <thead>
+                                        <tr>
+                                            <th class="w-1">
+                                                No.
+                                            </th>
+                                            <th>Date</th>
+                                            <th>Attendance Time</th>
+                                            <th>Attendance Image</th>
+                                            <th>Leaving Time</th>
+                                            <th>Leaving Image</th>
+                                            <th>Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {%load static%}
+                                        {% for entry in presence_data %}
+                                        <tr>
+                                            <td>{{ forloop.counter }}</td>
+                                            <td>{{ entry.date }}</td>
+                                            <td>{{ entry.attended }}</td>
+                                            <td>
+                                                {% if entry.attendance_image_path %}
+                                                {% load static %}
+                                                <img src="{% static entry.attendance_image_path %}" class="img-fluid" width="35"/>
+                                                {% else %}
+                                                No image
+                                                {% endif %}
+                                            </td>
+                                            <td>{{ entry.leave }}</td>
+                                            <td>
+                                                {% if entry.leaving_image_path %}
+                                                {% load static %}
+                                                <img src="{% static entry.leaving_image_path %}" class="img-fluid" width="35"/>
+                                                {% else %}
+                                                No image
+                                                {% endif %}
+                                            </td>
+                                            <td>{{ entry.status }}</td>
+                                        </tr>
+                                        {% empty %}
+                                        <tr>
+                                            <td colspan="7" class="text-center">No presence records found.</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                    
+                                    
+                                </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Libs JS -->
+<script src="../dist/libs/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+<script src="../dist/libs/jquery/dist/jquery.slim.min.js"></script>
+<script src="../dist/libs/peity/jquery.peity.min.js"></script>
+<script src="../dist/libs/apexcharts/dist/apexcharts.min.js"></script>
+<script src="../dist/libs/flatpickr/dist/flatpickr.min.js"></script>
+<!-- Tabler Core -->
+<script src="../dist/js/tabler.min.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        flatpickr(document.getElementById('calendar-range'), {
+            mode:"range"
+        });
+    });
+</script>
+<script>
+    // @formatter:off
+    document.addEventListener("DOMContentLoaded", function () {
+        window.ApexCharts && (new ApexCharts(document.getElementById('chart-donut'), {
+            chart: {
+                type: "donut",
+                fontFamily: 'inherit',
+                height: 240,
+                sparkline: {
+                    enabled: true
+                },
+                animations: {
+                    enabled: false
+                },
+            },
+            fill: {
+                opacity: 1,
+            },
+            series: [197, 55, 9],
+            labels: ["Ontime", "Late", "Absence"],
+            grid: {
+                strokeDashArray: 4,
+            },
+            colors: ["#206bc4", "#cd201f", "#5a3b7f"],
+            legend: {
+                show: true,
+            },
+            tooltip: {
+                fillSeriesColor: false
+            },
+        })).render();
+    });
+    // @formatter:on
+</script>
+<script>
+    // @formatter:off
+    document.addEventListener("DOMContentLoaded", function () {
+        window.ApexCharts && (new ApexCharts(document.getElementById('chart-bar'), {
+            chart: {
+                type: "bar",
+                fontFamily: 'inherit',
+                height: 250,
+                parentHeightOffset: 0,
+                toolbar: {
+                    show: false,
+                },
+                animations: {
+                    enabled: false
+                },
+                stacked: true,
+            },
+            plotOptions: {
+                bar: {
+                    columnWidth: '50%',
+                }
+            },
+            dataLabels: {
+                enabled: false,
+            },
+            fill: {
+                opacity: 1,
+            },
+            series: [{
+                name: "Ontime",
+                data: [155, 65, 465, 265, 225, 325, 80]
+            },{
+                name: "Late",
+                data: [113, 42, 65, 54, 76, 65, 35]
+            }],
+            grid: {
+                padding: {
+                    top: -20,
+                    right: 0,
+                    left: -4,
+                    bottom: -4
+                },
+                strokeDashArray: 4,
+            },
+            xaxis: {
+                labels: {
+                    padding: 0
+                },
+                tooltip: {
+                    enabled: false
+                },
+                axisBorder: {
+                    show: false,
+                },
+                type: 'datetime',
+            },
+            yaxis: {
+                labels: {
+                    padding: 4
+                },
+            },
+            labels: [
+                '2020-06-20', '2020-06-21', '2020-06-22', '2020-06-23', '2020-06-24', '2020-06-25', '2020-06-26'
+            ],
+            colors: ["#206bc4", "#cd201f"],
+            legend: {
+                show: true,
+                position:"top"
+            },
+        })).render();
+    });
+    // @formatter:on
+</script>
+<script>
+  document.body.style.display = "block"
+</script>
+{% endblock %}

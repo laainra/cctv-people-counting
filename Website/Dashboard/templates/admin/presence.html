@@ -1,0 +1,253 @@
+{% extends '../components/base.html' %}
+{% block title %}
+Presence 
+{% endblock %}
+<!-- This is a comment to prevent Prettifier -->
+{% block content %} {% csrf_token %}
+
+<div class="content">
+    <div class="container-xl">
+      <!-- Page title -->
+      <div class="page-header">
+        <div class="row align-items-center">
+          <div class="col-auto">
+            <!-- Page pre-title -->
+            <div class="page-pretitle">
+              Employees
+            </div>
+            <h2 class="page-title">
+              Employee Attendance
+            </h2>
+          </div>
+          <!-- Page title actions -->
+          <div class="col-auto ml-auto d-print-none">
+            <a href="#" class="btn btn-white" data-toggle="modal" data-target="#modal-export">
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"></path><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2"></path><polyline points="7 11 12 16 17 11"></polyline><line x1="12" y1="4" x2="12" y2="16"></line></svg>
+                Export
+              </a>
+          </div>
+        </div>
+      </div>
+      <div class="row row-deck row-cards">
+
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body border-bottom py-3">
+                    <div class="d-flex mb-4">
+                        <div style="max-width: 200px;" class="mr-2">
+                            <input type="date" id="filter-date" class="form-control calendar-range" placeholder="Date" />
+                        </div>
+                        <div style="max-width: 200px;" class="mr-2">
+                            <select id="filter-personnel" class="form-control" onchange="filterByPersonnel()">
+                                <option selected>All Employees</option>
+                                {% for personnel in personnel_list %}
+                                <option value="{{ personnel.id }}">{{ personnel.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                    </div>
+                    <div class="d-flex">
+                        <div class="text-muted">
+                            Show
+                            <div class="mx-2 d-inline-block">
+                            <input type="text" class="form-control form-control-sm" value="8" size="3">
+                            </div>
+                            entries
+                        </div>
+                        <div class="ml-auto text-muted">
+                            Search:
+                            <div class="ml-2 d-inline-block">
+                            <input type="text" class="form-control form-control-sm">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table card-table table-vcenter text-nowrap datatable text-center">
+                        <thead>
+                            <tr>
+                                <th class="w-1">
+                                    No.
+                                </th>
+                                <th>Employee ID</th>
+                                <th>Employee Name</th>
+                                <th>Attendance Time</th>
+                                <th>Attendance Image</th>
+                                <th>Status</th>
+                                <th>Leaving Time</th>
+                                <th>Leaving Image</th>
+                                <th>Work Hours</th>
+                                <th>Overtime Hours</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for entry in presence_data %}
+                            <tr>
+                              <td>{{ forloop.counter }}</td>
+                              <td>{{ entry.id }}</td>
+                              <td>{{ entry.name }}</td>
+                              <td>{{ entry.attended }}</td>
+                              <td>
+                                {% if entry.attendance_image_path %}
+                                {% load static %}
+                                <img src="{% static entry.attendance_image_path %}" class="img-fluid" width="35"/>
+                                {% else %}
+                                No image
+                                {% endif %}
+                              <td>{{ entry.status }}</td>
+                              <td>{{ entry.leave }}</td>
+                              <td>
+                                {% if entry.leaving_image_path %}
+                                {% load static %}
+                                <img src="{% static entry.leaving_image_path %}" class="img-fluid" width="35"/>
+                                {% else %}
+                                No image
+                                {% endif %}
+                              </td>
+                              <td>{{ entry.work_hours }}</td>
+                              <td>{{ entry.notes }}</td>
+                              <td class="text-right">
+                                <span class="dropdown ml-1">
+                                  <button class="btn btn-white btn-sm dropdown-toggle align-text-top" data-boundary="viewport" data-toggle="dropdown">Actions</button>
+                                  <div class="dropdown-menu dropdown-menu-right">
+                                    <a class="dropdown-item" href="#">Action</a>
+                                    <a class="dropdown-item" href="#">Another action</a>
+                                  </div>
+                                </span>
+                              </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="card-footer d-flex align-items-center">
+                    <p class="m-0 text-muted">Showing <span>1</span> to <span>8</span> of <span>16</span> entries</p>
+                    <ul class="pagination m-0 ml-auto">
+                    <li class="page-item disabled">
+                        <a class="page-link" href="#" tabindex="-1">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><polyline points="15 6 9 12 15 18" /></svg>
+                        Prev
+                        </a>
+                    </li>
+                    <li class="page-item"><a class="page-link" href="#">1</a></li>
+                    <li class="page-item active"><a class="page-link" href="#">2</a></li>
+                    <li class="page-item"><a class="page-link" href="#">3</a></li>
+                    <li class="page-item"><a class="page-link" href="#">4</a></li>
+                    <li class="page-item"><a class="page-link" href="#">5</a></li>
+                    <li class="page-item">
+                        <a class="page-link" href="#">
+                        Next <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><polyline points="9 6 15 12 9 18" /></svg>
+                        </a>
+                    </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- MODAL EXPORT -->
+<div class="modal modal-blur fade" id="modal-export" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-body">
+          <div class="modal-title">Export to Excel</div>
+          <div>Are you sure you want to export all attendance data to Excel?</div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-link link-secondary mr-auto" data-dismiss="modal">Cancel</button>
+          <button onclick="downloadPresenceData()" type="button" class="btn btn-primary" data-dismiss="modal">Yes, export data</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+    function downloadPresenceData() {
+        const date = document.getElementById('filter-date').value;
+        const personnelId = document.getElementById('filter-personnel').value;
+        const url = date ? `{% url "download_presence_excel" %}?date=${date}&personnel_id=${personnelId}` : '{% url "download_presence_excel" %}';
+        window.location.href = url;
+      }
+      function filterByDate() {
+        const date = document.getElementById('filter-date').value;
+        const personnelId = document.getElementById('filter-personnel').value;
+        $.ajax({
+            url: '{% url "presence" %}',
+            method: 'GET',
+            data: { date: date, personnel_id: personnelId },
+            success: function(response) {
+                if (response.status === 'success') {
+                    const tbody = document.getElementById('presence-table-body');
+                    tbody.innerHTML = '';
+                    response.presence_data.forEach(entry => {
+                        const row = `<tr>
+                            <td>${entry.id}</td>
+                            <td>${entry.name}</td>
+                            <td>${entry.attended}</td>
+                            <td>${entry.leave}</td>
+                            <td>${entry.status}</td>
+                            <td>${entry.work_hours}</td>
+                            <td>${entry.notes}</td>
+                            <td>${entry.image_path ? `<img src="{% static '${entry.image_path}' %}" class="img-fluid" width="35"/>` : 'No image'}</td>
+                        </tr>`;
+                        tbody.innerHTML += row;
+                    });
+                } else {Swal.fire('Error', response.message, 'error');
+            }
+        },
+        error: function(error) {
+            console.error('Error fetching presence data:', error);
+            Swal.fire('Error', 'An error occurred while fetching presence data.', 'error');
+        }
+    });
+}
+
+function filterByPersonnel() {
+    const personnelId = document.getElementById('filter-personnel').value;
+    const date = document.getElementById('filter-date').value;
+    $.ajax({
+        url: '{% url "presence" %}',
+        method: 'GET',
+        data: { personnel_id: personnelId, date: date },
+        success: function(response) {
+            if (response.status === 'success') {
+                const tbody = document.getElementById('presence-table-body');
+                tbody.innerHTML = '';
+                response.presence_data.forEach(entry => {
+                    const row = `<tr>
+                        <td>${entry.id}</td>
+                        <td>${entry.name}</td>
+                        <td>${entry.attended}</td>
+                        <td>${entry.leave}</td>
+                        <td>${entry.status}</td>
+                        <td>${entry.work_hours}</td>
+                        <td>${entry.notes}</td>
+                        <td>${entry.image_path ? `<img src="{% static '${entry.image_path}' %}" class="img-fluid" width="35"/>` : 'No image'}</td>
+                    </tr>`;
+                    tbody.innerHTML += row;
+                });
+            } else {
+                Swal.fire('Error', response.message, 'error');
+            }
+        },
+        error: function(error) {
+            console.error('Error fetching presence data:', error);
+            Swal.fire('Error', 'An error occurred while fetching presence data.', 'error');
+        }
+    });
+}
+document.addEventListener('DOMContentLoaded', (event) => {
+    const dateInput = document.getElementById('filter-date');
+    const today = new Date().toISOString().split('T')[0];
+    dateInput.value = today;
+});
+</script>
+{% endblock %}

@@ -43,6 +43,10 @@ class PeopleCounting:
         'min_box_area': 100,
         'frame_rate': 30
     }
+        # Detection times for each person
+        self.detection_times = {}
+        
+        
     # Function to get distance between line and point
     def distance(self, x1, y1, x2, y2, x, y):
         A = x - x1
@@ -76,7 +80,7 @@ class PeopleCounting:
         (bbox_x1, bbox_y1, bbox_x2, bbox_y2), bbox_id, bbox_conf = bbox
 
         # text = f"{self.id[bbox_id]['name']} - {self.id[bbox_id]['gender']} ({bbox_conf:.2f})"
-        text = f"{self.id[bbox_id]['name']} "
+        text = f"{self.id[bbox_id]['name']} ({self.id[bbox_id].get('time', '0')})"
 
         (w, h), _ = cv2.getTextSize(text, self.font, self.font_size, self.font_thickness)
 
@@ -86,8 +90,14 @@ class PeopleCounting:
         cv2.drawMarker(img, (int(bbox_x2), int(bbox_y2)), (0, 0, 255), thickness=1)
         cv2.putText(img, text, (bbox_x1, bbox_y1 - 10), self.font, self.font_size, (255, 255, 255), self.font_thickness)
         
+        # Display timer
+        detection_duration = self.detection_times.get(bbox_id, 0)
+        seconds = int(detection_duration.total_seconds())
+        timer_text = f"{seconds}s"
+        cv2.putText(img, timer_text, (bbox_x1, bbox_y1 - 30), self.font, 0.6, (0, 255, 0), 2)
+
         return img
-    
+
     # Function to get persons bounding box 
     def extract_bboxes(self, img):
         self.ori_img_size = img.shape
@@ -173,8 +183,16 @@ class PeopleCounting:
                 'prev_distGreen': 0,
                 'score': 0
             })
+            
             self.id[bbox_id] = person_data
-
+            
+            if bbox_id not in self.detection_times:
+                self.detection_times[bbox_id] = current_time
+            else:
+                # Calculate the duration of detection
+                detection_duration = current_time - self.detection_times[bbox_id]
+                self.detection_times[bbox_id] = detection_duration
+                
             # Check which face belongs to which person bounding box
             for idx, (((ax1, ay1, ax2, ay2, w, h), center1, center2), (face_name, score, feat), (gender, gender_score)) in enumerate(zip(face_coordinates, feats, genders)):
                 # print(len(feats), len(face_coordinates), len(genders))
@@ -335,7 +353,7 @@ class PeopleCounting:
 
         # Store occupancy
         self.GV.occupancy = (self.GV.female_enter + self.GV.male_enter + self.GV.unknown_enter + self.GV.total_enter) - (self.GV.exit + self.GV.total_exit) 
-        
+ 
         if self.GV.occupancy < 0:
             self.GV.occupancy = 0
 

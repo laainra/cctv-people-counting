@@ -1,0 +1,68 @@
+[
+    {
+        "name": "Lala",
+        "datetime": "2025-01-13 09:50:13",
+        "confidence": 0.761798083782196,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20250113/Lala_20250113_095013.jpg"
+    },
+    {
+        "name": "Lala",
+        "datetime": "2025-01-13 09:52:43",
+        "confidence": 0.7597760558128357,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20250113/Lala_20250113_095243.jpg"
+    },
+    {
+        "name": "Lala",
+        "datetime": "2025-01-13 11:29:49",
+        "confidence": 0.756321907043457,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20250113/Lala_20250113_112949.jpg"
+    },
+    {
+        "name": "Lala",
+        "datetime": "2025-01-13 11:29:52",
+        "confidence": 0.763112485408783,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20250113/Lala_20250113_112952.jpg"
+    },
+    {
+        "name": "Lala",
+        "datetime": "2025-01-13 11:30:03",
+        "confidence": 0.7583426237106323,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20250113/Lala_20250113_113003.jpg"
+    },
+    {
+        "name": "Lala",
+        "datetime": "2025-01-13 11:30:05",
+        "confidence": 0.7664757370948792,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20250113/Lala_20250113_113005.jpg"
+    },
+    {
+        "name": "Lala",
+        "datetime": "2025-01-13 11:31:30",
+        "confidence": 0.7595455050468445,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20250113/Lala_20250113_113130.jpg"
+    },
+    {
+        "name": "Lala",
+        "datetime": "2025-01-13 11:31:48",
+        "confidence": 0.7758470773696899,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20250113/Lala_20250113_113148.jpg"
+    },
+    {
+        "name": "Lala",
+        "datetime": "2025-01-13 11:32:01",
+        "confidence": 0.8032680749893188,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20250113/Lala_20250113_113201.jpg"
+    },
+    {
+        "name": "Lala",
+        "datetime": "2025-01-13 11:32:02",
+        "confidence": 0.8048012256622314,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20250113/Lala_20250113_113202.jpg"
+    },
+    {
+        "name": "Lala",
+        "datetime": "2025-01-13 11:33:52",
+        "confidence": 0.756504237651825,
+        "image_path": "static/img/extracted_faces/predicted_faces/absence/20250113/Lala_20250113_113352.jpg"
+    }
+]
