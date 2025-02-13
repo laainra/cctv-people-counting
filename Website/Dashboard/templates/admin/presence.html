@@ -64,7 +64,7 @@ Presence
                     </div>
                 </div>
                 <div class="table-responsive">
-                    <table class="table card-table table-vcenter text-nowrap datatable">
+                    <table class="table card-table table-vcenter text-nowrap datatable text-center">
                         <thead>
                             <tr>
                                 <th class="w-1">
@@ -72,10 +72,11 @@ Presence
                                 </th>
                                 <th>Employee ID</th>
                                 <th>Employee Name</th>
-                                <th>Check-in Time</th>
+                                <th>Attendance Time</th>
+                                <th>Attendance Image</th>
                                 <th>Status</th>
-                                <th>Check-out Time</th>
-                                <th>Photo</th>
+                                <th>Leaving Time</th>
+                                <th>Leaving Image</th>
                                 <th>Work Hours</th>
                                 <th>Overtime Hours</th>
                                 <th></th>
@@ -88,12 +89,19 @@ Presence
                               <td>{{ entry.id }}</td>
                               <td>{{ entry.name }}</td>
                               <td>{{ entry.attended }}</td>
+                              <td>
+                                {% if entry.attendance_image_path %}
+                                {% load static %}
+                                <img src="{% static entry.attendance_image_path %}" class="img-fluid" width="35"/>
+                                {% else %}
+                                No image
+                                {% endif %}
                               <td>{{ entry.status }}</td>
                               <td>{{ entry.leave }}</td>
                               <td>
-                                {% if entry.image_path %}
+                                {% if entry.leaving_image_path %}
                                 {% load static %}
-                                <img src="{% static entry.image_path %}" class="img-fluid" width="35"/>
+                                <img src="{% static entry.leaving_image_path %}" class="img-fluid" width="35"/>
                                 {% else %}
                                 No image
                                 {% endif %}

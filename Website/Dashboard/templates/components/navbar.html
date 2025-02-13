@@ -101,28 +101,23 @@
                   </a>
                 </li>
                 <li class="nav-item dropdown">
-                  <a class="nav-link dropdown-toggle"  data-toggle="dropdown" role="button" aria-expanded="false" >
+                  <a class="nav-link dropdown-toggle" href="#navbar-extra2" data-toggle="dropdown" role="button" aria-expanded="false" >
                     <span class="nav-link-icon d-md-none d-lg-inline-block">
-                      <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"></path><circle cx="12" cy="7" r="4"></circle><path d="M5.5 21v-2a4 4 0 0 1 4 -4h5a4 4 0 0 1 4 4v2"></path></svg>
+                      <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-md" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"></path><polyline points="14 3 14 8 19 8"></polyline><path d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z"></path><line x1="9" y1="9" x2="10" y2="9"></line><line x1="9" y1="13" x2="15" y2="13"></line><line x1="9" y1="17" x2="15" y2="17"></line></svg>
                     </span>
                     <span class="nav-link-title">
-                      Employees
+                      Presence
                     </span>
                   </a>
                   <ul class="dropdown-menu">
                     <li >
-                      <a class="dropdown-item" href="{% url 'divisions' %}" >
-                        Division
-                      </a>
-                    </li>
-                    <li >
-                      <a class="dropdown-item" href="{% url 'employees' %}" >
-                        Employees
+                      <a class="dropdown-item" href="{% url 'presence_stream' %}" >
+                        Presence Camera Streaming
                       </a>
                     </li>
                     <li >
                       <a class="dropdown-item" href="{% url 'presence' %}" >
-                        Presence
+                        Presence Report
                       </a>
                     </li>
                   </ul>
@@ -130,7 +125,34 @@
                 <li class="nav-item dropdown">
                   <a class="nav-link dropdown-toggle" href="#navbar-extra2" data-toggle="dropdown" role="button" aria-expanded="false" >
                     <span class="nav-link-icon d-md-none d-lg-inline-block">
-                      <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"></path><path d="M3 21h4l13 -13a1.5 1.5 0 0 0 -4 -4l-13 13v4"></path><line x1="14.5" y1="5.5" x2="18.5" y2="9.5"></line><polyline points="12 8 7 3 3 7 8 12"></polyline><line x1="7" y1="8" x2="5.5" y2="9.5"></line><polyline points="16 12 21 17 17 21 12 16"></polyline><line x1="16" y1="17" x2="14.5" y2="18.5"></line></svg>
+                      <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-md" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"></path><rect x="3" y="4" width="18" height="12" rx="1"></rect><line x1="7" y1="20" x2="17" y2="20"></line><line x1="9" y1="16" x2="9" y2="20"></line><line x1="15" y1="16" x2="15" y2="20"></line></svg>
+                    </span>
+                    <span class="nav-link-title">
+                      Employee Tracking
+                    </span>
+                  </a>
+                  <ul class="dropdown-menu">
+                    <li >
+                      <a class="dropdown-item" href="{% url 'tracking_stream' %}" >
+                        Tracking Camera Streaming
+                      </a>
+                    </li>
+                    <li >
+                      <a class="dropdown-item" href="{% url 'work_time_report' %}" >
+                        Work Time Report
+                      </a>
+                    </li>
+                    <li >
+                      <a class="dropdown-item" href="{% url 'tracking_report' %}" >
+                        Tracking Report
+                      </a>
+                    </li>
+                  </ul>
+                </li>
+                <li class="nav-item dropdown">
+                  <a class="nav-link dropdown-toggle" href="#navbar-extra2" data-toggle="dropdown" role="button" aria-expanded="false" >
+                    <span class="nav-link-icon d-md-none d-lg-inline-block">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-md" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"></path><path d="M3 21h4l13 -13a1.5 1.5 0 0 0 -4 -4l-13 13v4"></path><line x1="14.5" y1="5.5" x2="18.5" y2="9.5"></line><polyline points="12 8 7 3 3 7 8 12"></polyline><line x1="7" y1="8" x2="5.5" y2="9.5"></line><polyline points="16 12 21 17 17 21 12 16"></polyline><line x1="16" y1="17" x2="14.5" y2="18.5"></line></svg>
                     </span>
                     <span class="nav-link-title">
                       Configuration
@@ -149,17 +171,29 @@
                     </li>
                   </ul>
                 </li>
-              </ul>
-              {% comment %} <div class="my-2 my-md-0 flex-grow-1 flex-md-grow-0 order-first order-md-last">
-                <form action="." method="get">
-                  <div class="input-icon">
-                    <span class="input-icon-addon">
-                      <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="10" cy="10" r="7" /><line x1="21" y1="21" x2="15" y2="15" /></svg>
+                <li class="nav-item dropdown active">
+                  <a class="nav-link dropdown-toggle" href="#navbar-extra2" data-toggle="dropdown" role="button" aria-expanded="false" >
+                    <span class="nav-link-icon d-md-none d-lg-inline-block">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-md" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"></path><ellipse cx="12" cy="6" rx="8" ry="3"></ellipse><path d="M4 6v6a8 3 0 0 0 16 0v-6"></path><path d="M4 12v6a8 3 0 0 0 16 0v-6"></path></svg>
                     </span>
-                    <input type="text" class="form-control" placeholder="Search…">
-                  </div>
-                </form>
-              </div> {% endcomment %}
+                    <span class="nav-link-title">
+                      Database
+                    </span>
+                  </a>
+                  <ul class="dropdown-menu">
+                    <li >
+                      <a class="dropdown-item active" href="{% url 'divisions' %}" >
+                        Divison Data
+                      </a>
+                    </li>
+                    <li >
+                      <a class="dropdown-item" href="{% url 'employees' %}" >
+                        Employee Data
+                      </a>
+                    </li>
+                  </ul>
+                </li>
+              </ul>
             </div>
           </div>
         </div>
@@ -235,16 +269,7 @@
             </li>
             
           </ul>
-          {% comment %} <div class="my-2 my-md-0 flex-grow-1 flex-md-grow-0 order-first order-md-last">
-            <form action="." method="get">
-              <div class="input-icon">
-                <span class="input-icon-addon">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="10" cy="10" r="7" /><line x1="21" y1="21" x2="15" y2="15" /></svg>
-                </span>
-                <input type="text" class="form-control" placeholder="Search…">
-              </div>
-            </form>
-          </div> {% endcomment %}
+
         </div>
       </div>
     </div>

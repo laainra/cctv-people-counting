@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import face_rec, profile, presence, authentication, camera, home, personnel, settings, superadmin, stream, admin, employee
+from .views import face_rec, profile, presence, authentication, camera, home, personnel, settings, superadmin, stream, admin, employee, work_timer, tracking
 # from .views.presence import presence
 
 urlpatterns = [
@@ -33,7 +33,7 @@ urlpatterns = [
     path('personnel-entries', personnel.personnel_entries_data, name='personnel_entries_data'),
     path('download_personnel_presence', personnel.download_personnel_presence, name='download_personnel_presence'),
     path('settings', settings.settings, name="settings"),
-    path('presence', presence.presence, name="presence"),
+    path('presence/', presence.presence, name="presence"),
     path('download_presence_excel', presence.download_presence_excel, name="download_presence_excel"),
     path('download', home.download, name="download"),
     # path('personnels/add', personnel.add_personnel, name='add_personnel'),
@@ -60,7 +60,7 @@ urlpatterns = [
     path('edit_division/<int:id>/', admin.edit_division, name='edit_division'),
     path('delete_division/<int:id>/', admin.delete_division, name='delete_division'),
     path('employees/', admin.employees, name='employees'),
-    path('presence/', admin.presence, name='presence'),
+    # path('presence/', admin.presence, name='presence'),
     path('presence_cam/', admin.presence_cam, name='presence_cam'),
     path('tracking_cam/', admin.tracking_cam, name='tracking_cam'),
 
@@ -74,6 +74,8 @@ urlpatterns = [
     path('ai_video_feed/', stream.ai_video_feed, name='ai_video_feed'),
     path('set_cam_id/', stream.set_cam_id, name='set_cam_id'),
     path('stream/', stream.stream, name='stream'),
+    path('presence_stream/', stream.presence_stream, name='presence_stream'),
+    path('tracking_stream/', stream.tracking_stream, name='tracking_stream'),
     
     path('profile/', profile.profile, name='profile'),
 
@@ -83,4 +85,9 @@ urlpatterns = [
     path('train/', face_rec.train_model, name='train_model'),
     path('recognize/', face_rec.predict_video, name='predict_video'),
     path('dataset/', face_rec.dataset, name='dataset'),
+    
+    path('work_time_report/', work_timer.work_time_report, name='work_time_report'),
+    path('video_feed_timer/<int:cam_id>/', work_timer.video_feed_timer, name='video_feed_timer'),
+    
+    path('tracking_report/', tracking.tracking_report, name='tracking_report'),
 ]

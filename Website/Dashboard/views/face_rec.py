@@ -28,10 +28,6 @@ if not os.path.exists(dataset_folder):
 if not os.path.exists(static_folder):
     os.makedirs(static_folder)
 
-# Global variables to track detection time
-detection_times = {}
-last_detection_time = {}
-is_face_detected = False
 
 def load_label_to_name(file_path=label_to_name_path):
     """Load label-to-name mapping from a JSON file. Create the file if it does not exist."""

@@ -11,6 +11,7 @@ from django.contrib.auth.decorators import login_required
 from django.http.response import StreamingHttpResponse, JsonResponse
 from .. import forms, models
 from ..decorators import role_required
+from datetime import datetime
 
 # Artificial Intelligence Library
 from ..Artificial_Intelligence.variables import RecognitionVariable as RV
@@ -318,8 +319,6 @@ def generate_stream(request):
             # print(f"Error getting frame: {e}")
             continue
     
-        
-    
 @login_required(login_url='login')
 def video_feed(request):
     return StreamingHttpResponse(generate_stream(request), content_type='multipart/x-mixed-replace; boundary=frame')
@@ -463,6 +462,13 @@ def edit_tracking_camera(request, id):
 
     return render(request, 'edit_tracking_camera.html', {'Active_Cam': active_cam, 'form': form})
 
+def format_time(time_str):
+    """Convert 'HH:MM' to 'HH:MM:SS' format."""
+    try:
+        return datetime.strptime(time_str, "%H:%M").time()  # Default seconds to 00
+    except ValueError:
+        return None  # Handle invalid time formats
+
 @login_required
 def add_presence_camera(request):
     if request.method == 'POST':
@@ -471,14 +477,19 @@ def add_presence_camera(request):
             company = models.Company.objects.get(user=request.user)
             camera = form.save(commit=False) 
             camera.company = company 
-            camera.save() 
+
+            # Convert time fields to match '%H:%M:%S' format
+            camera.attendance_time_start = format_time(request.POST['attendance_time_start'])
+            camera.attendance_time_end = format_time(request.POST['attendance_time_end'])
+            camera.leaving_time_start = format_time(request.POST['leaving_time_start'])
+            camera.leaving_time_end = format_time(request.POST['leaving_time_end'])
+
+            camera.save()
 
             cam = models.Camera_Settings.objects.last()
-
             MC.add_camera(cam.id, cam.feed_src)
 
             request.session['status'] = 'adding_success'
-
             return JsonResponse({'status': 'success'})
         else:
             request.session['status'] = 'adding_error'
@@ -491,29 +502,28 @@ def edit_presence_camera(request, id):
     active_cam = models.Camera_Settings.objects.get(id=id)
     form = forms.AddPresenceCameraForm(request.POST, instance=active_cam)
     if request.method == 'POST':
-        
         if form.is_valid():
-            form.save()
+            active_cam.feed_src = form.cleaned_data['feed_src']
+            active_cam.cam_name = form.cleaned_data['cam_name']
+
+            # Convert time fields before saving
+            active_cam.attendance_time_start = format_time(request.POST['attendance_time_start'])
+            active_cam.attendance_time_end = format_time(request.POST['attendance_time_end'])
+            active_cam.leaving_time_start = format_time(request.POST['leaving_time_start'])
+            active_cam.leaving_time_end = format_time(request.POST['leaving_time_end'])
 
             if active_cam.feed_src != form.cleaned_data['feed_src']:
                 MC.stop_cam(active_cam.id)
                 MC.add_camera(active_cam.id, form.cleaned_data['feed_src'])
                 active_cam.cam_is_active = False
-            
-            active_cam.feed_src = form.cleaned_data['feed_src']
-            active_cam.cam_name = form.cleaned_data['cam_name']
-            active_cam.attendance_time_start = form.cleaned_data['attendance_time_start']
-            active_cam.attendance_time_end = form.cleaned_data['attendance_time_end']
-            active_cam.leaving_time_start = form.cleaned_data['leaving_time_start']
-            active_cam.leaving_time_end = form.cleaned_data['leaving_time_end']
-            active_cam.save()
 
+            active_cam.save()
             request.session['status'] = 'editing_success'
             return JsonResponse({'status': 'success'})
         else:
             request.session['status'] = 'editing_error'
 
-    return render(request, 'edit_presence_camera.html', {'Active_Cam': active_cam})
+    return render(request, 'edit_presence_camera.html', {'Active_Cam': active_cam}) 
 
 def get_edit_camera_url(request, camera_id):
     camera = models.Camera.objects.get(id=camera_id)  # Assuming you have a Camera model

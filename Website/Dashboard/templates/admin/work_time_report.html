@@ -1,0 +1,128 @@
+{% extends '../components/base.html' %}
+{% block title %}
+Work Time Report 
+{% endblock %}
+<!-- This is a comment to prevent Prettifier -->
+{% block content %} {% csrf_token %}
+
+<div class="content">
+    <div class="container-xl">
+      <!-- Page title -->
+      <div class="page-header">
+        <div class="row align-items-center">
+          <div class="col-auto">
+            <!-- Page pre-title -->
+            <div class="page-pretitle">
+             Report
+            </div>
+            <h2 class="page-title">
+                Work Time Report
+            </h2>
+          </div>
+          <!-- Page title actions -->
+          <div class="col-auto ml-auto d-print-none">
+            <a href="#" class="btn btn-white" data-toggle="modal" data-target="#modal-export">
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"></path><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2"></path><polyline points="7 11 12 16 17 11"></polyline><line x1="12" y1="4" x2="12" y2="16"></line></svg>
+                Export
+              </a>
+          </div>
+        </div>
+      </div>
+      <div class="row row-deck row-cards">
+
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body border-bottom py-3">
+                    <div class="d-flex mb-4">
+                        <div style="max-width: 200px;" class="mr-2">
+                            <input type="date" id="filter-date" class="form-control calendar-range" placeholder="Date" />
+                        </div>
+                        <div style="max-width: 200px;" class="mr-2">
+                            <select id="filter-personnel" class="form-control" onchange="filterByPersonnel()">
+                                <option selected>All Employees</option>
+                                {% for personnel in personnel_list %}
+                                <option value="{{ personnel.id }}">{{ personnel.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                    </div>
+                    <div class="d-flex">
+                        <div class="text-muted">
+                            Show
+                            <div class="mx-2 d-inline-block">
+                            <input type="text" class="form-control form-control-sm" value="8" size="3">
+                            </div>
+                            entries
+                        </div>
+                        <div class="ml-auto text-muted">
+                            Search:
+                            <div class="ml-2 d-inline-block">
+                            <input type="text" class="form-control form-control-sm">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table card-table table-vcenter text-nowrap datatable">
+                        <thead>
+                            <tr>
+                                <th class="w-1">
+                                    No.
+                                </th>
+                                <th>Date</th>
+                                <th>Employee ID</th>
+                                <th>Employee Name</th>
+                                <th>Divison</th>
+                                <th>Time Detected</th>
+                                <th>CCTV Areas</th>
+                                <th>Detail</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for entry in work_time_data %}
+                            <tr>
+                              <td>{{ forloop.counter }}</td>
+                              <td>{{ entry.employee_id }}</td>
+                              <td>{{ entry.employee_name }}</td>
+                              <td>{{ entry.employee_division }}</td>
+                              <td>{{ entry.time_detected }}</td>
+                              <td>{{ entry.cctv_areas }}</td>
+                              <td>
+                                <button class="btn btn-sm btn-primary" data-toggle="modal" data-target="#modal-detail">Detail</button>
+                              </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="card-footer d-flex align-items-center">
+                    <p class="m-0 text-muted">Showing <span>1</span> to <span>8</span> of <span>16</span> entries</p>
+                    <ul class="pagination m-0 ml-auto">
+                    <li class="page-item disabled">
+                        <a class="page-link" href="#" tabindex="-1">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><polyline points="15 6 9 12 15 18" /></svg>
+                        Prev
+                        </a>
+                    </li>
+                    <li class="page-item"><a class="page-link" href="#">1</a></li>
+                    <li class="page-item active"><a class="page-link" href="#">2</a></li>
+                    <li class="page-item"><a class="page-link" href="#">3</a></li>
+                    <li class="page-item"><a class="page-link" href="#">4</a></li>
+                    <li class="page-item"><a class="page-link" href="#">5</a></li>
+                    <li class="page-item">
+                        <a class="page-link" href="#">
+                        Next <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><polyline points="9 6 15 12 9 18" /></svg>
+                        </a>
+                    </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</div>

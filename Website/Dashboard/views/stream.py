@@ -19,14 +19,57 @@ from ..decorators import role_required
 from ..Artificial_Intelligence.multi_camera import MultiCamera as MC
 from ..Artificial_Intelligence.variables import RecognitionVariable as RV
 
-
+# presence_stream
 
 @login_required(login_url='login')
 @role_required('admin')
 def stream(request):
-    cam = models.Camera_Settings.objects.get(id=request.session['cam_id'])
     company = models.Company.objects.get(user=request.user)
-    return render(request, 'admin/stream.html', {'company': company, 'cam': cam})
+    cams = models.Camera_Settings.objects.filter(role_camera='P_IN' or "P_OUT", company=company)
+    return render(request, 'admin/stream.html', {'company': company, 'cams': cams})
+
+@login_required(login_url='login')
+@role_required('admin')
+def presence_stream(request):
+    company = models.Company.objects.get(user=request.user)
+    cams = models.Camera_Settings.objects.filter(role_camera='P_IN' or "P_OUT", company=company)
+    return render(request, 'admin/presence_stream.html', {'company': company, 'cams': cams})
+
+
+def start_presence_stream(request, cam_id):
+    return
+
+def stop_presence_stream(request, cam_id):
+    return
+
+def generate_presence_stream(request):
+    return
+
+def presence_cam_feed(request):
+    return StreamingHttpResponse(generate_presence_stream(request), content_type='multipart/x-mixed-replace; boundary=frame')
+
+
+# tracking_stream
+
+@login_required(login_url='login')
+@role_required('admin')
+def tracking_stream(request):
+    company = models.Company.objects.get(user=request.user)
+    cams = models.Camera_Settings.objects.filter(role_camera='T', company=company)
+    return render(request, 'admin/tracking_stream.html', {'company': company, 'cams': cams})
+
+def start_tracking_stream(request, cam_id):
+    return
+
+def stop_tracking_stream(request, cam_id):
+    return
+
+def generate_tracking_stream(request):
+    return
+
+def tracking_cam_feed(request):
+    return StreamingHttpResponse(generate_tracking_stream(request), content_type='multipart/x-mixed-replace; boundary=frame')
+
 
 @login_required
 def start_ai_stream(request):

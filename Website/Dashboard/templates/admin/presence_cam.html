@@ -470,9 +470,10 @@ Presence Camera
     })
     .then(response => response.json())
     .then(data => {
+      window.location.reload();
       if (data.status === 'success') {
         closeModal('modal-add');
-        location.reload();
+        window.location.reload();
       } else {
         Swal.fire({
           title: 'Error!',
