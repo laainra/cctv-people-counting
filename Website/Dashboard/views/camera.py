@@ -126,19 +126,19 @@ def start_stream(request):
         print(f"Start RTSP stream from: {cam.feed_src}")
 
         # Set known faces for face recognition
-        if len(RV.known_features) == 0:
-            RV.set_all_known_faces()
-        else:
-            for personnel_name in os.listdir(var.personnel_path):
-                if RV.known_features.get(personnel_name) == None:
-                    RV.set_personnel_known_faces(personnel_name)
-                else:
-                    if personnel_name == 'Unknown':
-                        if len(RV.known_features[personnel_name]) != (len(os.listdir(os.path.join(var.personnel_path, personnel_name))) - 1):
-                            RV.set_personnel_known_faces(personnel_name)
-                    else:
-                        if len(RV.known_features[personnel_name]) != len(os.listdir(os.path.join(var.personnel_path, personnel_name))):
-                            RV.set_personnel_known_faces(personnel_name)
+        # if len(RV.known_features) == 0:
+        #     RV.set_all_known_faces()
+        # else:
+        #     for personnel_name in os.listdir(var.personnel_path):
+        #         if RV.known_features.get(personnel_name) == None:
+        #             RV.set_personnel_known_faces(personnel_name)
+        #         else:
+        #             if personnel_name == 'Unknown':
+        #                 if len(RV.known_features[personnel_name]) != (len(os.listdir(os.path.join(var.personnel_path, personnel_name))) - 1):
+        #                     RV.set_personnel_known_faces(personnel_name)
+        #             else:
+        #                 if len(RV.known_features[personnel_name]) != len(os.listdir(os.path.join(var.personnel_path, personnel_name))):
+        #                     RV.set_personnel_known_faces(personnel_name)
         # ai_stream = WT(cam.feed_src, cam.id)
         # print("AI Stream initialized")
         # ai_stream.start_stream()
@@ -161,7 +161,7 @@ def start_stream(request):
         MC.start_cam(cam.id)
 
         request.session['status'] = 'stream_success'
-        print(f"Session status set to 'stream_success'")
+        print(f"Session status set to 'stream_success' {cam.feed_src}")
         return JsonResponse({'status': 'success', 'camera_active': cam.cam_is_active})
     else:
         request.session['status'] = 'stream_error'

@@ -8,11 +8,11 @@ from django.conf import settings
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
 dataset_folder = os.path.join(BASE_DIR, 'static', 'img', 'personnel_pics')
-model_path = '../model_lbph.xml'
+model_path = '../../model_lbph.xml'
 static_folder = os.path.join(BASE_DIR, 'static')
 label_to_name_path = os.path.join(static_folder, 'label_to_name.json')
 
-def recognize_face(cap):
+def recognizing_face(cap):
     """Process face recognition from the camera stream."""
     recognizer = cv2.face.LBPHFaceRecognizer_create()
 

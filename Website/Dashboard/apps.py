@@ -13,7 +13,7 @@ class DashboardConfig(AppConfig):
         thread_watching.start()
 
         # Start the work timer thread
-        from .views.work_timer import work_timer
-        thread_work_timer = Thread(target=work_timer)
+        from .views.face_rec import recognize_face
+        thread_work_timer = Thread(target=recognize_face)
         thread_work_timer.daemon = True  # Make the thread exit when the main program exits
         thread_work_timer.start()

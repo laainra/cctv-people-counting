@@ -109,18 +109,26 @@ def train_model(request):
     if user:
         face_id = user.id
         face_name = user.name
-        face_folder = os.path.join(var.personnel_path, face_name)
+        face_folder = os.path.join(var.personnel_path)  # Ensure this path is correct
 
-    for file_name in os.listdir(face_folder):
-        if file_name.endswith('.jpg'):
-            img_path = os.path.join(face_folder, file_name)
-            img = cv2.imread(img_path, cv2.IMREAD_GRAYSCALE)
-            img = cv2.resize(img, target_size)
-            label = int(file_name.split('_')[1])  # Extract ID from filename
-            faces.append(img)
-            labels.append(np.int32(label))
-            extracted_name = file_name.split('_')[2]  # Extract name from filename
-            label_to_name[label] = extracted_name  # Map label to name
+        # Check if the face folder exists
+        if not os.path.exists(face_folder):
+            return JsonResponse({'status': 'error', 'message': 'Face folder does not exist.'})
+
+        for name_folder in os.listdir(face_folder):
+            name_folder_path = os.path.join(face_folder, name_folder)  # Construct full path
+            # Check if the name_folder_path is a directory
+            if os.path.isdir(name_folder_path):
+                for file_name in os.listdir(name_folder_path):
+                    if file_name.endswith('.jpg'):
+                        img_path = os.path.join(name_folder_path, file_name)  # Use the full path
+                        img = cv2.imread(img_path, cv2.IMREAD_GRAYSCALE)
+                        img = cv2.resize(img, target_size)
+                        label = int(file_name.split('_')[1])  # Extract ID from filename
+                        faces.append(img)
+                        labels.append(np.int32(label))
+                        extracted_name = file_name.split('_')[2]  # Extract name from filename
+                        label_to_name[label] = extracted_name  # Map label to name
 
     if len(faces) > 0:
         recognizer = cv2.face.LBPHFaceRecognizer_create()
@@ -130,110 +138,124 @@ def train_model(request):
         return JsonResponse({'status': 'success', 'message': 'Model successfully trained and saved.'})
     else:
         return JsonResponse({'status': 'error', 'message': 'No face data to train.'})
-
+    
 def recognize_face(request):
     global is_face_detected
     global detection_times
     global last_detection_time
     global last_save_time
-
-    cap = cv2.VideoCapture(0)  
-    recognizer = cv2.face.LBPHFaceRecognizer_create()
-
-    if not os.path.exists(model_path):
-        return JsonResponse({'status': 'error', 'message': 'Model not available, please train the model first.'})
-
-    recognizer.read(model_path)
-
-    label_to_name = {}
-    personnel_folder = var.personnel_path
-
-    for face_folder in os.listdir(personnel_folder):
-        face_folder_path = os.path.join(personnel_folder, face_folder)
-        if os.path.isdir(face_folder_path):
-            for file_name in os.listdir(face_folder_path):
-                if file_name.endswith('.jpg'):
-                    label = int(file_name.split('_')[1])
-                    extracted_name = file_name.split('_')[2]
-                    label_to_name[label] = extracted_name
-
-    def save_or_update_database(name, total_time):
-        """Save or update the detection time in the Work_Timer table."""
-        personnel = models.Personnels.objects.get(name=name)  # Get the personnel object
-        
-        # Check if a record already exists for this personnel
-        try:
-            work_timer_entry = models.Work_Timer.objects.get(personnel=personnel, type='FACE_DETECTED', datetime__date=datetime.now().date())
-            # Update the existing record
-            work_timer_entry.timer += int(total_time)  # Add the new time to the existing time
-            work_timer_entry.save()
-        except models.Work_Timer.DoesNotExist:
-            # Create a new record if it doesn't exist
-            models.Work_Timer.objects.create(
-                personnel=personnel,
-                camera_id=1,  # Replace with the actual camera ID
-                type='FACE_DETECTED',
-                datetime=datetime.now(),
-                timer=int(total_time)
-            )
-
-    def generate_frames():
-        global is_face_detected
-        global detection_times
-        global last_detection_time
-        global last_save_time
-
-        while True:
-            ret, frame = cap.read()
-            if not ret:
-                break
+    
+    camera_urls = models.Camera_Settings.objects.filter(cam_is_active = True, role_camera="T").values_list('feed_src', flat=True)
+    while True:
+        for camera_url in camera_urls:
             
-            gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-            faces_detected = face_cascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=5)
+            cap = cv2.VideoCapture(camera_url)
 
-            for (x, y, w, h) in faces_detected:
-                face = cv2.resize(gray[y:y+h, x:x+w], (200, 200))
-                label, confidence = recognizer.predict(face)
+            if not cap.isOpened():
+                # print(f"Failed to open camera: {camera_url}")
+                cap = cv2.VideoCapture(0)
+                continue  
+            
+            recognizer = cv2.face.LBPHFaceRecognizer_create()
 
-                name = label_to_name.get(label, "Unknown")
+            if not os.path.exists(model_path):
+                return JsonResponse({'status': 'error', 'message': 'Model not available, please train the model first.'})
+
+            recognizer.read(model_path)
+
+            label_to_name = {}
+            personnel_folder = var.personnel_path
+
+            for face_folder in os.listdir(personnel_folder):
+                face_folder_path = os.path.join(personnel_folder, face_folder)
+                if os.path.isdir(face_folder_path):
+                    for file_name in os.listdir(face_folder_path):
+                        if file_name.endswith('.jpg'):
+                            label = int(file_name.split('_')[1])
+                            extracted_name = file_name.split('_')[2]
+                            label_to_name[label] = extracted_name
+
+            def save_or_update_database(name, total_time):
+                """Save or update the detection time in the Work_Timer table."""
+                personnel = models.Personnels.objects.get(name=name)  # Get the personnel object
                 
-                # Update detection time
-                current_time = datetime.now()
-                if name != "Unknown":
-                    if name in last_detection_time:
-                        elapsed_time = (current_time - last_detection_time[name]).total_seconds()
-                        detection_times[name] += elapsed_time
-                    else:
-                        detection_times[name] = 0
+                # Check if a record already exists for this personnel
+                try:
+                    work_timer_entry = models.Work_Timer.objects.get(personnel=personnel, type='FACE_DETECTED', datetime__date=datetime.now().date())
+                    # Update the existing record
+                    work_timer_entry.timer += int(total_time)  # Add the new time to the existing time
+                    work_timer_entry.save()
+                except models.Work_Timer.DoesNotExist:
+                    # Create a new record if it doesn't exist
+                    models.Work_Timer.objects.create(
+                        personnel=personnel,
+                        camera_id=1,  # Replace with the actual camera ID
+                        type='FACE_DETECTED',
+                        datetime=datetime.now(),
+                        timer=int(total_time)
+                    )
 
-                    last_detection_time[name] = current_time
-                    is_face_detected = True
+            def generate_frames():
+                global is_face_detected
+                global detection_times
+                global last_detection_time
+                global last_save_time
 
-                    # Check if a minute has passed to save to the database
-                    if (current_time - last_save_time) >= timedelta(minutes=1):
-                        save_or_update_database(name, detection_times[name])
-                        last_save_time = current_time  # Update the last save time
-                else:
-                    is_face_detect = False
+                while True:
+                    ret, frame = cap.read()
+                    if not ret:
+                        break
+                    
+                    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+                    faces_detected = face_cascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=5)
 
-                # Calculate the total time recognized
-                total_time_recognized = int(detection_times.get(name, 0))
-                timer_text = f'Timer: {total_time_recognized}s'
+                    for (x, y, w, h) in faces_detected:
+                        face = cv2.resize(gray[y:y+h, x:x+w], (200, 200))
+                        label, confidence = recognizer.predict(face)
 
-                # Draw a rectangle around the face
-                cv2.rectangle(frame, (x, y), (x+w, y+h), (255, 0, 0), 2)
-                cv2.putText(frame, f'Name: {name}  ({confidence:.2f}), {timer_text}', (x, y-10), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
+                        name = label_to_name.get(label, "Unknown")
+                        print(f"Recognized face: {name}")
+                        
+                        # Update detection time
+                        current_time = datetime.now()
+                        if name != "Unknown":
+                            if name in last_detection_time:
+                                elapsed_time = (current_time - last_detection_time[name]).total_seconds()
+                                detection_times[name] += elapsed_time
+                            else:
+                                detection_times[name] = 0
 
-            ret, jpeg = cv2.imencode('.jpg', frame)
-            if not ret:
-                break
+                            last_detection_time[name] = current_time
+                            is_face_detected = True
 
-            yield (b'--frame\r\n'
-                   b'Content-Type: image/jpeg\r\n\r\n' + jpeg.tobytes() + b'\r\n')
+                            # Check if a minute has passed to save to the database
+                            if (current_time - last_save_time) >= timedelta(minutes=1):
+                                print(f"Saving detection time for {name}: {detection_times[name]} seconds") 
+                                save_or_update_database(name, detection_times[name])
+                                last_save_time = current_time  # Update the last save time
+                        else:
+                            is_face_detect = False
 
-        cap.release()
+                        # Calculate the total time recognized
+                        total_time_recognized = int(detection_times.get(name, 0))
+                        timer_text = f'Timer: {total_time_recognized}s'
+                        
+                        print(f'Name: {name}  ({confidence:.2f}), {timer_text}')
 
-    return StreamingHttpResponse(generate_frames(), content_type='multipart/x-mixed-replace; boundary=frame')
+                        # Draw a rectangle around the face
+                        cv2.rectangle(frame, (x, y), (x+w, y+h), (255, 0, 0), 2)
+                        cv2.putText(frame, f'Name: {name}  ({confidence:.2f}), {timer_text}', (x, y-10), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
+
+                    ret, jpeg = cv2.imencode('.jpg', frame)
+                    if not ret:
+                        break
+
+                    yield (b'--frame\r\n'
+                        b'Content-Type: image/jpeg\r\n\r\n' + jpeg.tobytes() + b'\r\n')
+
+                cap.release()
+
+            return StreamingHttpResponse(generate_frames(), content_type='multipart/x-mixed-replace; boundary=frame')
 
 def capture_video(request):
     """View for streaming video with capture new dataset."""

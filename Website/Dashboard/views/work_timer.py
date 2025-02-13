@@ -3,7 +3,8 @@ import cv2
 from datetime import datetime, timedelta
 from django.http import JsonResponse, StreamingHttpResponse
 from .. import models
-from ..Artificial_Intelligence.face_rec_haar import recognize_face
+# from ..Artificial_Intelligence.face_rec_haar import recognize_face
+from .face_rec import recognize_face
 from django.shortcuts import render
 # Global variables to track detection times
 detection_times = {}
@@ -11,6 +12,7 @@ last_detection_time = {}
 last_save_time = datetime.now()
 
 def work_timer():
+    
     """Continuously process frames from multiple RTSP cameras."""
     global detection_times, last_detection_time, last_save_time
 
@@ -19,6 +21,7 @@ def work_timer():
 
     while True:
         for camera_url in camera_urls:
+            print(f"Starting work time counting for {camera_url}")
             # print(f"Processing camera: {camera_url}")  # Print the current camera URL
             cap = cv2.VideoCapture(camera_url)
 
@@ -27,7 +30,7 @@ def work_timer():
                 continue  # Skip to the next camera if it fails to open
 
             recognized_faces = recognize_face(cap)
-
+    
             current_time = datetime.now()
             for name, bbox in recognized_faces:
                 print(f"Recognized face: {name}")  # Print the recognized name
@@ -111,4 +114,4 @@ def video_feed_timer(request, cam_id):
 
 def work_time_report(request):
     """View to display the work time report."""
-    return render(request, 'work_time_report.html')
+    return render(request, 'admin/work_time_report.html')

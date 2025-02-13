@@ -29,10 +29,10 @@ Stream
                     <div id="loader" class="spinner-border text-primary" role="status" style="display: none;">
                         <span class="sr-only">Loading...</span>
                     </div>
-                    <img id="img_stream" src="{% url 'video_feed' %}" style="width: 100%; border-radius: 10px; z-index: 1001; position: relative; {% if cam.cam_is_active %}display: block;{% else %}display: none;{% endif %}" />
+                    {% comment %} <img id="img_stream" src="{% url 'video_feed' %}" style="width: 100%; border-radius: 10px; z-index: 1001; position: relative; {% if cam.cam_is_active %}display: block;{% else %}display: none;{% endif %}" /> {% endcomment %}
                 </div>
                 <div class="card-footer d-flex justify-content-center">
-                    <button type="button" class="btn btn-primary mr-2" id="start-stream" onclick="toggleStream('start')" {% if cam.cam_is_active %}style="display: none;"{% endif %}>Start Stream</button>
+                    <button type="button" class="btn btn-primary mr-2" id="start-stream" onclick="{% url "start_stream"%}" {% if cam.cam_is_active %}style="display: none;"{% endif %}>Start Stream</button>
                     <button type="button" class="btn btn-danger" id="stop-stream" onclick="toggleStream('stop')" {% if cam.cam_is_active %}style="display: inline-block;"{% else %}style="display: none;"{% endif %}>Stop Stream</button>
                 </div>
             </div>
