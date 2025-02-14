@@ -6,7 +6,14 @@ class DashboardConfig(AppConfig):
     name = 'Dashboard'
 
     def ready(self):
+        # Start the presence watching thread
         from .views.presence import start_watching 
-        thread = Thread(target=start_watching)
-        thread.daemon = True  # Make the thread exit when the main program exits
-        thread.start()
+        thread_watching = Thread(target=start_watching)
+        thread_watching.daemon = True  # Make the thread exit when the main program exits
+        thread_watching.start()
+
+        # Start the work timer thread
+        from .views.face_rec import recognize_face
+        thread_work_timer = Thread(target=recognize_face)
+        thread_work_timer.daemon = True  # Make the thread exit when the main program exits
+        thread_work_timer.start()

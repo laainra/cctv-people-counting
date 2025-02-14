@@ -12,6 +12,7 @@ from django.utils.dateparse import parse_date
 
 from django.shortcuts import render, redirect, HttpResponse
 from django.contrib.auth.decorators import login_required
+from ..decorators import role_required
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import JsonResponse, HttpResponse
 from django.db.models import Count, Q
@@ -33,10 +34,15 @@ import os
 import shutil
 
 @login_required(login_url='login')
+@role_required('admin')
 def personnels(request):
     """Display a list of all personnel."""
-    personnels = models.Personnels.objects.all()
+    company_id = models.Company.objects.get(user=request.user)
+    personnels = models.Personnels.objects.filter(company=company_id)
+    divisions = models.Divisions.objects.filter(company=company_id)
+
     personnel_data = []
+    divisions_data = [{'id': division.id, 'name': division.name} for division in divisions]  # Corrected
 
     for personnel in personnels:
         # Fetch images for each personnel
@@ -50,99 +56,102 @@ def personnels(request):
 
         # Add personnel details to the list
         personnel_data.append({
-            'id':personnel.id,
+            'id': personnel.id,
             'name': personnel.name,
+            'username': personnel.user.username,
+            'email': personnel.user.email,
+            'password': personnel.user.password,
+            'division': personnel.division.name,
             'gender': personnel.gender,
             'employment_status': personnel.employment_status,
             'profile_image': profile_image,
         })
 
-    return render(request, 'personnel.html', {'Personnels': personnel_data, 'Page': "Personnels"})
+    return render(request, 'personnel.html', {'Personnels': personnel_data, 'Divisions': divisions_data, 'Page': "Personnels"})
 
 
+@login_required(login_url='login')
 def get_personnel(request, personnel_id):
-    """Display the data of one personnel."""
-    try:
-        personnel = models.Personnels.objects.get(id=personnel_id)
-        
-
-        images = models.Personnel_Images.objects.filter(personnel=personnel)
-        
-        if images.exists():  
-            profile_image = f'img/personnel_pics/{personnel.name}/{os.path.basename(images.first().image_path)}'
-        else:
-            profile_image = 'img/user_default.png' 
-
-        data = {
-            'id':personnel_id,
-            'name': personnel.name,
-            'gender': personnel.gender,
-            'employment_status': personnel.employment_status,
-            'profile_image': profile_image,  
-        }
-        
-        return JsonResponse(data)
-    
-    except models.Personnels.DoesNotExist:
-        return JsonResponse({'error': 'Personnel not found'}, status=404)
-
+    personnel = get_object_or_404(models.Personnels, id=personnel_id)
+    data = {
+        'id': personnel.id,
+        'name': personnel.name,
+        'division': {
+            'id': personnel.division.id,
+            'name': personnel.division.name
+        },
+        'email': personnel.user.email,
+        'username': personnel.user.username,
+        'password': personnel.user.password,
+    }
+    return JsonResponse(data)
 
 @login_required(login_url='login')
 @csrf_exempt
 def add_personnel(request):
-    """Handle adding a new personnel."""
+    """Handle adding a new personnel along with username, email, and password."""
+    
     if request.method == 'POST':
-        name = request.POST.get('name')
-        gender = request.POST.get('gender')
-        employment_status = request.POST.get('employment_status')
-
-        # Debugging output to check the values received
-        print(f"Received data - Name: {name}, Gender: {gender}, Employment Status: {employment_status}")
-
-        if name and gender and employment_status:
-            # Check if personnel with the same name already exists
-            existing_personnel = models.Personnels.objects.filter(name=name).first()
+        form = forms.PersonnelForm(request.POST)
+        
+        if form.is_valid():
+            name = form.cleaned_data['name']
+            # gender = form.cleaned_data['gender']
+            # employment_status = form.cleaned_data['employment_status']
+            division = form.cleaned_data['division']
+            company = models.Company.objects.get(user=request.user)
+            
+            # Ensure that the personnel's name is unique for the same company
+            existing_personnel = models.Personnels.objects.filter(name=name, company=company).first()
             if existing_personnel:
                 return JsonResponse({'status': 'error', 'message': 'Personnel with this name already exists'})
 
-            personnel = models.Personnels.objects.create(
-                name=name,
-                gender=gender,
-                employment_status=employment_status
-            )
-
-            # Debugging: Check the path before creating directory
+            # Path for storing personnel images
             path = os.path.join(var.personnel_path, name)
-            print(f"Directory path: {path}")
-
-            # Ensure directory exists
             if not os.path.exists(path):
                 try:
-                    os.makedirs(path, exist_ok=True)  # Creates directory if not exists
-                    print(f"Directory created: {path}")
+                    os.makedirs(path, exist_ok=True)
                 except Exception as e:
-                    print(f"Error creating directory: {e}")
                     return JsonResponse({'status': 'error', 'message': f'Failed to create directory: {e}'})
 
-            return JsonResponse({'status': 'success', 'message': 'Personnel added successfully'})
-        else:
-            return JsonResponse({'status': 'error', 'message': 'Missing data in request'})
+            # Save personnel and associated user
+            personnel = form.save(commit=False)
+            personnel.company = company  # Associate the personnel with the company
+            personnel.save()
 
-    return JsonResponse({'status': 'error', 'message': 'Failed to add personnel'})
+            return JsonResponse({'status': 'success', 'message': 'Personnel added successfully'})
+
+        else:
+            return JsonResponse({'status': 'error', 'message': 'Invalid form data'})
+
+    return JsonResponse({'status': 'error', 'message': 'Invalid request method'})
 
 @login_required(login_url='login')
 @csrf_exempt
 def edit_personnel(request, personnel_id):
-    """Handle editing a personnel."""
-    personnel = get_object_or_404(models.Personnels, id=personnel_id)
     if request.method == 'POST':
-        personnel.name = request.POST.get('name', personnel.name)
-        personnel.gender = request.POST.get('gender', personnel.gender)
-        personnel.employment_status = request.POST.get('employment_status', personnel.employment_status)
-        personnel.save()
-        return JsonResponse({'status': 'success', 'message': 'Personnel updated successfully'})
-    return JsonResponse({'status': 'error', 'message': 'Failed to update personnel'})
+        personnel = get_object_or_404(models.Personnels, id=personnel_id)
+        old_name = personnel.name  # Simpan nama lama untuk memeriksa perubahan
+        form = forms.PersonnelForm(request.POST, instance=personnel)
+        if form.is_valid():
+            personnel = form.save(commit=False)
+            new_name = personnel.name
 
+            # Periksa apakah nama telah berubah
+            if old_name != new_name:
+                old_path = os.path.join(var.personnel_path, old_name)
+                new_path = os.path.join(var.personnel_path, new_name)
+                if os.path.exists(old_path):
+                    try:
+                        os.rename(old_path, new_path)
+                    except Exception as e:
+                        return JsonResponse({'status': 'error', 'message': f'Failed to rename directory: {e}'})
+
+            personnel.save()
+            return JsonResponse({'status': 'success', 'message': 'Personnel updated successfully'})
+        else:
+            return JsonResponse({'status': 'error', 'message': 'Invalid form data', 'errors': form.errors})
+    return JsonResponse({'status': 'error', 'message': 'Invalid request method'})
 
 @login_required(login_url='login')
 @csrf_exempt
@@ -738,5 +747,3 @@ def download_personnel_presence(request):
     )
 
     return response
-
-

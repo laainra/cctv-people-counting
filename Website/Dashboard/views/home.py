@@ -9,6 +9,7 @@ from xlsxwriter.workbook import Workbook
 # Backend Library
 
 from django.shortcuts import render,  HttpResponse
+from ..decorators import role_required
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.hashers import make_password
@@ -28,8 +29,17 @@ from ..Artificial_Intelligence.multi_camera import MultiCamera as MC
 # ================================================== STATISTICS DASHBOARD ================================================== #
 
 @login_required(login_url='login')
+@role_required('admin')
 def home(request):
-    data = models.Camera_Settings.objects.all()
+
+    try:
+        company = models.Company.objects.get(user=request.user)
+    except models.Company.DoesNotExist:
+        return HttpResponse("User does not belong to any company.", status=403)
+    
+    # Filter data based on the retrieved company
+    data = models.Camera_Settings.objects.filter(company=company)
+    # data = models.Camera_Settings.objects.all()
 
     if len(data) == 0:
         active_cam = None
@@ -367,3 +377,10 @@ def download(request):
             response['Content-Disposition'] = 'inline; filename=' + os.path.basename(file_path)
             return response
     raise Http404
+
+
+
+@login_required(login_url='login')
+@role_required('employee')
+def employee_home(request):
+    return render(request, 'employee_home.html')

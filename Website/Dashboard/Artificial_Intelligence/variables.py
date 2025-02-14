@@ -10,6 +10,7 @@ class GlobalVariable:
         self.face_coordinates = []
         self.person_bboxes = []
         self.genders = []
+        self.detection_times = {} 
 
         # Face recognition result
         self.names = np.array(["Unknown", "Unknown"])
