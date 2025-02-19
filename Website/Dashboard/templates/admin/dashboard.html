@@ -1,23 +1,18 @@
-
 {% extends '../components/base.html' %}
 {% block title %}
 Dashboard Admin
 {% endblock %}
 
-{% block content %} {% csrf_token %}
+{% block content %}
+{% csrf_token %}
 <div class="content">
     <div class="container-xl">
       <!-- Page title -->
       <div class="page-header">
         <div class="row align-items-center">
           <div class="col-auto">
-            <!-- Page pre-title -->
-            <div class="page-pretitle">
-              Overview
-            </div>
-            <h2 class="page-title">
-              Dashboard
-            </h2>
+            <div class="page-pretitle">Overview</div>
+            <h2 class="page-title">Dashboard</h2>
           </div>
         </div>
       </div>
@@ -31,7 +26,7 @@ Dashboard Admin
                     <div class="mb-3">
                         <div style="max-width: 250px;" class="mr-2">
                             <div class="input-icon">
-                                <input id="calendar-range" type="date" value="2020-06-20" class="form-control" placeholder="Select a date range" />
+                                <input id="calendar-range" type="date"  class="form-control" placeholder="Select a date range" />
                             </div>
                         </div>
                     </div>
@@ -52,32 +47,27 @@ Dashboard Admin
           </div>
         </div>
 
-        <div class="col-12">
+        <div class="col-12 p-2">
             <div class="card">
-                <div class="card-header border-0">
+                <div class="card -header border-0">
                     <h3 class="card-title">Top Employee</h3>
                 </div>
                 <div class="card-body">
                     <div class="d-flex mb-3">
                         <div style="max-width: 200px;" class="mr-2">
-                            <select class="form-select">
-                                <option selected>Januari</option>
-                                <option>Februari</option>
-                                <option>Maret</option>
-                            </select>
+                            <label for="month-select" class="form-label">Month</label>
+                            <select id="month-select" name="month" class="form-select"></select>
                         </div>
                         <div style="max-width: 200px;" class="mr-2">
-                            <select class="form-select">
-                                <option selected>2025</option>
-                                <option>2026</option>
-                                <option>2027</option>
-                            </select>
+                            <label for="year-select" class="form-label">Year</label>
+                            <select id="year-select" name="year" class="form-select"></select>
                         </div>
                         <div style="max-width: 200px;" class="mr-2">
-                            <select class="form-select">
-                                <option selected>Paling Ontime</option>
-                                <option>Paling Late</option>
-                                <option>Bekerja Keras</option>
+                            <label for="performance-select" class="form-label">Performance</label>
+                            <select id="performance-select" name="performance" class="form-select">
+                                <option value="ontime" selected>Most On Time</option>
+                                <option value="late">Most Late</option>
+                                <option value="hardworking">Hardest Worker</option>
                             </select>
                         </div>
                     </div>
@@ -86,9 +76,7 @@ Dashboard Admin
                             <table class="table card-table table-vcenter text-nowrap datatable">
                                 <thead>
                                     <tr>
-                                        <th class="w-1">
-                                            No.
-                                        </th>
+                                        <th class="w-1">No.</th>
                                         <th>ID Employee</th>
                                         <th>Nama Employee</th>
                                         <th>Divisi</th>
@@ -96,45 +84,19 @@ Dashboard Admin
                                     </tr>
                                 </thead>
                                 <tbody>
+                                    {% for employee in top_employees %}
                                     <tr>
-                                        <td>1</td>
-                                        <td><span class="text-muted">28935</span></td>
-                                        <td>
-                                            Carlson Limited
-                                        </td>
-                                        <td>
-                                            supervisor
-                                        </td>
-                                        <td>
-                                            30
-                                        </td>
+                                        <td>{{ forloop.counter }}</td>
+                                        <td><span class="text-muted">{{ employee.employee_id }}</span></td>
+                                        <td>{{ employee.name }}</td>
+                                        <td>{{ employee.division }}</td>
+                                        <td>{{ employee.total_ontime }}</td>
                                     </tr>
+                                    {% empty %}
                                     <tr>
-                                        <td>2</td>
-                                        <td><span class="text-muted">28936</span></td>
-                                        <td>
-                                            The Quick
-                                        </td>
-                                        <td>
-                                            supervisor
-                                        </td>
-                                        <td>
-                                            29
-                                        </td>
+                                        <td colspan="5" class="text-center">No top employees found.</td>
                                     </tr>
-                                    <tr>
-                                        <td>3</td>
-                                        <td><span class="text-muted">28937</span></td>
-                                        <td>
-                                            Fox Jumps
-                                        </td>
-                                        <td>
-                                            supervisor
-                                        </td>
-                                        <td>
-                                            25
-                                        </td>
-                                    </tr>
+                                    {% endfor %}
                                 </tbody>
                             </table>
                         </div>
@@ -145,8 +107,6 @@ Dashboard Admin
 
       </div>
     </div>
-
-  </div>
 </div>
 
 <!-- Libs JS -->
@@ -160,12 +120,48 @@ Dashboard Admin
 <script>
     document.addEventListener("DOMContentLoaded", function () {
         flatpickr(document.getElementById('calendar-range'), {
-            mode:"range"
+            mode: "range"
         });
     });
 </script>
 <script>
-    // @formatter:off
+    document.addEventListener("DOMContentLoaded", function () {
+        // Populate months
+        const monthSelect = document.getElementById('month-select');
+        const months = [
+            { value: 1, name: 'January' },
+            { value: 2, name: 'February' },
+            { value: 3, name: 'March' },
+            { value: 4, name: 'April' },
+            { value: 5, name: 'May' },
+            { value: 6, name: 'June' },
+            { value: 7, name: 'July' },
+            { value: 8, name: 'August' },
+            { value: 9, name: 'September' },
+            { value: 10, name: 'October' },
+            { value: 11, name: 'November' },
+            { value: 12, name: 'December' }
+        ];
+
+        months.forEach(month => {
+            const option = document.createElement('option');
+            option.value = month.value;
+            option.textContent = month.name;
+            monthSelect.appendChild(option);
+        });
+
+        // Populate years
+        const yearSelect = document.getElementById('year-select');
+        const currentYear = new Date().getFullYear();
+        for (let i = currentYear; i <= currentYear + 5; i++) { // Next 5 years
+            const option = document.createElement('option');
+            option.value = i;
+            option.textContent = i;
+            yearSelect.appendChild(option);
+        }
+    });
+</script>
+<script>
     document.addEventListener("DOMContentLoaded", function () {
         window.ApexCharts && (new ApexCharts(document.getElementById('chart-donut'), {
             chart: {
@@ -182,7 +178,7 @@ Dashboard Admin
             fill: {
                 opacity: 1,
             },
-            series: [197, 55],
+            series: [{{ summary.ontime }}, {{ summary.late }}],
             labels: ["Ontime", "Late"],
             grid: {
                 strokeDashArray: 4,
@@ -196,10 +192,8 @@ Dashboard Admin
             },
         })).render();
     });
-    // @formatter:on
 </script>
 <script>
-    // @formatter:off
     document.addEventListener("DOMContentLoaded", function () {
         window.ApexCharts && (new ApexCharts(document.getElementById('chart-bar'), {
             chart: {
@@ -265,11 +259,10 @@ Dashboard Admin
             colors: ["#206bc4", "#cd201f"],
             legend: {
                 show: true,
-                position:"top"
+                position: "top"
             },
         })).render();
     });
-    // @formatter:on
 </script>
 <script>
   document.body.style.display = "block"

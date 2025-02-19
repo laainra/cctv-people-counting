@@ -30,8 +30,9 @@ Capture Faces
                         </div>
                         <br>
                         <br>
-                        <img id="img_stream" src="{% url 'capture_video' %}" class="img-fluid rounded w-100" style="display: block;" onload="hideLoading()" />
                         <button class="btn btn-primary mt-3" onclick="captureFaces()">Capture Faces</button>
+                        <img id="img_stream" src="{% url 'capture_video' %}" class="img-fluid rounded w-100" style="display: block;" onload="hideLoading()" />
+                        
                     </div>
                 </div>
             </div>
@@ -55,19 +56,30 @@ Capture Faces
         document.getElementById('img_stream').style.display = 'block'; // Show the image after loading
     }
 
-    // Function to capture faces
     function captureFaces() {
-        Swal.fire({
+        // Initialize the progress variables
+        let capturedFaces = 0;
+        const totalFaces = 50; // Total faces to capture
+        const progressInterval = 100; // Interval for updating progress in milliseconds
+    
+        // Show the SweetAlert with a loading spinner and progress bar
+        const swalInstance = Swal.fire({
             title: 'Capturing Faces...',
-            text: 'Please wait while we capture your faces.',
+            html: `
+                <div id="progress-container" style="width: 100%; height: 30px; background-color: #f3f3f3; border-radius: 5px;">
+                    <div id="progress-bar" style="width: 0%; height: 100%; background-color: #4caf50; border-radius: 5px;"></div>
+                </div>
+                <div id="progress-text" style="text-align: center; margin-top: 5px;">Captured Faces: 0/${totalFaces} (0%)</div>
+            `,
             allowEscapeKey: false,
             allowOutsideClick: false,
-            showConfirmButton: false, 
+            showConfirmButton: false,
             onBeforeOpen: () => {
                 Swal.showLoading();
             }
         });
-
+    
+        // Start the fetch request to capture faces
         fetch("{% url 'capture_faces' %}", {
             method: 'POST',
             headers: {
@@ -79,16 +91,30 @@ Capture Faces
         .then(response => response.json())
         .then(data => {
             if (data.status === 'success') {
-                // Show SweetAlert success message
-                Swal.fire({
-                    title: 'Success!',
-                    text: data.message,
-                    icon: 'success',
-                    confirmButtonText: 'OK'
-                }).then(() => {
-                    // Redirect to dataset page after closing the alert
-                    window.location.href = "{% url 'dataset' %}";
-                });
+                // Simulate progress updates
+                const interval = setInterval(() => {
+                    if (capturedFaces < totalFaces) {
+                        capturedFaces++;
+                        const progressPercentage = (capturedFaces / totalFaces) * 100;
+    
+                        // Update the progress bar and text
+                        document.getElementById('progress-bar').style.width = progressPercentage + '%';
+                        document.getElementById('progress-text').innerText = `Captured Faces: ${capturedFaces}/${totalFaces} (${progressPercentage.toFixed(2)}%)`;
+                    } else {
+                        clearInterval(interval); // Stop the interval when complete
+                        Swal.close(); // Close the loading alert
+                        // Show success message
+                        Swal.fire({
+                            title: 'Success!',
+                            text: data.message,
+                            icon: 'success',
+                            confirmButtonText: 'OK'
+                        }).then(() => {
+                            // Redirect to dataset page after closing the alert
+                            window.location.href = "{% url 'dataset' %}";
+                        });
+                    }
+                }, progressInterval);
             } else {
                 // Show SweetAlert error message
                 Swal.fire({
@@ -109,7 +135,6 @@ Capture Faces
             });
         });
     }
-
     // Call captureFaces function when the page loads or based on user action
     document.addEventListener('DOMContentLoaded', (event) => {
         showLoading(); // Show loading animation when the page loads

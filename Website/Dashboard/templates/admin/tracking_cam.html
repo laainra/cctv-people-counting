@@ -60,7 +60,7 @@ Tracking Camera
                                 <th>Camera Name</th>
                                 <th>RTSP IP</th>
                                 <th>Status</th>
-                                <th>Stream</th>
+                                {% comment %} <th>Stream</th> {% endcomment %}
                                 <th width="100">Uniform Detection Feature</th>
                                 <th width="100">ID Card Detection Feature</th>
                                 <th width="100">Shoe Detection Feature</th>
@@ -82,9 +82,9 @@ Tracking Camera
                               <span class="badge bg-danger">Inactive</span>
                               {% endif %}
                             </td>
-                            <td>
+                            {% comment %} <td>
                               <button class="btn btn-primary btn-sm" onclick="redirectToStream({{ cam.id }})">View Stream</button>
-                            </td>
+                            </td> {% endcomment %}
                             <td>
                               {% if cam.uniform_detection %}
                               <span class="badge bg-success">Yes</span>
@@ -341,7 +341,7 @@ Tracking Camera
       streamButton.textContent = 'Stop Stream';
   
       // Start stream
-      fetch('/start_stream/', {
+      fetch('/start_tracking_stream/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -371,7 +371,7 @@ Tracking Camera
         });
     } else {
       // Stop stream
-      fetch('/stop_stream/', {
+      fetch('/stop_tracking_stream/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -611,7 +611,7 @@ Tracking Camera
           console.log(data);
           if (data.status === 'success') {
               // Redirect to the stream page with camId as a query parameter
-              window.location.href = "{% url 'stream' %}" ;
+              
           } else {
               console.error('Error setting cam_id:', data.message);
           }

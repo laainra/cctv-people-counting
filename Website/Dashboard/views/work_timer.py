@@ -6,6 +6,11 @@ from .. import models
 # from ..Artificial_Intelligence.face_rec_haar import recognize_face
 from .face_rec import recognize_face
 from django.shortcuts import render
+from django.utils import timezone
+from collections import defaultdict
+from datetime import timedelta
+from django.db import connection
+
 # Global variables to track detection times
 detection_times = {}
 last_detection_time = {}
@@ -113,5 +118,77 @@ def video_feed_timer(request, cam_id):
     return StreamingHttpResponse(stream_timer_video(camera_url), content_type='multipart/x-mixed-replace; boundary=frame')
 
 def work_time_report(request):
-    """View to display the work time report."""
-    return render(request, 'admin/work_time_report.html')
+    company = models.Company.objects.get(user=request.user)
+    personnel_list = models.Personnels.objects.filter(company=company)
+
+    # Get the date from the request, default to today if not provided
+    filter_date = request.GET.get('filter_date', timezone.now().date())
+
+    # Use a raw SQL query to fetch work time data for the selected date
+    with connection.cursor() as cursor:
+        cursor.execute("""
+            SELECT wt.id, wt.datetime, wt.type, wt.timer, wt.camera_id, wt.personnel_id,
+                p.name AS employee_name, p.division_id AS employee_division, c.cam_name AS camera_name
+            FROM dashboard_work_timer wt
+            JOIN dashboard_personnels p ON wt.personnel_id = p.id
+            JOIN dashboard_camera_settings c ON wt.camera_id = c.id
+            WHERE DATE(wt.datetime) = %s AND p.company_id = %s
+        """, [filter_date, company.id])
+        
+        # Fetch all results
+        work_time_data = cursor.fetchall()
+
+    # Aggregate data
+    aggregated_data = defaultdict(lambda: {
+        'total_time_detected': timedelta(),
+        'cctv_areas': set(),
+        'employee_id': None,
+        'employee_name': None,
+        'division': None,
+        'date': None,
+    })
+
+    for entry in work_time_data:
+        # Assuming entry is a tuple: (id, datetime, type, timer, camera_id, personnel_id, employee_name, employee_division, camera_name)
+        timer_seconds = entry[3]  # Assuming 'timer' is in seconds
+        personnel_id = entry[5]
+        employee_name = entry[6]
+        employee_division = entry[7]
+        camera_name = entry[8]
+
+        # Calculate total time detected
+        total_time = timedelta(seconds=timer_seconds)
+        aggregated_data[personnel_id]['total_time_detected'] += total_time
+        
+        # Store employee details
+        aggregated_data[personnel_id]['employee_id'] = personnel_id
+        aggregated_data[personnel_id]['employee_name'] = employee_name
+        aggregated_data[personnel_id]['division'] = employee_division
+        aggregated_data[personnel_id]['cctv_areas'].add(camera_name)  # Collect CCTV areas
+        aggregated_data[personnel_id]['date'] = entry[1].date()
+
+    # Prepare data for rendering
+    report_data = []
+    for data in aggregated_data.values():
+        total_seconds = int(data['total_time_detected'].total_seconds())  # Convert timedelta to total seconds
+        total_hours = total_seconds // 3600  # Calculate hours
+        total_minutes = (total_seconds % 3600) // 60  # Calculate remaining minutes
+
+        report_data.append({
+            'employee_id': data['employee_id'],
+            'employee_name': data['employee_name'],
+            'division': data['division'],
+            'total_time_hours': total_hours if total_hours > 0 else 0,  # Show 0 if less than 1 hour
+            'total_time_minutes': total_minutes if total_hours > 0 else total_seconds // 60,  # Show minutes if hours are 0
+            'cctv_areas': ', '.join(data['cctv_areas']),  # Join CCTV areas
+            'date': data['date'],
+        })  
+
+        
+        print(report_data)
+
+    return render(request, 'admin/work_time_report.html', {
+        'personnel_list': personnel_list,
+        'work_time_report': report_data,
+        'filter_date': filter_date,  # Pass the selected filter date to the template
+    })

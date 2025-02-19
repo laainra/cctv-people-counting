@@ -171,7 +171,7 @@ class CameraStream:
                         #     work_timer.datetime = datetime.now()
                         #     work_timer.save()
                     except models.Personnels.DoesNotExist:
-                        print(f"Personnel '{name}' not found in the database. Marking as 'Unknown'.")
+                        # print(f"Personnel '{name}' not found in the database. Marking as 'Unknown'.")
                         # Assign "Unknown" to bounding box or handle the detection accordingly
                         name = "Unknown"
 

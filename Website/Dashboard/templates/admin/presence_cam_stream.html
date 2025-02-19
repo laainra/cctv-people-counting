@@ -1,0 +1,108 @@
+{% extends '../components/base.html' %}
+{% block title %}
+Presence Stream
+{% endblock %}
+
+{% block content %}
+{% csrf_token %}
+<div class="content">
+    <div class="container-xl">
+      <div class="page-header">
+        <div class="row align-items-center">
+          <div class="col-auto">
+            <div class="page-pretitle">
+              {{ company.name }}'s
+            </div>
+            <h2 class="page-title">
+                Presence Stream
+            </h2>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+
+                    <!-- Camera Cards -->
+                    <div class="row">
+                        {% for cam in presence_cameras %}
+                        <div class="col-md-6"> <!-- Change col-md-4 to col-md-6 for 2 columns -->
+                            
+                            <div class="card mb-3 text-center">
+                                <div class="card-body flex">
+                                    <h5 class="card-title mr-2">{{ cam.cam_name }}</h5>
+                                    <!-- Status Badge -->
+                                    {% if cam.cam_is_active %}
+                                        <span class="badge bg-success">Active</span>
+                                    {% else %}
+                                        <span class="badge bg-danger">Inactive</span>
+                                    {% endif %}
+
+                                    <!-- Start and Stop Buttons -->
+                                    <div class="mb-3">
+                                        {% if cam.cam_is_active %}
+                                            <a href="{% url 'stop_presence_stream' cam.id %}">
+                                                <button class="btn btn-danger stop-stream" onclick="toggleStream('stop', {{ cam.id }})">Stop Stream</button>
+                                            </a>
+                                        {% else %}
+                                            <a href="{% url 'start_presence_stream' cam.id %}">
+                                                <button class="btn btn-primary start-stream" onclick="toggleStream('start', {{ cam.id }})">Start Stream</button>
+                                            </a>
+                                        {% endif %}
+                                    </div>
+
+                                    <div id="loader" class="spinner-border text-primary" role="status" style="display: none;">
+                                        <span class="sr-only">Loading...</span>
+                                    </div>
+
+                                    <!-- Video Stream -->
+                                    <img id="img_stream_{{ cam.id }}" src="{% url 'predict_video' cam.id %}" style="width: 100%; border-radius: 10px; display: {% if cam.cam_is_active %}block{% else %}none{% endif %};" />
+                                </div>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <div class="col-12">
+                            <p>No cameras available.</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+</div>
+
+<script>
+    function updateStream() {
+        const cameraSelect = document.getElementById('cameraSelect');
+        const selectedCamId = cameraSelect.value;
+        const imgStream = document.getElementById('img_stream');
+
+        imgStream.src = `{% url 'predict_video' 0 %}`.replace('0', selectedCamId);
+        imgStream.style.display = 'block'; // Show the image
+    }
+    function toggleStream(action, camId) {
+      const loader = document.getElementById(`loader_${camId}`);
+      const imgStream = document.getElementById(`img_stream_${camId}`);
+  
+      if (action === 'start') {
+          // Show the loader
+          loader.style.display = 'block';
+          imgStream.style.display = 'none'; // Hide the stream image while loading
+  
+          // Simulate an AJAX call to start the stream
+          setTimeout(() => {
+              // After the stream is started, hide the loader and show the stream image
+              loader.style.display = 'none';
+              imgStream.style.display = 'block'; // Show the stream image
+          }, 2000); // Simulate a delay for starting the stream
+      } else if (action === 'stop') {
+          // Handle stopping the stream (if needed)
+          imgStream.style.display = 'none'; // Hide the stream image
+      }
+  }
+</script>
+
+{% endblock %}

@@ -68,14 +68,18 @@ urlpatterns = [
     path('employee/presence_history/', employee.presence_history, name='presence_history'),
     path('employee/take_image/', employee.take_image, name='take_image'),
 
-    # URL lainnya...
-    path('start_ai_stream/', stream.start_ai_stream, name='start_ai_stream'),
-    path('stop_ai_stream/', stream.stop_ai_stream, name='stop_ai_stream'),
-    path('ai_video_feed/', stream.ai_video_feed, name='ai_video_feed'),
+
     path('set_cam_id/', stream.set_cam_id, name='set_cam_id'),
+    # path('stream/', stream.stream, name='stream'),
+    path('presence_stream/', stream.presence_cam_stream, name='presence_stream'),
+    path('presence_cam_stream/', stream.presence_cam_stream, name='presence_cam_stream'),
+    path('start_presence_stream/<int:cam_id>/', stream.start_presence_stream, name='start_presence_stream'),
+    path('stop_presence_stream/<int:cam_id>/', stream.stop_presence_stream, name='stop_presence_stream'),
+    path('tracking_stream/', stream.tracking_cam_stream, name='tracking_stream'),
+    path('tracking_cam_stream/', stream.tracking_cam_stream, name='tracking_cam_stream'),
+    path('start_tracking_stream/<int:cam_id>/', stream.start_tracking_stream, name='start_tracking_stream'),
+    path('stop_tracking_stream/<int:cam_id>/', stream.stop_tracking_stream, name='stop_tracking_stream'),
     path('stream/', stream.stream, name='stream'),
-    path('presence_stream/', stream.presence_stream, name='presence_stream'),
-    path('tracking_stream/', stream.tracking_stream, name='tracking_stream'),
     
     path('profile/', profile.profile, name='profile'),
 
@@ -83,7 +87,7 @@ urlpatterns = [
     path('capture_data/', face_rec.capture_faces, name='capture_faces'),
     path('capture_video/', face_rec.capture_video, name='capture_video'),
     path('train/', face_rec.train_model, name='train_model'),
-    path('recognize/', face_rec.predict_video, name='predict_video'),
+    path('recognize/<int:cam_id>/', face_rec.predict_video, name='predict_video'),
     path('dataset/', face_rec.dataset, name='dataset'),
     
     path('work_time_report/', work_timer.work_time_report, name='work_time_report'),

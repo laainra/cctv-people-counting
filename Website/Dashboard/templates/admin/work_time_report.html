@@ -34,9 +34,12 @@ Work Time Report
             <div class="card">
                 <div class="card-body border-bottom py-3">
                     <div class="d-flex mb-4">
-                        <div style="max-width: 200px;" class="mr-2">
-                            <input type="date" id="filter-date" class="form-control calendar-range" placeholder="Date" />
-                        </div>
+                        <form method="GET" action="{% url 'work_time_report' %}">
+                            <div style="max-width: 200px;" class="mr-2">
+                                <input type="date" id="filter-date" name="filter_date" class="form-control calendar-range" placeholder="Date" value="{{ filter_date|date:'Y-m-d' }}" />
+                            </div>
+                            <button type="submit" class="btn btn-primary mt-1">Filter</button>
+                        </form>
                         <div style="max-width: 200px;" class="mr-2">
                             <select id="filter-personnel" class="form-control" onchange="filterByPersonnel()">
                                 <option selected>All Employees</option>
@@ -81,17 +84,23 @@ Work Time Report
                             </tr>
                         </thead>
                         <tbody>
-                            {% for entry in work_time_data %}
+                            {% for report in work_time_report %}
                             <tr>
-                              <td>{{ forloop.counter }}</td>
-                              <td>{{ entry.employee_id }}</td>
-                              <td>{{ entry.employee_name }}</td>
-                              <td>{{ entry.employee_division }}</td>
-                              <td>{{ entry.time_detected }}</td>
-                              <td>{{ entry.cctv_areas }}</td>
-                              <td>
-                                <button class="btn btn-sm btn-primary" data-toggle="modal" data-target="#modal-detail">Detail</button>
-                              </td>
+                                <td>{{ forloop.counter }}</td>
+                                <td>{{ report.date }}</td>
+                                <td>{{ report.employee_id }}</td>
+                                <td>{{ report.employee_name }}</td>
+                                <td>{{ report.division }}</td>
+                                <td>
+                                    {% if report.total_time_hours == 0 %}
+                                        {{ report.total_time_minutes }} Menit
+                                    {% else %}
+                                        {{ report.total_time_hours }} Jam {{ report.total_time_minutes }} Menit
+                                    {% endif %}
+                                </td>
+                                <td>{{ report.cctv_areas }}</td>
+                                <td>{{ report.cctv_areas }}</td>
+                                {% comment %} <td><a href="{% url 'detail_view' report.employee_id %}">Detail</a></td> {% endcomment %}
                             </tr>
                             {% endfor %}
                         </tbody>

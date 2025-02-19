@@ -224,11 +224,11 @@ class AddTrackingCameraForm(forms.ModelForm):
 class ProfileForm(forms.ModelForm):
     class Meta:
         model = models.CustomUsers
-        fields = ['email', 'username']
+        fields = ['email', 'username', 'password']
         widgets = {
             'email': forms.EmailInput(attrs={'class': 'form-control'}),
             'username': forms.TextInput(attrs={'class': 'form-control'}),
-            'password': forms.TextInput(attrs={'class': 'form-control'}),
+            'password': forms.PasswordInput(attrs={'class': 'form-control'}),
         }
 
 class CompanyNameForm(forms.ModelForm):
@@ -236,7 +236,7 @@ class CompanyNameForm(forms.ModelForm):
         model = models.Company
         fields = ['name']
         widgets = {
-            'name': forms.TextInput(attrs={'class': 'form-control', 'readonly': 'readonly'}),
+            'name': forms.TextInput(attrs={'class': 'form-control'}),
         }
 
 class PersonnelNameForm(forms.ModelForm):
@@ -244,5 +244,5 @@ class PersonnelNameForm(forms.ModelForm):
         model = models.Personnels
         fields = ['name']
         widgets = {
-            'name': forms.TextInput(attrs={'class': 'form-control', 'readonly': 'readonly'}),
+            'name': forms.TextInput(attrs={'class': 'form-control'}),
         }

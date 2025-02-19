@@ -26,7 +26,7 @@ JSON_PATH = os.path.join(DIR, 'static', 'attendance' , 'attendance.json')
 
 
 def read_attendance_data():
-    print("Starting Read Attendance JSON data...")
+    # print("Starting Read Attendance JSON data...")
     # Mendapatkan tanggal kemarin dan hari ini
     attendance_date_yesterday = (datetime.now() - timedelta(days=1)).date()
     attendance_date_today = datetime.now().date()
@@ -62,7 +62,7 @@ def read_attendance_data():
                 return []
             data_list = json.loads(data)
         
-        print("Attendance JSON data read successfully.")
+        # print("Attendance JSON data read successfully.")
         return data_list
 
     except json.JSONDecodeError as e:
@@ -75,7 +75,7 @@ def read_attendance_data():
 
 # Insert presence data into the database
 def insert_presence(cam_id, personnel_id, detected_time, status, image_path):
-    print(f"Starting insert presence data for {personnel_id}...")
+    # print(f"Starting insert presence data for {personnel_id}...")
 
     if not cam_id or not personnel_id or not detected_time or not status:
         # print("Invalid data detected, skipping insertion.")
@@ -92,11 +92,12 @@ def insert_presence(cam_id, personnel_id, detected_time, status, image_path):
         
     print(f"Presence saved as {status} for personnel ID {personnel_id} at {detected_time}")
 
-def process_attendance_entry(data, cam_id):
-    print("Starting proccess attendance entry...")
+def process_attendance_entry(data):
+    # print("Starting proccess attendance entry...")
     name = data.get('name')
     datetime_str = data.get('datetime')
     image_path = data.get('image_path')
+    cam_id = data.get('camera_id') 
     detected_time = datetime.strptime(datetime_str, '%Y-%m-%d %H:%M:%S')
 
     try:
@@ -162,19 +163,18 @@ def process_attendance_entry(data, cam_id):
     print(f"Inserted {status} entry for {name} at {detected_time}")
     
 # Main function to process presence
-def presence_process(cam_id):
-    print(f"Starting Process Presence for {cam_id}...")
+def presence_process():
+    # print(f"Starting Process Presence for {cam_id}...")
     data_list = read_attendance_data()
     
     # Process each entry
     for data in data_list:
-        process_attendance_entry(data, cam_id)
+        process_attendance_entry(data)
         
-    print("Presence data processed successfully.")
+    # print("Presence data processed successfully.")
     # delete_attendance_file()
     return {'status': 'success', 'message': 'Attendance data processed successfully'}
-
-def get_presence_data(date, personnel_id=None):
+def get_presence_data(date, personnel_id=None, company=None):
     query = '''
         SELECT 
             p.id AS personnel_id,
@@ -235,11 +235,16 @@ def get_presence_data(date, personnel_id=None):
         WHERE 
             DATE(d.timestamp) = %s
     '''
+    
     params = [date, date, date, date]
 
     if personnel_id:
         query += " AND p.id = %s"
         params.append(personnel_id)
+    
+    if company:
+        query += " AND p.company_id = %s"  # Assuming company_id is the foreign key in the personnels table
+        params.append(company.id)  # Use company.id to filter by the company
 
     query += " GROUP BY p.id"
 
@@ -267,8 +272,10 @@ def get_presence_data(date, personnel_id=None):
             'attendance_image_path': attendance_image_path,
             'leaving_image_path': leaving_image_path,
         })
-    print("Presence data retrieved successfully.: ", presence_data)
+    
+    print("Presence data retrieved successfully: ", presence_data)
     return presence_data
+
 
 def get_presence_by_status(date, status=None):
     query = '''
@@ -328,8 +335,9 @@ def get_active_cam_ids():
 @login_required(login_url='login')
 @role_required('admin')
 def presence(request):
+    company = models.Company.objects.get(user=request.user)
     if request.method == "POST":
-        cam_id = request.POST.get("cam_id")  # Mengambil `cam_id` dari POST request
+        cam_id = request.POST.get("cam_id")  # Get `cam_id` from POST request
         if not cam_id:
             cam_id = get_active_cam_ids()
             if not cam_id:
@@ -338,7 +346,7 @@ def presence(request):
         if request.POST.get("command") == "presence-data":
             date = request.POST.get('date', timezone.now().date().strftime('%Y-%m-%d'))
             try:
-                presence_data = get_presence_data(date)
+                presence_data = get_presence_data(date, company)
                 return JsonResponse({'status': 'success', 'presence_data': presence_data})
             except Exception as e:
                 return JsonResponse({'status': 'error', 'message': str(e)})
@@ -349,11 +357,12 @@ def presence(request):
     elif request.method == 'GET':
         try:
             today = request.GET.get('date', timezone.now().date().strftime('%Y-%m-%d'))
+            filter_date = request.GET.get('filter_date', today)
             personnel_id = request.GET.get('personnel_id')
-            presence_data = get_presence_data(today, personnel_id)
+            presence_data = get_presence_data(filter_date, personnel_id, company=company)
             status = get_presence_by_status(today)
-            personnel_list = models.Personnels.objects.all()
-            print(presence_data)
+            company = models.Company.objects.get(user=request.user)
+            personnel_list = models.Personnels.objects.filter(company=company)
             return render(request, 'admin/presence.html', {
                 'presence_data': presence_data,
                 'date': today,
@@ -390,19 +399,19 @@ class AttendanceHandler(FileSystemEventHandler):
     def on_created(self, event):
         
         # Retrieve active camera IDs with role 'p_in' and 'p_out'
-        active_cam_ids = get_active_cam_ids()
-        for cam_id in active_cam_ids:
-            print(f"File created, running presence process for camera ID: {cam_id}")
-            presence_process(cam_id)
-            print(f"Presence Proccess Executed Successfully  for camera ID: {cam_id}")
+        # active_cam_ids = get_active_cam_ids()
+        # for cam_id in active_cam_ids:
+        #     print(f"File created, running presence process for camera ID: {cam_id}")
+        presence_process()
+        print(f"Presence Proccess Executed Successfully")
 
     def on_modified(self, event):
         # Retrieve active camera IDs with role 'p_in' and 'p_out'
-        active_cam_ids = get_active_cam_ids()
-        for cam_id in active_cam_ids:
-            print(f"File modified, running presence process for camera ID: {cam_id}")
-            presence_process(cam_id)
-            print(f"Presence Proccess Executed Successfully  for camera ID: {cam_id}")
+        # active_cam_ids = get_active_cam_ids()
+        # for cam_id in active_cam_ids:
+        #     print(f"File modified, running presence process for camera ID: {cam_id}")
+        presence_process()
+        print(f"Presence Proccess Executed Successfully ")
 
 # Watchdog observer setup
 def start_watching():

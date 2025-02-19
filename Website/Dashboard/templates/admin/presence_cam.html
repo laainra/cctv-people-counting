@@ -68,7 +68,7 @@ Presence Camera
                                 <th>Camera Role</th>
                                 <th>RTSP IP</th>
                                 <th>Status</th>
-                                <th>View Stream</th>
+                                {% comment %} <th>View Stream</th> {% endcomment %}
                                 <th width="100">Attendance Start Time</th>
                                 <th width="100">Attendance End Time</th>
                                 <th width="100">Leaving Start Time</th>
@@ -90,9 +90,9 @@ Presence Camera
                               <span class="badge bg-danger">Inactive</span>
                               {% endif %}
                             </td>
-                            <td>
+                             {% comment %} <td>
                               <button class="btn btn-primary btn-sm" onclick="redirectToStream({{ cam.id }})">View Stream</button>
-                            </td>
+                            </td> {% endcomment %}
                             <td>{{ cam.attendance_time_start }}</td>
                             <td>{{ cam.attendance_time_end }}</td>
                             <td>{{ cam.leaving_time_start }}</td>
@@ -290,16 +290,19 @@ Presence Camera
           },
           body: JSON.stringify({ cam_id: camId })
       })
-      .then(response => response.json())
-      .then(data => {
-          console.log(data);
-          if (data.status === 'success') {
-              // Redirect to the stream page with camId as a query parameter
-              window.location.href = "{% url 'stream' %}"
-          } else {
-              console.error('Error setting cam_id:', data.message);
-          }
-      })
+      .then(response => {
+        if (response.redirected) {
+            // If the response is a redirect, navigate to the new URL
+            window.location.href = response.url;  // Use the URL from the response
+        } else {
+            return response.json();
+        }
+    })
+    .then(data => {
+        if (data && data.status !== 'success') {
+            console.error('Error setting cam_id:', data.message);
+        }
+    })
       .catch(error => {
           console.error('Error setting cam_id:', error);
       });
@@ -344,7 +347,7 @@ Presence Camera
       streamButton.textContent = 'Stop Stream';
 
       // Simulate stream starting
-      fetch(`/start_stream/`)
+      fetch(`start_stream/`)
         .then(response => response.json())
         .then(data => {
           if (data.status === 'success') {
@@ -362,7 +365,7 @@ Presence Camera
         });
     } else {
       // Stop stream
-      fetch(`/stop_stream/`)
+      fetch(`stop_stream/`)
         .then(response => response.json())
         .then(data => {
           if (data.status === 'success') {
@@ -497,13 +500,24 @@ Presence Camera
   function updateCamera() {
     const cameraId = document.getElementById('edit-camera-id').value;
     const formData = new FormData();
-    formData.append('cam_name', document.getElementById('edit-camera-name').value);
-    formData.append('role_camera', document.getElementById('edit-camera-role').value);
-    formData.append('feed_src', document.getElementById('edit-camera-feed-src').value);
-    formData.append('attendance_time_start', document.getElementById('edit-attendance-time-start').value);
-    formData.append('attendance_time_end', document.getElementById('edit-attendance-time-end').value);
-    formData.append('leaving_time_start', document.getElementById('edit-leaving-time-start').value);
-    formData.append('leaving_time_end', document.getElementById('edit-leaving-time-end').value);
+    
+    // Get current values from the form
+    const camName = document.getElementById('edit-camera-name').value;
+    const roleCamera = document.getElementById('edit-camera-role').value;
+    const feedSrc = document.getElementById('edit-camera-feed-src').value;
+    const attendanceTimeStart = document.getElementById('edit-attendance-time-start').value;
+    const attendanceTimeEnd = document.getElementById('edit-attendance-time-end').value;
+    const leavingTimeStart = document.getElementById('edit-leaving-time-start').value;
+    const leavingTimeEnd = document.getElementById('edit-leaving-time-end').value;
+
+    // Append all fields to FormData
+    formData.append('cam_name', camName);
+    formData.append('role_camera', roleCamera);
+    formData.append('feed_src', feedSrc);
+    formData.append('attendance_time_start', attendanceTimeStart);
+    formData.append('attendance_time_end', attendanceTimeEnd);
+    formData.append('leaving_time_start', leavingTimeStart);
+    formData.append('leaving_time_end', leavingTimeEnd);
 
     fetch(`/edit_presence_camera/${cameraId}/`, {
       method: 'POST',
@@ -541,7 +555,7 @@ Presence Camera
         confirmButtonText: 'OK'
       });
     });
-  }
+}
   document.getElementById('edit-camera-form').addEventListener('submit', function(event) {
     event.preventDefault();
     updateCamera();

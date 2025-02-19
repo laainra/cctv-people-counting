@@ -14,7 +14,7 @@ Stream
           <div class="col-auto">
             <!-- Page pre-title -->
             <div class="page-pretitle">
-              Camera
+              {{cam.name}}'s
             </div>
             <h2 class="page-title">
                 Stream
@@ -29,84 +29,20 @@ Stream
                     <div id="loader" class="spinner-border text-primary" role="status" style="display: none;">
                         <span class="sr-only">Loading...</span>
                     </div>
-                    {% comment %} <img id="img_stream" src="{% url 'video_feed' %}" style="width: 100%; border-radius: 10px; z-index: 1001; position: relative; {% if cam.cam_is_active %}display: block;{% else %}display: none;{% endif %}" /> {% endcomment %}
-                </div>
-                <div class="card-footer d-flex justify-content-center">
-                    <button type="button" class="btn btn-primary mr-2" id="start-stream" onclick="{% url "start_stream"%}" {% if cam.cam_is_active %}style="display: none;"{% endif %}>Start Stream</button>
-                    <button type="button" class="btn btn-danger" id="stop-stream" onclick="toggleStream('stop')" {% if cam.cam_is_active %}style="display: inline-block;"{% else %}style="display: none;"{% endif %}>Stop Stream</button>
-                </div>
+                    {%if cam.role_camera == "T"  %}
+                     <img id="img_stream" src="{% url 'tracking_cam_feed' cam.id %}" style="width: 100%; border-radius: 10px; z-index: 1001; position: relative; {% if cam.cam_is_active %}display: block;{% else %}display: none;{% endif %}" /> 
+                     {% else%}
+                     <img id="img_stream" src="{% url 'presence_cam_feed' cam.id %}" style="width: 100%; border-radius: 10px; z-index: 1001; position: relative; {% if cam.cam_is_active %}display: block;{% else %}display: none;{% endif %}" /> 
+                     {%endif%}
+                    </div>
+                {% comment %} <div class="card-footer d-flex justify-content-center">
+                    <button type="button" class="btn btn-primary mr-2" id="start-stream" {% if cam.cam_is_active %}style="display: none;"{% endif %}>Start Stream</button>
+                    <button type="button" class="btn btn-danger" id="stop-stream" {% if cam.cam_is_active %}style="display: inline-block;"{% else %}style="display: none;"{% endif %}>Stop Stream</button>
+                </div> {% endcomment %}
             </div>
         </div>
       </div>
     </div>
 </div>
 
-<script>
-    function toggleStream(action) {
-        const startButton = document.getElementById('start-stream');
-        const stopButton = document.getElementById('stop-stream');
-        const loader = document.getElementById('loader');
-        const imgStream = document.getElementById('img_stream');
-        const camId = {{ cam.id }}; // Ensure cam.id is passed to the template context
-
-        if (action === 'start') {
-            // Show loader and start stream
-            loader.style.display = 'block';
-            imgStream.style.display = 'none';
-            startButton.style.display = 'none';
-            stopButton.style.display = 'inline-block';
-
-            // Start stream
-            fetch(`/start_stream/`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': '{{ csrf_token }}'
-                },
-                body: JSON.stringify({ cam_id: camId })
-            })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.status === 'success') {
-                        loader.style.display = 'none';
-                        imgStream.style.display = 'block';
-                    } else {
-                        alert('Failed to start stream');
-                        startButton.style.display = 'inline-block';
-                        stopButton.style.display = 'none';
-                    }
-                })
-                .catch(error => {
-                    console.error('Error starting stream:', error);
-                    alert('Failed to start stream');
-                    startButton.style.display = 'inline-block';
-                    stopButton.style.display = 'none';
-                });
-        } else if (action === 'stop') {
-            // Stop stream
-            fetch(`/stop_stream/`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': '{{ csrf_token }}'
-                },
-                body: JSON.stringify({ cam_id: camId })
-            })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.status === 'success') {
-                        imgStream.style.display = 'none';
-                        startButton.style.display = 'inline-block';
-                        stopButton.style.display = 'none';
-                    } else {
-                        alert('Failed to stop stream');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error stopping stream:', error);
-                    alert('Failed to stop stream');
-                });
-        }
-    }
-</script>
 {% endblock %}

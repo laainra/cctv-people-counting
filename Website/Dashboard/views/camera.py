@@ -188,7 +188,7 @@ def stop_stream(request):
 
 @login_required
 def delete_camera(request, id):
-    # Delete camera settings and counted instances associated with the camera
+# Delete camera settings and counted instances associated with the camera
     models.Camera_Settings.objects.get(id=id).delete()
     try:
         models.Counted_Instances.objects.filter(camera=id).delete()
@@ -196,8 +196,8 @@ def delete_camera(request, id):
         pass
 
     # Stop and delete the camera using MC
-    MC.stop_cam(id)
-    MC.delete_cam(id)
+    # MC.stop_cam(id)
+    # MC.delete_cam(id)
 
     # Get the first camera setting
     first_cam = models.Camera_Settings.objects.first()
@@ -216,7 +216,7 @@ def delete_camera(request, id):
     request.session['status'] = 'camera_deleted'
 
     # Redirect to the camera page
-    return redirect('camera')
+    return redirect('presence_cam')
 
 @login_required
 def add_camera(request):
@@ -462,12 +462,16 @@ def edit_tracking_camera(request, id):
 
     return render(request, 'edit_tracking_camera.html', {'Active_Cam': active_cam, 'form': form})
 
-def format_time(time_str):
+def format_time(time_str, default_time=None):
     """Convert 'HH:MM' to 'HH:MM:SS' format."""
+    if not time_str:  # Check if the input is empty
+        return default_time if default_time else datetime.strptime("00:00", "%H:%M").time()  # Return default time if input is empty
+
     try:
         return datetime.strptime(time_str, "%H:%M").time()  # Default seconds to 00
     except ValueError:
-        return None  # Handle invalid time formats
+        print(f"Invalid time format: {time_str}. Returning default time.")
+        return default_time if default_time else datetime.strptime("00:00", "%H:%M").time()  # Return default time on error
 
 @login_required
 def add_presence_camera(request):
@@ -500,28 +504,37 @@ def add_presence_camera(request):
 @login_required
 def edit_presence_camera(request, id):
     active_cam = models.Camera_Settings.objects.get(id=id)
-    form = forms.AddPresenceCameraForm(request.POST, instance=active_cam)
+    
     if request.method == 'POST':
-        if form.is_valid():
-            active_cam.feed_src = form.cleaned_data['feed_src']
-            active_cam.cam_name = form.cleaned_data['cam_name']
+        # Get the new values from the request
+        cam_name = request.POST.get('cam_name', active_cam.cam_name)
+        role_camera = request.POST.get('role_camera', active_cam.role_camera)
+        feed_src = request.POST.get('feed_src', active_cam.feed_src)
+        
+        # Pass the existing values as default to format_time
+        attendance_time_start = format_time(request.POST.get('attendance_time_start'), active_cam.attendance_time_start)
+        attendance_time_end = format_time(request.POST.get('attendance_time_end'), active_cam.attendance_time_end)
+        leaving_time_start = format_time(request.POST.get('leaving_time_start'), active_cam.leaving_time_start)
+        leaving_time_end = format_time(request.POST.get('leaving_time_end'), active_cam.leaving_time_end)
 
-            # Convert time fields before saving
-            active_cam.attendance_time_start = format_time(request.POST['attendance_time_start'])
-            active_cam.attendance_time_end = format_time(request.POST['attendance_time_end'])
-            active_cam.leaving_time_start = format_time(request.POST['leaving_time_start'])
-            active_cam.leaving_time_end = format_time(request.POST['leaving_time_end'])
+        # Update the camera settings
+        active_cam.cam_name = cam_name
+        active_cam.role_camera = role_camera
+        active_cam.feed_src = feed_src
+        active_cam.attendance_time_start = attendance_time_start
+        active_cam.attendance_time_end = attendance_time_end
+        active_cam.leaving_time_start = leaving_time_start
+        active_cam.leaving_time_end = leaving_time_end
+        
+        # Check if feed_src has changed
+        if active_cam.feed_src != feed_src:
+            MC.stop_cam(active_cam.id)
+            MC.add_camera(active_cam.id, feed_src)
+            active_cam.cam_is_active = False
 
-            if active_cam.feed_src != form.cleaned_data['feed_src']:
-                MC.stop_cam(active_cam.id)
-                MC.add_camera(active_cam.id, form.cleaned_data['feed_src'])
-                active_cam.cam_is_active = False
-
-            active_cam.save()
-            request.session['status'] = 'editing_success'
-            return JsonResponse({'status': 'success'})
-        else:
-            request.session['status'] = 'editing_error'
+        active_cam.save()
+        request.session['status'] = 'editing_success'
+        return JsonResponse({'status': 'success'})
 
     return render(request, 'edit_presence_camera.html', {'Active_Cam': active_cam}) 
 

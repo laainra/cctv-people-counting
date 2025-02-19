@@ -148,5 +148,6 @@ def get_presence_data(date=None, personnel_id=None):
 @login_required(login_url='login')
 @role_required('employee')
 def take_image(request):
-    user = models.Personnels.objects.filter(user=request.user)
-    return render(request, 'employee/take_image.html')
+    employee = models.Personnels.objects.get(user=request.user)
+    name = employee.name
+    return render(request, 'employee/take_image.html', {'name':name})

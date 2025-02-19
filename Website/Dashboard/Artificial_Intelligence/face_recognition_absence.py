@@ -271,6 +271,9 @@ def process_attendance():
             predicted_name, confidence = predict_face(img_path, database)
             current_date = detection_time.date()
             
+            # Extract camera ID from the filename
+            camera_id = img_file.split('_')[-1].split('.')[0]  # Assuming the camera ID is the last part of the filename
+            
             # Define status based on the conditions
             if confidence >= 0.75:
                 # Check if there is already data for this person today
@@ -293,7 +296,8 @@ def process_attendance():
                     'name': predicted_name,
                     'datetime': detection_time.strftime('%Y-%m-%d %H:%M:%S'),
                     'confidence': float(confidence),
-                    'image_path': os.path.relpath(new_path, BASE_DIR).replace("\\", "/")
+                    'image_path': os.path.relpath(new_path, BASE_DIR).replace("\\", "/"),
+                    'camera_id': camera_id
                 }
                 attendance_data.append(new_record)
                 shutil.move(img_path, new_path)
@@ -377,3 +381,4 @@ if __name__ == "__main__":
     process_attendance()
     # Then run the monitoring service
     run_face_recognition_service()
+

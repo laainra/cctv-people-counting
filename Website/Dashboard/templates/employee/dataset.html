@@ -48,61 +48,85 @@ Dataset Wajah
     captureFaces = () => {
         window.location.href = "{% url 'capture_page' %}";
             }
-    // Function to capture faces
-    function trainModel() {
-        Swal.fire({
-            title: 'Training model...',
-            text: 'Please wait while we capture your faces.',
-            allowEscapeKey: false,
-            allowOutsideClick: false,
-            showConfirmButton: false, 
-            onBeforeOpen: () => {
-                Swal.showLoading();
-            }
-        });
-
-        fetch("{% url 'train_model' %}", {
-            method: 'POST',
-            headers: {
-                'X-CSRFToken': '{{ csrf_token }}',
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({})
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.status === 'success') {
-                // Show SweetAlert success message
-                Swal.fire({
-                    title: 'Success!',
-                    text: data.message,
-                    icon: 'success',
-                    confirmButtonText: 'OK'
-                }).then(() => {
-                    // Redirect to dataset page after closing the alert
-                    window.location.href = "{% url 'dataset' %}";
+            function trainModel() {
+                // Initialize the progress variables
+                let progress = 0; // Progress percentage
+                const totalSteps = 100; // Total steps for the progress bar
+                const progressInterval = 100; // Interval for updating progress in milliseconds
+            
+                // Show the SweetAlert with a loading spinner and progress bar
+                const swalInstance = Swal.fire({
+                    title: 'Training model...',
+                    html: `
+                        <div id="progress-container" style="width: 100%; height: 30px; background-color: #f3f3f3; border-radius: 5px;">
+                            <div id="progress-bar" style="width: 0%; height: 100%; background-color: #4caf50; border-radius: 5px;"></div>
+                        </div>
+                        <div id="progress-text" style="text-align: center; margin-top: 5px;">Progress: 0%</div>
+                    `,
+                    allowEscapeKey: false,
+                    allowOutsideClick: false,
+                    showConfirmButton: false,
+                    onBeforeOpen: () => {
+                        Swal.showLoading();
+                    }
                 });
-            } else {
-                // Show SweetAlert error message
-                Swal.fire({
-                    title: 'Error!',
-                    text: data.message,
-                    icon: 'error',
-                    confirmButtonText: 'Try Again'
+            
+                // Start the fetch request to train the model
+                fetch("{% url 'train_model' %}", {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': '{{ csrf_token }}',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({})
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        // Simulate progress updates
+                        const interval = setInterval(() => {
+                            if (progress < totalSteps) {
+                                progress++;
+                                const progressPercentage = (progress / totalSteps) * 100;
+            
+                                // Update the progress bar and text
+                                document.getElementById('progress-bar').style.width = progressPercentage + '%';
+                                document.getElementById('progress-text').innerText = `Progress: ${progressPercentage.toFixed(2)}%`;
+                            } else {
+                                clearInterval(interval); // Stop the interval when complete
+                                Swal.close(); // Close the loading alert
+                                // Show success message
+                                Swal.fire({
+                                    title: 'Success!',
+                                    text: data.message,
+                                    icon: 'success',
+                                    confirmButtonText: 'OK'
+                                }).then(() => {
+                                    // Redirect to dataset page after closing the alert
+                                    window.location.href = "{% url 'dataset' %}";
+                                });
+                            }
+                        }, progressInterval);
+                    } else {
+                        // Show SweetAlert error message
+                        Swal.fire({
+                            title: 'Error!',
+                            text: data.message,
+                            icon: 'error',
+                            confirmButtonText: 'Try Again'
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    Swal.fire({
+                        title: 'Error!',
+                        text: 'An unexpected error occurred.',
+                        icon: 'error',
+                        confirmButtonText: 'OK'
+                    });
                 });
             }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            Swal.fire({
-                title: 'Error!',
-                text: 'An unexpected error occurred.',
-                icon: 'error',
-                confirmButtonText: 'OK'
-            });
-        });
-    }
-
 </script>
 {% endblock %}
 

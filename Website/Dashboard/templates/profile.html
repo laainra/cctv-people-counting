@@ -48,11 +48,11 @@ Profile
                                 {% if user.role == 'superadmin' %}
                                     {{ form.as_p }}
                                 {% elif user.role == 'admin' %}
+                                {{ form.1.as_p }}
                                     {{ form.0.as_p }}
-                                    {{ form.1.as_p }}
                                 {% elif user.role == 'employee' %}
+                                {{ form.1.as_p }}
                                     {{ form.0.as_p }}
-                                    {{ form.1.as_p }}
                                 {% endif %}
                                 <button type="submit" class="btn btn-primary">Save Changes</button>
                                 <button type="button" class="btn btn-secondary" onclick="toggleEditForm()">Cancel</button>

@@ -11,7 +11,7 @@
                 <div class="col-auto">
                     <!-- Page pre-title -->
                     <div class="page-pretitle">Take</div>
-                    <h2 class="page-title">{{ user.name }}'s Stream</h2>
+                    <h2 class="page-title">{{ name }}'s Stream</h2>
                 </div>
             </div>
         </div>
@@ -19,7 +19,7 @@
             <div class="col-12">
                 <div class="card">
                     <div class="card-body text-center">
-                        <img id="img_stream" src="{% url 'predict_video' %}" class="img-fluid rounded w-100" style="display: block;" />
+                        <img id="img_stream" src="{% url 'predict_video' 0 %}" class="img-fluid rounded w-100" style="display: block;" />
                     </div>
                 </div>
             </div>
