@@ -97,7 +97,10 @@ def process_attendance_entry(data):
     name = data.get('name')
     datetime_str = data.get('datetime')
     image_path = data.get('image_path')
-    cam_id = data.get('camera_id') 
+    cam= data.get('camera_id') 
+    cam_id = cam.lstrip('cam') 
+    cam_id = int(cam_id) 
+    print(cam_id)
     detected_time = datetime.strptime(datetime_str, '%Y-%m-%d %H:%M:%S')
 
     try:
@@ -118,17 +121,26 @@ def process_attendance_entry(data):
             print("Camera settings not found.")
             return
 
-    # Parse waktu dari pengaturan kamera
-    attendance_start, attendance_end, leaving_start, leaving_end = map(lambda t: datetime.strptime(t, '%H:%M:%S').time(), camera)
+    print("DEBUG: Isi camera sebelum parsing waktu:", camera)
     current_time = detected_time.time()
 
+
+    try:
+        attendance_start = datetime.strptime(camera[0], '%H:%M:%S').time() if camera[0] else None
+        attendance_end = datetime.strptime(camera[1], '%H:%M:%S').time() if camera[1] else None
+        leaving_start = datetime.strptime(camera[2], '%H:%M:%S').time() if camera[2] else None
+        leaving_end = datetime.strptime(camera[3], '%H:%M:%S').time() if camera[3] else None
+    except (TypeError, ValueError):
+        print("Invalid camera time format detected.")
+        return
+
     # Tentukan status berdasarkan waktu yang terdeteksi
-    if attendance_start <= current_time <= attendance_end:
+    if attendance_start and attendance_end and attendance_start <= current_time <= attendance_end:
         status = 'ONTIME'
-    elif leaving_start <= current_time <= leaving_end:
+    elif leaving_start and leaving_end and leaving_start <= current_time <= leaving_end:
         status = 'LEAVE'
     else:
-        if attendance_end < current_time < leaving_start:
+        if attendance_end and leaving_start and attendance_end < current_time < leaving_start:
             status = 'LATE'
         else:
             status = 'LEAVE'

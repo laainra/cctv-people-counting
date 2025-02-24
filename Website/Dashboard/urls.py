@@ -88,7 +88,8 @@ urlpatterns = [
     path('capture_video/', face_rec.capture_video, name='capture_video'),
     path('train/', face_rec.train_model, name='train_model'),
     path('recognize/<int:cam_id>/', face_rec.predict_video, name='predict_video'),
-    path('dataset/', face_rec.dataset, name='dataset'),
+    path('dataset/<int:personnel_id>/', face_rec.dataset, name='dataset'),
+    path('dataset/', face_rec.dataset, name='dataset_no_id'),
     
     path('work_time_report/', work_timer.work_time_report, name='work_time_report'),
     path('video_feed_timer/<int:cam_id>/', work_timer.video_feed_timer, name='video_feed_timer'),

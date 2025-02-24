@@ -46,6 +46,7 @@ def save_label_to_name(label_to_name, file_path=label_to_name_path):
         json.dump(label_to_name, f)
 
 def capture_page(request):
+
     user = models.Personnels.objects.filter(user_id=request.user).first()
     name = user.name
     return render(request, 'employee/capture.html', {'name': name})
@@ -293,18 +294,39 @@ def predict_video(request, cam_id=None):
     except models.Camera_Settings.DoesNotExist:
         return JsonResponse({'status': 'error', 'message': 'Camera not found.'}, status=404)
 
-def dataset(request):
+def dataset(request, personnel_id=None):
     images = []
-    user = models.Personnels.objects.filter(user_id=request.user).first()
-    
-    if user:
-        face_id = user.id
-        face_name = user.name
-        face_folder = os.path.join(var.personnel_path, face_name)
-    if os.path.exists(dataset_folder):
+ 
+def dataset(request, personnel_id=None):
+    images = []
+    detection_times = []  # Ensure it's initialized
+
+    # Determine personnel: If no ID, get by logged-in user
+    if personnel_id is None:
+        personnel = models.Personnels.objects.filter(user_id=request.user.id).first()
+    else:
+        personnel = models.Personnels.objects.filter(id=personnel_id).first()
+
+    if not personnel:
+        return render(request, 'employee/dataset.html', {
+            'images': [],
+            'name': "Unknown",
+            'detection_times': [],
+            'error': "No personnel found"
+        })
+
+    # Define face folder
+    face_name = personnel.name
+    face_folder = os.path.join(var.personnel_path, face_name)
+
+    # Ensure the folder exists before listing files
+    if os.path.exists(face_folder):
         for file_name in os.listdir(face_folder):
             if file_name.endswith('.jpg'):
-                images.append({
-                    'url': f'img/personnel_pics/{face_name}/{file_name}',  
-                })
-    return render(request, 'employee/dataset.html', {'images': images, 'name': face_name, 'detection_times': detection_times})  
+                images.append({'url': f'img/personnel_pics/{face_name}/{file_name}'})
+
+    return render(request, 'employee/dataset.html', {
+        'images': images,
+        'name': face_name,
+        'detection_times': detection_times
+    })

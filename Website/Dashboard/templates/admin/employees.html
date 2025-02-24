@@ -93,7 +93,7 @@ Employees
                                 <td>{{forloop.counter}}</td>
                                 <a onclick="openPersonnelDetailModal({{ employee.id }}, '{{ employee.name }}')">
                                 <td>
-                                    <span class="text-muted">{{employee.employeeid}}</span>
+                                    <span class="text-muted">{{employee.id}}</span>
                                 </td>
                                 <td>{{employee.name}}</td>
                                 <td>{{employee.division.name}}</td>
@@ -101,7 +101,7 @@ Employees
                                 <td>{{employee.user.email}}</td>
                                 <td>{{employee.user.username}}</td>
                                 <td>********</td>
-                                <td>     <a href="#" onclick="openImagesModal({{ employee.id }}, '{{ employee.name }}')" class="btn btn-primary ml-3 d-none d-sm-inline-block" data-toggle="modal" data-target="#modal-tambah">
+                                <td>     <a href="#" onclick="openDatasetPage({{ employee.id }})" class="btn btn-primary ml-3 d-none d-sm-inline-block" data-toggle="modal" data-target="#modal-tambah">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
                                         <path stroke="none" d="M0 0h24H0z"/>
                                         <line x1="12" y1="5" x2="12" y2="19"/>
@@ -397,6 +397,11 @@ Employees
 </div>
 
 <script>
+
+  function openDatasetPage(id) {
+    window.location.href = `/dataset/${id}/`;
+}
+
     document.addEventListener('DOMContentLoaded', function() {
 
      

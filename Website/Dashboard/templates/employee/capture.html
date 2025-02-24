@@ -111,7 +111,7 @@ Capture Faces
                             confirmButtonText: 'OK'
                         }).then(() => {
                             // Redirect to dataset page after closing the alert
-                            window.location.href = "{% url 'dataset' %}";
+                            window.location.href = "{% url 'dataset_no_id' %}";
                         });
                     }
                 }, progressInterval);

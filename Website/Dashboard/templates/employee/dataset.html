@@ -22,10 +22,12 @@ Dataset Wajah
 
             <div class="card">
                 <div class="card-body">
+                    {%if user.role == 'employee' %}
                     <div class="card-body text-center">
-                        <button class="btn btn-primary mt-3" onclick="captureFaces()">Capture Faces Again</button>
+                        <button class="btn btn-primary mt-3" onclick="captureFaces()">Capture Faces</button>
                         <button class="btn btn-primary mt-3" onclick="trainModel()">Train Face Model</button>
                    </div>
+                   {%endif%}
                     <div class="row row-deck row-cards">
                         {% load static %}
                         {% for image in images %}
@@ -103,7 +105,7 @@ Dataset Wajah
                                     confirmButtonText: 'OK'
                                 }).then(() => {
                                     // Redirect to dataset page after closing the alert
-                                    window.location.href = "{% url 'dataset' %}";
+                                    window.location.reload()
                                 });
                             }
                         }, progressInterval);

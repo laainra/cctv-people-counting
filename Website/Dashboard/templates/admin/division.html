@@ -264,7 +264,7 @@ function loadDivisions() {
             });
             document.getElementById('division-count').innerText = data.divisions.length;
         } else {
-            alert(data.message);
+     
         }
     });
 }
@@ -292,12 +292,7 @@ function addDivision() {
                 'success'
             );
             location.reload();
-        } else {
-            Swal.fire(
-                'Error!',
-                data.message,
-                'error'
-            );
+        
         }
     });
 }
