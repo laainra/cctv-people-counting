@@ -94,7 +94,7 @@ WSGI_APPLICATION = 'Website.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'db_cctvproject',
+        'NAME': 'cctvdb',
         'USER': 'root',
         'PASSWORD': '',
         'HOST': '127.0.0.1',
@@ -189,6 +189,8 @@ AUTH_USER_MODEL = 'Dashboard.CustomUsers'
 
 ASGI_APPLICATION = 'Dashboard.asgi.application'
 
-SESSION_COOKIE_AGE = 3600 
 
-SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+SESSION_COOKIE_AGE = 1209600  # 1 day in seconds
+
+# Optional: Make session persist even if browser is closed
+SESSION_EXPIRE_AT_BROWSER_CLOSE = False

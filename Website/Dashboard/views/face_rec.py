@@ -1,3 +1,4 @@
+from django.db import connection
 import cv2
 import os
 import json
@@ -9,7 +10,11 @@ from .var import var
 from django.conf import settings  # Import settings to access static files
 from datetime import datetime, timedelta
 from django.utils import timezone 
-
+# from .presence import process_attendance_entry
+from django.views.decorators.csrf import csrf_exempt
+from django.contrib import messages
+from django.shortcuts import redirect
+from .. camera import camera_instance
 # Initialize Haar Cascade for face detection
 face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
 dataset_folder = var.personnel_path
@@ -64,11 +69,11 @@ def capture_faces(request):
         if not face_id:
             return JsonResponse({'status': 'error', 'message': 'Face ID is required.'})
 
-        cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)  # DirectShow (Windows)
+        cap = cv2.VideoCapture(1, cv2.CAP_DSHOW) # DirectShow (Windows)
         if not cap.isOpened():
-            cap = cv2.VideoCapture(0, cv2.CAP_MSMF)  # Media Foundation (Windows)
+            cap = cv2.VideoCapture(1, cv2.CAP_MSMF)  # Media Foundation (Windows)
         if not cap.isOpened():
-            cap = cv2.VideoCapture(0, cv2.CAP_V4L2)  # Video4Linux (Linux)
+            cap = cv2.VideoCapture(1, cv2.CAP_V4L2)  # Video4Linux (Linux)
     
         if not cap.isOpened():
             return JsonResponse({'status': 'error', 'message': 'Failed to open camera.'})
@@ -150,12 +155,12 @@ def recognize_face(request, cam=None):
     global last_save_time
     
     if cam is None or cam.feed_src == 0:
-        camera_url = 0  
+        camera_url = 1 
     else:
         camera_url = cam.feed_src
         
         
-    camera_name = cam.cam_name
+    # camera_name = cam.cam_name
 
 
     # Initialize the recognizer and load the model
@@ -176,9 +181,15 @@ def recognize_face(request, cam=None):
                     label_to_name[label] = extracted_name
 
     while True:
-        print(f"Start to open camera: {camera_name} {camera_url}")
+        print(f"Start to open camera: {camera_url}")
         cap = cv2.VideoCapture(camera_url)
             
+        # if not cap.isOpened():
+        #     cap = cv2.VideoCapture(camera_url, cv2.CAP_DSHOW) # DirectShow (Windows)
+        # if not cap.isOpened():
+        #     cap = cv2.VideoCapture(camera_url, cv2.CAP_MSMF)  # Media Foundation (Windows)
+        # if not cap.isOpened():
+        #     cap = cv2.VideoCapture(camera_url, cv2.CAP_V4L2)  # Video4Linux (Linux)
         if not cap.isOpened():
             print(f"Failed to open camera: {camera_url}")
             continue  # Try the next camera URL
@@ -200,41 +211,41 @@ def recognize_face(request, cam=None):
                 
                 if confidence >= 0.70:
                 # Update detection time
-                    current_time = datetime.now()
-                    if name != "Unknown":
-                        if name in last_detection_time:
-                            elapsed_time = (current_time - last_detection_time[name]).total_seconds()
-                            detection_times[name] += elapsed_time
-                        else:
-                            detection_times[name] = 0
+                    if not camera_url == 0 or not camera_url == 1:
+                        current_time = datetime.now()
+                        if name != "Unknown":
+                            if name in last_detection_time:
+                                elapsed_time = (current_time - last_detection_time[name]).total_seconds()
+                                detection_times[name] += elapsed_time
+                            else:
+                                detection_times[name] = 0
 
-                        last_detection_time[name] = current_time
-                        is_face_detected = True
-                        
-                        total_time_recognized = int(detection_times.get(name, 0))
-                        timer_text = f'Timer: {total_time_recognized}s'
-                        
-                        print(f'Name: {name}  ({confidence:.2f}), {timer_text}')
+                            last_detection_time[name] = current_time
+                            is_face_detected = True
+                            
+                            total_time_recognized = int(detection_times.get(name, 0))
+                            timer_text = f'Timer: {total_time_recognized}s'
+                            
+                            print(f'Name: {name}  ({confidence:.2f}), {timer_text}')
 
-                        # Check if a minute has passed to save to the database
-                        if (current_time - last_save_time) >= timedelta(minutes=1):
-                            if not camera_url == 0:
-                                save_or_update_database(name, detection_times[name], camera_url)
-                            last_save_time = current_time  # Update the last save time
-                            print(f"Saving detection time for {name}: {detection_times[name]} seconds") 
+                            # Check if a minute has passed to save to the database
+                            if (current_time - last_save_time) >= timedelta(minutes=1):
+                                if not camera_url == 0 or not camera_url == 1:
+                                    save_or_update_database(name, detection_times[name], camera_url)
+                                last_save_time = current_time  # Update the last save time
+                                print(f"Saving detection time for {name}: {detection_times[name]} seconds") 
                 else:
                     is_face_detected = False
                     
-
                 
                 # Draw a rectangle around the face
                 cv2.rectangle(frame, (x, y), (x+w, y+h), (255, 0, 0), 2)
-                if request.path == '/presence_stream/':
-                    # Display only name and confidence
-                    cv2.putText(frame, f'Name: {name} ({confidence:.2f})', (x, y-10), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
-                elif request.path == '/tracking_stream/':
-                    # Assuming timer_text is defined and updated elsewhere in your code
-                    cv2.putText(frame, f'Name: {name} ({confidence:.2f}), Timer: {timer_text}', (x, y-10), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
+                # if request.path == '/presence_stream/':
+                #     # Display only name and confidence
+                #     cv2.putText(frame, f'Name: {name} ({confidence:.2f})', (x, y-10), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
+                # elif request.path == '/tracking_stream/':
+                #     # Assuming timer_text is defined and updated elsewhere in your code
+                cv2.putText(frame, f'Name: {name} ({confidence:.2f}), Timer: {timer_text}', (x, y-10), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
 
             # Yield the frame for streaming
             ret, jpeg = cv2.imencode('.jpg', frame)
@@ -268,23 +279,22 @@ def save_or_update_database(name, total_time, camera_url):
 def capture_video(request):
     """View for streaming video with capture new dataset."""
     def generate_frames():
-        cap = cv2.VideoCapture(0)  # Open the default camera
-        while True:
-            success, frame = cap.read()  # Read a frame from the camera
-            if not success:
-                break
-            else:
-                # Encode the frame in JPEG format
-                ret, buffer = cv2.imencode('.jpg', frame)
-                frame = buffer.tobytes()  # Convert to bytes
+            while True:
+                frame = camera_instance.get_frame()
+                if frame is None:
+                    continue
+
+                # Optional: tambahkan facebox di sini (tanpa simpan)
+                _, jpeg = cv2.imencode('.jpg', frame)
                 yield (b'--frame\r\n'
-                       b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+                    b'Content-Type: image/jpeg\r\n\r\n' + jpeg.tobytes() + b'\r\n')
+
     return StreamingHttpResponse(generate_frames(), content_type='multipart/x-mixed-replace; boundary=frame')
 
 def predict_video(request, cam_id=None):
     """View for streaming video with object detection."""
     
-    if cam_id == 0:
+    if cam_id == 0 or cam_id == 1:
         # Handle the case for webcam
         return StreamingHttpResponse(recognize_face(request, cam=None), content_type='multipart/x-mixed-replace; boundary=frame')
     
@@ -330,3 +340,259 @@ def dataset(request, personnel_id=None):
         'name': face_name,
         'detection_times': detection_times
     })
+    
+    
+@csrf_exempt
+def delete_images(request):
+    if request.method == 'POST':
+        images = request.POST.getlist('images_to_delete')
+        
+        for img_path in images:
+            # img_path format: 'img/personnel_pics/Name/image.jpg'
+            relative_path = img_path.replace('img/personnel_pics/', '')  # e.g. Name/image.jpg
+            personnel_name, filename = relative_path.split('/', 1)
+
+            # Bangun path absolut pakai var.personnel_path
+            full_path = os.path.join(var.personnel_path, personnel_name, filename)
+
+            if os.path.exists(full_path):
+                os.remove(full_path)
+
+        messages.success(request, "Selected images have been deleted.")
+        
+    return redirect(request.META.get('HTTP_REFERER', 'dataset'))
+
+
+def presence_video_stream(request):
+    def generate_frames():
+        while True:
+            frame = camera_instance.get_frame()
+            if frame is None:
+                continue
+
+            # Optional: tambahkan facebox di sini (tanpa simpan)
+            _, jpeg = cv2.imencode('.jpg', frame)
+            yield (b'--frame\r\n'
+                   b'Content-Type: image/jpeg\r\n\r\n' + jpeg.tobytes() + b'\r\n')
+
+    return StreamingHttpResponse(generate_frames(), content_type='multipart/x-mixed-replace; boundary=frame')
+
+@csrf_exempt
+def capture_absence_from_webcam(request):
+    """Process presence detection from the webcam feed."""
+    if request.method != 'POST':
+        return JsonResponse({'status': 'error', 'message': 'Invalid request method. Use POST.'})
+
+    global detected_labels  # Use the global variable to track detected labels
+
+    print("Starting presence detection...")
+
+    # Get the active camera with role "P_IN"
+    cam = models.Camera_Settings.objects.filter(role_camera='P', cam_is_active=True).first()
+    if not cam:
+        print("No active camera found.")
+        return JsonResponse({'status': 'error', 'message': 'No camera with role P_IN or P_OUT found.'})
+
+    recognizer = cv2.face.LBPHFaceRecognizer_create()
+    if not os.path.exists(model_path):
+        print("Model path does not exist.")
+        return JsonResponse({'status': 'error', 'message': 'Model not available, please train the model first.'})
+    recognizer.read(model_path)
+
+    label_to_name = {}
+    personnel_folder = var.personnel_path
+
+    # Load labels and names from personnel folder
+    for face_folder in os.listdir(personnel_folder):
+        face_folder_path = os.path.join(personnel_folder, face_folder)
+        if os.path.isdir(face_folder_path):
+            for file_name in os.listdir(face_folder_path):
+                if file_name.endswith('.jpg'):
+                    label = int(file_name.split('_')[1])
+                    extracted_name = file_name.split('_')[2]
+                    label_to_name[label] = extracted_name
+
+    # cap = cv2.VideoCapture(1, cv2.CAP_DSHOW)
+
+    # if not cap.isOpened():
+    #     print("Error: Camera could not be opened.")
+    #     return JsonResponse({'status': 'error', 'message': 'Camera could not be opened.'})
+
+    frame_count = 0  # To limit the number of frames processed
+    max_frames = 100  # Set a maximum number of frames to process
+    faces_detected = False  # Flag to track if any faces were detected
+
+    while frame_count < max_frames:
+        frame = camera_instance.get_frame()
+        if frame is None:
+            return JsonResponse({'status': 'error', 'message': 'No frame available from camera.'})
+
+
+        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        faces = face_cascade.detectMultiScale(gray, scaleFactor=1.2, minNeighbors=5)
+
+        if len(faces) == 0:
+            print("No faces detected in this frame.")
+            frame_count += 1
+            continue  # Skip to the next frame
+
+        faces_detected = True  # Set the flag to True since we detected faces
+
+        for (x, y, w, h) in faces:
+            roi = gray[y:y + h, x:x + w]
+            roi_resized = cv2.resize(roi, (200, 200))
+            label, confidence = recognizer.predict(roi_resized)
+
+            name = label_to_name.get(label, "Unknown")
+            print(f"Detected face: {name} with confidence: {confidence}")
+
+            now = datetime.now()
+            # Define the directory for saving images
+            save_directory = os.path.join(settings.BASE_DIR, 'Dashboard/static/img/extracted_faces/predicted_faces/absence', now.strftime('%Y%m%d'))
+            
+            # Check if the directory exists, if not, create it
+            if not os.path.exists(save_directory):
+                os.makedirs(save_directory)
+                print(f"Created directory: {save_directory}")
+
+            image_path = os.path.join(save_directory, f"{name}_{now.strftime('%H%M%S')}.jpg")
+            
+            success = cv2.imwrite(image_path, frame[y:y + h, x:x + w])
+            if success:
+                print(f"Image saved at: {image_path}")
+            else:
+                print(f"Failed to save image at: {image_path}")
+                continue 
+
+            relative_path = os.path.relpath(image_path, settings.BASE_DIR).replace("\\", "/")
+
+            data = {
+                'name': name,
+                'datetime': now.strftime('%Y-%m-%d %H:%M:%S'),
+                'image_path': relative_path,
+                'camera_id': cam.id
+            }
+
+            # Directly insert attendance entry without checking for existing records
+            # insert_presence(cam.id, data['name'], now, 'ONTIME', relative_path)
+            result = process_attendance_entry(data)
+            
+
+            if result == 'success':
+                print(f"Presence recorded for {name}.")
+                return JsonResponse({'status': 'success', 'message': f'Presence recorded for {name}.'})
+            elif result == 'already_present':
+                print(f"{name} has already been marked present.")
+                return JsonResponse({'status': 'info', 'message': f'{name}: Already Presence'})
+            elif result == 'not_eligible_for_leave':
+                return JsonResponse({'status': 'info', 'message': 'Cannot record LEAVE before ONTIME or LATE'})
+            elif result == 'personnel_not_found':
+                return JsonResponse({'status': 'error', 'message': 'Personnel not found'})
+            elif result == 'invalid_camera':
+                return JsonResponse({'status': 'error', 'message': 'Invalid or inactive camera'})
+
+        frame_count += 1  # Increment the frame count
+
+    # cap.release()
+
+    # if not faces_detected:
+    #     return JsonResponse({'status': 'info', 'message': 'No new presence detected after processing frames.'})
+
+    return JsonResponse({'message': 'Processing completed without detecting new presence.'})
+
+# Insert presence data into the database
+def insert_presence(cam_id, personnel_id, detected_time, status, image_path):
+    if not cam_id or not personnel_id or not detected_time or not status:
+        return
+    with connection.cursor() as cursor:
+        cursor.execute('''
+            INSERT INTO dashboard_personnel_entries (camera_id, personnel_id, timestamp, presence_status, image)
+            VALUES (%s, %s, %s, %s, %s)
+        ''', [cam_id, personnel_id, detected_time, status, image_path])
+def process_attendance_entry(data):
+    name = data.get('name')
+    datetime_str = data.get('datetime')
+    image_path = data.get('image_path')
+    cam_id = data.get('camera_id')
+    detected_time = datetime.strptime(datetime_str, '%Y-%m-%d %H:%M:%S')
+
+    try:
+        personnel = models.Personnels.objects.get(name=name)
+        personnel_id = personnel.id
+    except models.Personnels.DoesNotExist:
+        print(f"Personnel '{name}' not found.")
+        return
+
+    with connection.cursor() as cursor:
+        cursor.execute("""
+            SELECT 
+                attendance_time_start, 
+                attendance_time_end, 
+                leaving_time_start, 
+                leaving_time_end,
+                (SELECT COUNT(*) FROM dashboard_personnel_entries WHERE personnel_id = %s AND DATE(timestamp) = %s AND presence_status = 'ONTIME') AS has_ontime,
+                (SELECT COUNT(*) FROM dashboard_personnel_entries WHERE personnel_id = %s AND DATE(timestamp) = %s AND presence_status = 'LATE') AS has_late,
+                (SELECT COUNT(*) FROM dashboard_personnel_entries WHERE personnel_id = %s AND DATE(timestamp) = %s AND presence_status = 'LEAVE') AS has_leave
+            FROM dashboard_camera_settings 
+            WHERE id = %s AND role_camera IN ('P')
+        """, [personnel_id, detected_time.date(), personnel_id, detected_time.date(), personnel_id, detected_time.date(), cam_id])
+        
+        result = cursor.fetchone()
+
+    if not result:
+        print("Camera settings not found or not a valid P camera.")
+        return
+
+    attendance_start = datetime.strptime(result[0], '%H:%M:%S').time() if result[0] else None
+    attendance_end = datetime.strptime(result[1], '%H:%M:%S').time() if result[1] else None
+    leaving_start = datetime.strptime(result[2], '%H:%M:%S').time() if result[2] else None
+    leaving_end = datetime.strptime(result[3], '%H:%M:%S').time() if result[3] else None
+
+    has_ontime = result[4]
+    has_late = result[5]
+    has_leave = result[6]
+    current_time = detected_time.time()
+
+    # Determine status
+    status = None
+    if attendance_start and attendance_end and attendance_start <= current_time <= attendance_end:
+        status = 'ONTIME'
+    elif leaving_start and leaving_end and leaving_start <= current_time <= leaving_end:
+        status = 'LEAVE'
+    else:
+        if attendance_end and leaving_start and attendance_end < current_time < leaving_start:
+            status = 'LATE'
+        else:
+            status = 'LEAVE'
+
+    # Prevent duplicate entries
+    if status == 'ONTIME' and has_ontime:
+        print("ONTIME already recorded.")
+        return 'already_present'
+    if status == 'LATE':
+        if has_ontime or has_late:
+            print("Either ONTIME or LATE already recorded.")
+            return 'already_present'
+    if status == 'LEAVE':
+        if has_leave:
+            print("LEAVE already recorded.")
+            return 'already_present'
+        if not (has_ontime or has_late):
+            print("Cannot record LEAVE without ONTIME or LATE.")
+            return 'not_eligible_for_leave'
+
+    if status == 'LATE' and has_ontime:
+        status = 'LEAVE'
+        if has_leave:
+            print("LEAVE already recorded.")
+            return 'already_present'
+
+    # Save into DB
+    insert_presence(cam_id, personnel_id, detected_time, status, image_path)
+    print(f"Inserted {status} entry for {name} at {detected_time}")
+    return True
+
+
+def predict_presence_video(request, cam_id=None):
+    """Streaming video feed to the client."""
+    return StreamingHttpResponse(presence_video_stream(request), content_type='multipart/x-mixed-replace; boundary=frame')

@@ -27,18 +27,27 @@ Dataset Wajah
                         <button class="btn btn-primary mt-3" onclick="captureFaces()">Capture Faces</button>
                         <button class="btn btn-primary mt-3" onclick="trainModel()">Train Face Model</button>
                    </div>
+             
                    {%endif%}
-                    <div class="row row-deck row-cards">
-                        {% load static %}
-                        {% for image in images %}
-                        <div class="col-3 col-md-2 col-lg-1 mb-2"> <!-- 10 images per row -->
-                          <img src="{% static image.url %}" alt="Face Image" class="img-thumbnail" style="width: 100px; height: 100px; object-fit: cover;">
-                      </div>
 
-                            {% comment %} </div><div class="row row-deck row-cards"> <!-- Start a new row after every 5 images --> {% endcomment %}
-              
-                        {% endfor %}
-                    </div>
+                    <form id="delete-form" method="post" action="{% url 'delete_images' %}">
+                        {% csrf_token %}
+                        <div class="mb-3 text-center" id="delete-button-container" style="display: none;">
+                            <button type="submit" class="btn btn-danger">Delete Selected</button>
+                        </div>
+                        <div class="row row-deck row-cards">
+                            {% load static %}
+                            {% for image in images %}
+                            <div class="col-3 col-md-2 col-lg-1 mb-2 text-center">
+                                <label>
+                                    <input type="checkbox" name="images_to_delete" value="{{ image.url }}" class="image-checkbox" onchange="toggleDeleteButton()">
+                                    <img src="{% static image.url %}" alt="Face Image" class="img-thumbnail" style="width: 100px; height: 100px; object-fit: cover;">
+                                </label>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </form>
+                    
 
                 </div>
             </div>
@@ -128,6 +137,13 @@ Dataset Wajah
                         confirmButtonText: 'OK'
                     });
                 });
+            }
+
+            function toggleDeleteButton() {
+                const checkboxes = document.querySelectorAll('.image-checkbox');
+                const deleteButtonContainer = document.getElementById('delete-button-container');
+                let anyChecked = Array.from(checkboxes).some(checkbox => checkbox.checked);
+                deleteButtonContainer.style.display = anyChecked ? 'block' : 'none';
             }
 </script>
 {% endblock %}

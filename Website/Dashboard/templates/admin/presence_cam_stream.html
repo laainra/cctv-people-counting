@@ -1,4 +1,160 @@
 {% extends '../components/base.html' %}
+{% block title %}Presence Stream{% endblock %}
+
+{% block content %}
+{% csrf_token %}
+<div class="content">
+  <div class="container-xl">
+    <div class="page-header">
+      <div class="row align-items-center">
+        <div class="col-auto">
+          <div class="page-pretitle">{{ company.name }}'s</div>
+          <h2 class="page-title">Presence Stream</h2>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-body">
+        <div class="row">
+          <!-- Video Feed -->
+          <div class="col-md-6 text-center">
+            <div id="loader" class="spinner-border text-primary" role="status" style="display: none;">
+              <span class="sr-only">Loading...</span>
+            </div>
+            <img id="img_stream" src="{% url 'capture_video' %}" style="width: 100%; border-radius: 10px;" />
+            <div id="alert-box"></div>
+          </div>
+
+          <!-- Real-time Table -->
+          <div class="col-md-6">
+            <h4 class="mb-3">Absen Hari Ini - <span id="today-date"></span></h4>
+
+            <table class="table table-bordered" id="presence-table">
+              <thead>
+                <tr>
+                  <th>Nama</th>
+                  <th>Status</th>
+          
+
+                </tr>
+              </thead>
+              <tbody>
+                <!-- Data will be injected here -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+  function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+      const cookies = document.cookie.split(';');
+      for (let i = 0; i < cookies.length; i++) {
+        const cookie = cookies[i].trim();
+        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+          break;
+        }
+      }
+    }
+    return cookieValue;
+  }
+
+  function detectPresence() {
+    fetch("{% url 'capture_absence_from_webcam' %}", {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': getCookie('csrftoken')
+      },
+      body: JSON.stringify({})
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.status === "success") {
+        Swal.fire({
+          icon: 'success',
+          title: data.message,
+          showConfirmButton: false,
+          timer: 2000
+        });
+        loadPresenceTable(); // refresh table on success
+      } else if (data.status === "info" || data.status === "error") {
+        Swal.fire({
+          icon: 'info',
+          title: data.message,
+          showConfirmButton: false,
+          timer: 2500
+        });
+      }
+    })
+    .catch(err => {
+      console.error('Error:', err);
+      Swal.fire({
+        icon: 'error',
+        title: 'Gagal mendeteksi kehadiran.',
+        text: 'Terjadi kesalahan pada sistem.',
+        showConfirmButton: true
+      });
+    });
+  }
+  function loadPresenceTable() {
+    fetch("{% url 'get_today_presences' %}")
+      .then(res => res.json())
+      .then(response => {
+        console.log(response);
+  
+        // Access the array inside the response
+        const data = response.data;  // Extract the array from the 'data' key
+  
+        // Check if the extracted data is an array
+        if (Array.isArray(data)) {
+          const tbody = document.querySelector('#presence-table tbody');
+          tbody.innerHTML = ''; // clear old data
+          data.forEach(row => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+              <td>${row.name}</td>
+              <td>${row.status}</td>
+            `;
+            tbody.appendChild(tr);
+          });
+        } else {
+          console.error('Data is not an array:', data);
+        }
+      })
+      .catch(error => {
+        console.error('Error fetching presence data:', error);
+      });
+  }
+  
+  
+
+  setInterval(detectPresence, 5000);
+  setInterval(loadPresenceTable, 5000); // refresh presence table
+  window.onload = loadPresenceTable;
+  document.addEventListener('DOMContentLoaded', function() {
+    const today = new Date();
+  
+    // Format the date in the format YYYY-MM-DD (you can change this to any format you prefer)
+    const formattedDate = today.toLocaleDateString('id-ID'); // 'id-ID' for Indonesian locale
+    
+    // Set the date to the element with ID 'today-date'
+    document.getElementById('today-date').textContent = formattedDate;
+  });
+  
+</script>
+{% endblock %}
+
+{% comment %} {% extends '../components/base.html' %}
 {% block title %}
 Presence Stream
 {% endblock %}
@@ -105,4 +261,4 @@ Presence Stream
   }
 </script>
 
-{% endblock %}
+{% endblock %} {% endcomment %}

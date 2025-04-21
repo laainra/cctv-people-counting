@@ -65,8 +65,8 @@ Presence Camera
                                     No.
                                 </th>
                                 <th>Camera Name</th>
-                                <th>Camera Role</th>
-                                <th>RTSP IP</th>
+                                {% comment %} <th>Camera Role</th> {% endcomment %}
+                                {% comment %} <th>Feed Source</th> {% endcomment %}
                                 <th>Status</th>
                                 {% comment %} <th>View Stream</th> {% endcomment %}
                                 <th width="100">Attendance Start Time</th>
@@ -81,8 +81,8 @@ Presence Camera
                           <tr>
                             <td>{{ cam.id }}</td>
                             <td>{{ cam.cam_name }}</td>
-                            <td>{{ cam.get_role_camera_display }}</td>
-                            <td>{{ cam.feed_src }}</td>
+                            {% comment %} <td>{{ cam.get_role_camera_display }}</td> {% endcomment %}
+                            {% comment %} <td>{{ cam.feed_src }}</td> {% endcomment %}
                             <td>
                               {% if cam.cam_is_active %}
                               <span class="badge bg-success">Active</span>
@@ -165,17 +165,20 @@ Presence Camera
             <label class="form-label">Camera Name</label>
             <input type="text" class="form-control" name="cam_name" required>
           </div>
-          <div class="mb-3">
+          {% comment %} <div class="mb-3">
             <label class="form-label">Camera Role</label>
             <select class="form-select" name="role_camera" required>
               <option value="P_IN">In</option>
               <option value="P_OUT">Out</option>
             </select>
-          </div>
-          <div class="mb-3">
+          </div> {% endcomment %}
+          {% comment %} <div class="mb-3">
             <label class="form-label">RTSP IP</label>
             <input type="text" class="form-control" name="feed_src" required>
-          </div>
+          </div> {% endcomment %}
+          <input type="hidden" name="role_camera" value="P">
+<input type="hidden" name="feed_src" value="1">
+
           <div class="mb-3">
             <label class="form-label">Attendance Start Time</label>
             <input type="time" class="form-control" name="attendance_time_start" required>
@@ -220,17 +223,17 @@ Presence Camera
             <label class="form-label">Camera Name</label>
             <input type="text" class="form-control" name="cam_name" id="edit-camera-name" required>
           </div>
-          <div class="mb-3">
+          {% comment %} <div class="mb-3">
             <label class="form-label">Camera Role</label>
             <select class="form-select" name="role_camera" id="edit-camera-role" required>
               <option value="P_IN">In</option>
               <option value="P_OUT">Out</option>
             </select>
-          </div>
-          <div class="mb-3">
+          </div> {% endcomment %}
+          {% comment %} <div class="mb-3">
             <label class="form-label">RTSP IP</label>
             <input type="text" class="form-control" name="feed_src" id="edit-camera-feed-src" required>
-          </div>
+          </div> {% endcomment %}
           <div class="mb-3">
             <label class="form-label">Attendance Start Time</label>
             <input type="time" class="form-control" name="attendance_time_start" id="edit-attendance-time-start" required>
@@ -465,36 +468,45 @@ Presence Camera
     event.preventDefault();
     const formData = new FormData(this);
     fetch('/add_presence_camera/', {
-      method: 'POST',
-      body: formData,
-      headers: {
-        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
-      }
-    })
-    .then(response => response.json())
-    .then(data => {
-      window.location.reload();
-      if (data.status === 'success') {
-        closeModal('modal-add');
-        window.location.reload();
-      } else {
-        Swal.fire({
-          title: 'Error!',
-          text: data.message,
-          icon: 'error',
-          confirmButtonText: 'OK'
-        });
-      }
-    })
-    .catch(error => {
-      console.error('Error adding camera:', error);
-      Swal.fire({
-        title: 'Error!',
-        text: 'An error occurred while adding the camera.',
-        icon: 'error',
-        confirmButtonText: 'OK'
-      });
+  method: 'POST',
+  body: formData,
+  headers: {
+    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+  }
+})
+.then(response => {
+  // Jika response bukan application/json, parsing sebagai text dan log
+  if (!response.ok) {
+    return response.text().then(text => {
+      console.error('Non-200 response body:', text);
+      throw new Error('Server error');
     });
+  }
+  return response.json();
+})
+.then(data => {
+  if (data.status === 'success') {
+    closeModal('modal-add');
+    window.location.reload();
+  } else {
+    Swal.fire({
+      title: 'Error!',
+      text: data.message || 'Gagal menambahkan kamera.',
+      icon: 'error',
+      confirmButtonText: 'OK'
+    });
+  }
+})
+.catch(error => {
+  console.error('Error adding camera:', error);
+  Swal.fire({
+    title: 'Error!',
+    text: 'An error occurred while adding the camera.',
+    icon: 'error',
+    confirmButtonText: 'OK'
+  });
+});
+
   });
   
   function updateCamera() {

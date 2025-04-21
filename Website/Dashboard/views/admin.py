@@ -16,25 +16,49 @@ def admin_home(request):
     current_year = datetime.now().year
 
     # Summary statistics for the current month
+    # summary = {
+    #     'ontime': models.Personnel_Entries.objects.filter(presence_status='ontime', timestamp__month=current_month, timestamp__year=current_year).count(),
+    #     'late': models.Personnel_Entries.objects.filter(presence_status='late', timestamp__month=current_month, timestamp__year=current_year).count(),
+    #     'unknown': models.Personnel_Entries.objects.filter(presence_status='unknown', timestamp__month=current_month, timestamp__year=current_year).count(),
+    # }
+
+    # # Fetch Personnel_Entries data for today
+    # today = datetime.now().date()
+    # presence_data = models.Personnel_Entries.objects.filter(
+    #     timestamp__date=today,
+    #     company=company  # Corrected to filter by related Personnel
+    # )
+
+    # # Fetch top employees based on on-time Personnel_Entries
+    # top_employees = models.Personnel_Entries.objects.filter(
+    #     timestamp__month=current_month,
+    #     timestamp__year=current_year,
+    #     presence_status='ontime').values('personnel').annotate(total_ontime=Count('id')).order_by('-total_ontime')[:5]
+    # Dummy summary statistics for the current month
     summary = {
-        'ontime': models.Personnel_Entries.objects.filter(presence_status='ontime', timestamp__month=current_month, timestamp__year=current_year).count(),
-        'late': models.Personnel_Entries.objects.filter(presence_status='late', timestamp__month=current_month, timestamp__year=current_year).count(),
-        'unknown': models.Personnel_Entries.objects.filter(presence_status='unknown', timestamp__month=current_month, timestamp__year=current_year).count(),
+        'ontime': 120,  # Dummy count of on-time entries
+        'late': 30,     # Dummy count of late entries
+        'unknown': 5,   # Dummy count of unknown entries
     }
 
-    # Fetch Personnel_Entries data for today
+    # Dummy presence data for today
     today = datetime.now().date()
-    presence_data = models.Personnel_Entries.objects.filter(
-        timestamp__date=today,
-        personnel__company=company  # Corrected to filter by related Personnel
-    )
+    presence_data = [
+        {'id': 'E001', 'name': 'Alice', 'presence_status': 'ontime', 'timestamp': today},
+        {'id': 'E002', 'name': 'Bob', 'presence_status': 'late', 'timestamp': today},
+        {'id': 'E003', 'name': 'Charlie', 'presence_status': 'ontime', 'timestamp': today},
+        {'id': 'E004', 'name': 'David', 'presence_status': 'unknown', 'timestamp': today},
+        {'id': 'E005', 'name': 'Eve', 'presence_status': 'ontime', 'timestamp': today},
+    ]
 
-    # Fetch top employees based on on-time Personnel_Entries
-    top_employees = models.Personnel_Entries.objects.filter(
-        timestamp__month=current_month,
-        timestamp__year=current_year,
-        presence_status='ontime').values('personnel').annotate(total_ontime=Count('id')).order_by('-total_ontime')[:5]
-
+    # Dummy top employees based on on-time Personnel_Entries
+    top_employees = [
+        {'id': 'E001', 'name': 'Alice', 'division': 'HR', 'total_ontime': 20},
+        {'id': 'E002', 'name': 'Bob', 'division': 'IT', 'total_ontime': 15},
+        {'id': 'E003', 'name': 'Charlie', 'division': 'Finance', 'total_ontime': 25},
+        {'id': 'E004', 'name': 'David', 'division': 'Marketing', 'total_ontime': 10},
+        {'id': 'E005', 'name': 'Eve', 'division': 'Sales', 'total_ontime': 5},
+    ]
     # Render the dashboard with the fetched data
     return render(request, 'admin/dashboard.html', {
         'company': company,
@@ -154,7 +178,7 @@ def presence(request):
 def presence_cam(request):
     company = models.Company.objects.get(user=request.user)
     cams = models.Camera_Settings.objects.filter(
-        Q(role_camera='P_IN') | Q(role_camera='P_OUT'),
+        Q(role_camera='P_IN') | Q(role_camera='P_OUT') | Q(role_camera='P'),
         company=company
     )
     return render(request, 'admin/presence_cam.html', {'cams': cams})

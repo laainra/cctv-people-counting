@@ -1,3 +1,5 @@
+from django.utils.timezone import localtime
+from datetime import date
 import json
 import os
 from datetime import datetime, timedelta
@@ -97,9 +99,9 @@ def process_attendance_entry(data):
     name = data.get('name')
     datetime_str = data.get('datetime')
     image_path = data.get('image_path')
-    cam= data.get('camera_id') 
-    cam_id = cam.lstrip('cam') 
-    cam_id = int(cam_id) 
+    cam_id= data.get('camera_id') 
+    # cam_id = cam.lstrip('cam') 
+    # cam_id = int(cam) 
     print(cam_id)
     detected_time = datetime.strptime(datetime_str, '%Y-%m-%d %H:%M:%S')
 
@@ -112,14 +114,17 @@ def process_attendance_entry(data):
 
     # Ambil pengaturan kamera
     with connection.cursor() as cursor:
-        cursor.execute(
-            'SELECT attendance_time_start, attendance_time_end, leaving_time_start, leaving_time_end FROM dashboard_camera_settings WHERE id = %s',
-            [cam_id]
-        )
+        cursor.execute("""
+            SELECT attendance_time_start, attendance_time_end, leaving_time_start, leaving_time_end 
+            FROM dashboard_camera_settings 
+            WHERE id = %s AND role_camera IN ('P_IN', 'P_OUT')
+        """, [cam_id])
         camera = cursor.fetchone()
-        if not camera:
-            print("Camera settings not found.")
-            return
+    
+    if not camera:
+        print("Camera settings not found or not a P_IN/P_OUT camera.")
+        return
+
 
     print("DEBUG: Isi camera sebelum parsing waktu:", camera)
     current_time = detected_time.time()
@@ -173,6 +178,7 @@ def process_attendance_entry(data):
     # Fungsi untuk menyimpan entri ke database
     insert_presence(cam_id, personnel_id, detected_time, status, image_path)
     print(f"Inserted {status} entry for {name} at {detected_time}")
+    return True
     
 # Main function to process presence
 def presence_process():
@@ -186,6 +192,7 @@ def presence_process():
     # print("Presence data processed successfully.")
     # delete_attendance_file()
     return {'status': 'success', 'message': 'Attendance data processed successfully'}
+
 def get_presence_data(date, personnel_id=None, company=None):
     query = '''
         SELECT 
@@ -270,8 +277,9 @@ def get_presence_data(date, personnel_id=None, company=None):
         leaving_time = entry[3].strftime('%H:%M:%S') if entry[3] else '-'
 
         work_hours = entry[5] or 'Still Working'
-        attendance_image_path = os.path.relpath(entry[7], start=DIR) if entry[7] else 'No image'
-        leaving_image_path = os.path.relpath(entry[8], start=DIR) if entry[8] else 'No image'
+        dashboard_dir = os.path.join(DIR, 'Dashboard')
+        attendance_image_path = os.path.relpath(entry[7], start=dashboard_dir) if entry[7] else 'No image'
+        leaving_image_path = os.path.relpath(entry[8], start=dashboard_dir) if entry[8] else 'No image'
 
         presence_data.append({
             'id': entry[0],
@@ -501,3 +509,140 @@ def download_presence_excel(request):
     # Write the Excel data to the response
     response.write(output.getvalue())
     return response
+
+def get_today_presences(request):
+    today = date.today()
+
+    # The query from get_presence_data function
+    query = '''
+        SELECT 
+            p.id AS personnel_id,
+            p.name,
+            MIN(CASE WHEN presence_status IN ('ONTIME', 'LATE') THEN timestamp END) AS attended_time,
+            MAX(CASE WHEN presence_status = 'LEAVE' THEN timestamp END) AS leaving_time,
+            CASE 
+                WHEN EXISTS (
+                    SELECT 1 
+                    FROM dashboard_personnel_entries AS sub 
+                    WHERE sub.personnel_id = p.id 
+                    AND DATE(sub.timestamp) = %s 
+                    AND presence_status = 'LEAVE'
+                ) THEN 'LEAVING'
+                ELSE MAX(CASE WHEN presence_status IN ('ONTIME', 'LATE') THEN presence_status END)
+            END AS latest_status,
+            TIMESTAMPDIFF(HOUR, 
+                MIN(CASE WHEN presence_status IN ('ONTIME', 'LATE') THEN timestamp END),
+                MAX(CASE WHEN presence_status = 'LEAVE' THEN timestamp END)
+            ) AS work_hours,
+            CASE 
+                WHEN TIMESTAMPDIFF(HOUR, 
+                    MIN(CASE WHEN presence_status IN ('ONTIME', 'LATE') THEN timestamp END),
+                    MAX(CASE WHEN presence_status = 'LEAVE' THEN timestamp END)
+                ) > 8 THEN CONCAT('Overtime ', TIMESTAMPDIFF(HOUR, 
+                    MIN(CASE WHEN presence_status IN ('ONTIME', 'LATE') THEN timestamp END),
+                    MAX(CASE WHEN presence_status = 'LEAVE' THEN timestamp END)
+                ) - 8, ' hours')
+                WHEN TIMESTAMPDIFF(HOUR, 
+                    MIN(CASE WHEN presence_status IN ('ONTIME', 'LATE') THEN timestamp END),
+                    MAX(CASE WHEN presence_status = 'LEAVE' THEN timestamp END)
+                ) < 8 THEN CONCAT('Less time ', 8 - TIMESTAMPDIFF(HOUR, 
+                    MIN(CASE WHEN presence_status IN ('ONTIME', 'LATE') THEN timestamp END),
+                    MAX(CASE WHEN presence_status = 'LEAVE' THEN timestamp END)
+                ), ' hours')
+                ELSE 'Standard Time'
+            END AS notes,
+            (SELECT d.image 
+            FROM dashboard_personnel_entries AS d 
+            WHERE d.personnel_id = p.id 
+            AND DATE(d.timestamp) = %s
+            AND presence_status IN ('ONTIME', 'LATE')
+            ORDER BY timestamp DESC 
+            LIMIT 1
+            ) AS attendance_image_path,
+            (SELECT d.image 
+            FROM dashboard_personnel_entries AS d 
+            WHERE d.personnel_id = p.id 
+            AND DATE(d.timestamp) = %s
+            AND presence_status = 'LEAVE'
+            ORDER BY timestamp DESC 
+            LIMIT 1
+            ) AS leaving_image_path
+        FROM 
+            dashboard_personnel_entries AS d
+        JOIN 
+            dashboard_personnels AS p ON p.id = d.personnel_id
+        WHERE 
+            DATE(d.timestamp) = %s
+        GROUP BY p.id
+    '''
+    
+    params = [today, today, today, today]
+
+    with connection.cursor() as cursor:
+        cursor.execute(query, params)
+        entries = cursor.fetchall()
+
+    presence_data = []
+    for entry in entries:
+        attended_time = entry[2].strftime('%H:%M:%S') if entry[2] else '-'
+        leaving_time = entry[3].strftime('%H:%M:%S') if entry[3] else '-'
+
+        work_hours = entry[5] or 'Still Working'
+        dashboard_dir = os.path.join(DIR, 'Dashboard')
+        attendance_image_path = os.path.relpath(entry[7], start=dashboard_dir) if entry[7] else 'No image'
+        leaving_image_path = os.path.relpath(entry[8], start=dashboard_dir) if entry[8] else 'No image'
+
+        presence_data.append({
+            'id': entry[0],
+            'name': entry[1],
+            'attended': attended_time,
+            'leave': leaving_time,
+            'status': entry[4],
+            'work_hours': work_hours,
+            'notes': entry[6] or 'No notes',
+            'attendance_image_path': attendance_image_path,
+            'leaving_image_path': leaving_image_path,
+        })
+    
+    print("Presence data retrieved successfully: ", presence_data)
+    del_img()
+    return JsonResponse({'data': presence_data})
+
+def del_img():
+    today = date.today()
+
+    # The query to fetch image paths in the database
+    query = '''
+        SELECT 
+            d.image
+        FROM 
+            dashboard_personnel_entries AS d
+        WHERE 
+            DATE(d.timestamp) = %s
+        '''
+    params = [today]
+
+    with connection.cursor() as cursor:
+        cursor.execute(query, params)
+        # Fetch all image paths from the database
+        db_image_paths = [entry[0] for entry in cursor.fetchall()]
+
+    # Folder where images are stored
+    # dashboard_dir = os.path.join(DIR, 'Dashboard')
+    
+    # Get all files in the directory
+    all_files = os.listdir(DIR)
+
+    # Remove files that are not in the database
+    for file in all_files:
+        file_path = os.path.join(DIR, file)
+        
+        # Check if the file is not in the database list
+        if file not in db_image_paths:
+            try:
+                # os.remove(file_path)  # Delete the file if not in the DB
+                print(f"Deleted file: {file_path}")
+            except Exception as e:
+                print(f"Error deleting file {file_path}: {str(e)}")
+
+    print("Deleted images in folder today")

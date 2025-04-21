@@ -23,11 +23,11 @@ Capture Faces
             <div class="col-12">
                 <div class="card">
                     <div class="card-body text-center">
-                        <div id="loading" style="display: none;">
+                        {% comment %} <div id="loading" style="display: none;">
                             <div class="spinner-border mb-2" role="status">
                                 <span class="visually-hidden">Loading...</span>
                             </div>
-                        </div>
+                        </div> {% endcomment %}
                         <br>
                         <br>
                         <button class="btn btn-primary mt-3" onclick="captureFaces()">Capture Faces</button>
@@ -55,15 +55,16 @@ Capture Faces
         document.getElementById('loading').style.display = 'none';
         document.getElementById('img_stream').style.display = 'block'; // Show the image after loading
     }
-
     function captureFaces() {
-        // Initialize the progress variables
         let capturedFaces = 0;
-        const totalFaces = 50; // Total faces to capture
-        const progressInterval = 100; // Interval for updating progress in milliseconds
+        const totalFaces = 50;
+        const progressInterval = 100;
     
-        // Show the SweetAlert with a loading spinner and progress bar
-        const swalInstance = Swal.fire({
+        const randomPausePoints = [5, 7, 11];
+        const pausePoint = randomPausePoints[Math.floor(Math.random() * randomPausePoints.length)];
+        let progressPercentage = 0;
+    
+        Swal.fire({
             title: 'Capturing Faces...',
             html: `
                 <div id="progress-container" style="width: 100%; height: 30px; background-color: #f3f3f3; border-radius: 5px;">
@@ -79,62 +80,69 @@ Capture Faces
             }
         });
     
-        // Start the fetch request to capture faces
-        fetch("{% url 'capture_faces' %}", {
-            method: 'POST',
-            headers: {
-                'X-CSRFToken': '{{ csrf_token }}',
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({})
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.status === 'success') {
-                // Simulate progress updates
-                const interval = setInterval(() => {
-                    if (capturedFaces < totalFaces) {
-                        capturedFaces++;
-                        const progressPercentage = (capturedFaces / totalFaces) * 100;
-    
-                        // Update the progress bar and text
-                        document.getElementById('progress-bar').style.width = progressPercentage + '%';
-                        document.getElementById('progress-text').innerText = `Captured Faces: ${capturedFaces}/${totalFaces} (${progressPercentage.toFixed(2)}%)`;
+        // Phase 1: Simulate initial progress
+        const simulateInitialProgress = setInterval(() => {
+            if (progressPercentage < pausePoint) {
+                progressPercentage++;
+                document.getElementById('progress-bar').style.width = progressPercentage + '%';
+                document.getElementById('progress-text').innerText = `Captured Faces: 0/${totalFaces} (${progressPercentage.toFixed(2)}%)`;
+            } else {
+                clearInterval(simulateInitialProgress);
+                // Start actual fetch at this point
+                fetch("{% url 'capture_faces' %}", {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': '{{ csrf_token }}',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({})
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        // Phase 2: Continue to 100%
+                        const interval = setInterval(() => {
+                            if (capturedFaces < totalFaces) {
+                                capturedFaces++;
+                                progressPercentage = pausePoint + ((capturedFaces / totalFaces) * (100 - pausePoint));
+                                document.getElementById('progress-bar').style.width = progressPercentage + '%';
+                                document.getElementById('progress-text').innerText = `Captured Faces: ${capturedFaces}/${totalFaces} (${progressPercentage.toFixed(2)}%)`;
+                            } else {
+                                clearInterval(interval);
+                                Swal.close();
+                                Swal.fire({
+                                    title: 'Success!',
+                                    text: data.message,
+                                    icon: 'success',
+                                    confirmButtonText: 'OK'
+                                }).then(() => {
+                                    window.location.href = "{% url 'dataset_no_id' %}";
+                                });
+                            }
+                        }, progressInterval);
                     } else {
-                        clearInterval(interval); // Stop the interval when complete
-                        Swal.close(); // Close the loading alert
-                        // Show success message
                         Swal.fire({
-                            title: 'Success!',
+                            title: 'Error!',
                             text: data.message,
-                            icon: 'success',
-                            confirmButtonText: 'OK'
-                        }).then(() => {
-                            // Redirect to dataset page after closing the alert
-                            window.location.href = "{% url 'dataset_no_id' %}";
+                            icon: 'error',
+                            confirmButtonText: 'Try Again'
                         });
                     }
-                }, progressInterval);
-            } else {
-                // Show SweetAlert error message
-                Swal.fire({
-                    title: 'Error!',
-                    text: data.message,
-                    icon: 'error',
-                    confirmButtonText: 'Try Again'
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    Swal.fire({
+                        title: 'Error!',
+                        text: 'An unexpected error occurred.',
+                        icon: 'error',
+                        confirmButtonText: 'OK'
+                    });
                 });
             }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            Swal.fire({
-                title: 'Error!',
-                text: 'An unexpected error occurred.',
-                icon: 'error',
-                confirmButtonText: 'OK'
-            });
-        });
+        }, progressInterval);
     }
+    
+    
     // Call captureFaces function when the page loads or based on user action
     document.addEventListener('DOMContentLoaded', (event) => {
         showLoading(); // Show loading animation when the page loads

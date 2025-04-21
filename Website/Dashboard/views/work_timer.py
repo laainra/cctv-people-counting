@@ -128,11 +128,13 @@ def work_time_report(request):
     with connection.cursor() as cursor:
         cursor.execute("""
             SELECT wt.id, wt.datetime, wt.type, wt.timer, wt.camera_id, wt.personnel_id,
-                p.name AS employee_name, p.division_id AS employee_division, c.cam_name AS camera_name
+                p.name AS employee_name, d.name AS employee_division, c.cam_name AS camera_name
             FROM dashboard_work_timer wt
             JOIN dashboard_personnels p ON wt.personnel_id = p.id
             JOIN dashboard_camera_settings c ON wt.camera_id = c.id
+            JOIN dashboard_divisions d ON p.division_id = d.id
             WHERE DATE(wt.datetime) = %s AND p.company_id = %s
+
         """, [filter_date, company.id])
         
         # Fetch all results

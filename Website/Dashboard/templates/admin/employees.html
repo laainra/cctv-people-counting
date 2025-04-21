@@ -45,29 +45,30 @@ Employees
                 </div> -->
                 <div class="card-body border-bottom py-3">
                     <div class="d-flex mb-4">
-                        <div style="max-width: 200px;" class="mr-2">
-                            <select class="form-select">
-                                <option selected>All Division</option>
-                                {% for division in divisions %}
-                                <option>{{division.name}}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
+                      <div style="max-width: 200px;" class="mr-2">
+                        <select class="form-select" id="divisionFilter" onchange="filterData()">
+                            <option value="">All Division</option>
+                            {% for division in divisions %}
+                            <option value="{{ division.id }}">{{ division.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="ml-auto text-muted">
+                      Search:
+                      <div class="ml-2 d-inline-block">
+                          <input type="text" class="form-control form-control-sm" id="searchInput" onkeyup="searchData()">
+                      </div>
+                  </div>
                     </div>
                     <div class="d-flex">
-                        <div class="text-muted">
-                            Show
-                            <div class="mx-2 d-inline-block">
-                            <input type="text" class="form-control form-control-sm" value="8" size="3">
-                            </div>
-                            entries
+                      {% comment %} <div class="text-muted">
+                        Show
+                        <div class="mx-2 d-inline-block">
+                            <input type="number" class="form-control form-control-sm" id="entriesCount" value="8" size="3" onchange="updateEntries()">
                         </div>
-                        <div class="ml-auto text-muted">
-                            Search:
-                            <div class="ml-2 d-inline-block">
-                            <input type="text" class="form-control form-control-sm">
-                            </div>
-                        </div>
+                        entries
+                    </div> {% endcomment %}
+          
                     </div>
                 </div>
                 <div class="table-responsive">
@@ -361,43 +362,50 @@ Employees
 
 <!-- MODAL IMPORT -->
 <div class="modal modal-blur fade" id="modal-import" tabindex="-1" role="dialog" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered" role="document">
+  <div class="modal-dialog modal-dialog-centered" role="document">
       <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">Import Employee Data</h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
-          </button>
-        </div>
-        <div class="modal-body">
-            <div class="mb-3">
-                <label class="form-label">File Excel</label>
-                <div class="form-file">
-                    <input type="file" class="form-file-input" id="customFile" accept=".xlsx">
-                    <label class="form-file-label" for="customFile">
-                      <span class="form-file-text">Choose file...</span>
-                      <span class="form-file-button">Browse</span>
-                    </label>
-                </div>
-                <small class="form-hint">File formt must .xlsx</small>
-            </div>
-            
-        </div>
-        <div class="modal-footer">
-          <a href="#" class="btn btn-link link-secondary" data-dismiss="modal">
-            Cancel
-          </a>
-          <a href="#" class="btn btn-primary ml-auto" data-dismiss="modal">
-            <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"></path><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2"></path><polyline points="7 9 12 4 17 9"></polyline><line x1="12" y1="4" x2="12" y2="16"></line></svg>
-            Import
-          </a>
-        </div>
+          <div class="modal-header">
+              <h5 class="modal-title">Import Employee Data</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                      <path stroke="none" d="M0 0h24v24H0z"/>
+                      <line x1="18" y1="6" x2="6" y2="18" />
+                      <line x1="6" y1="6" x2="18" y2="18" />
+                  </svg>
+              </button>
+          </div>
+          <form method="post" enctype="multipart/form-data" action="{% url 'import_personnel' %}">
+              {% csrf_token %}
+              <div class="modal-body">
+                  <div class="mb-3">
+                      <label class="form-label">File Excel</label>
+                      <div class="form-file">
+                          <input type="file" name="file" class="form-file-input" id="customFile" accept=".xlsx" required onchange="displayFileName()">
+                          <label class="form-file-label" for="customFile">
+                              <span class="form-file-text">Choose file...</span>
+                              <span class="form-file-button">Browse</span>
+                          </label>
+                      </div>
+                      <small class="form-hint">File format must be .xlsx</small>
+                      <p id="file-name" class="mt-2"></p> <!-- Tempat untuk menampilkan nama file -->
+                      <a href="{% url 'download_template' %}" class="btn btn-link">Download Format</a>
+                  </div>
+              </div>
+              <div class="modal-footer">
+                  <a href="#" class="btn btn-link link-secondary" data-dismiss="modal">Cancel</a>
+                  <button type="submit" class="btn btn-primary ml-auto">Import</button>
+              </div>
+          </form>
       </div>
-    </div>
+  </div>
 </div>
 
 <script>
-
+  function displayFileName() {
+    var input = document.getElementById('customFile');
+    var fileName = input.files[0] ? input.files[0].name : 'No file chosen';
+    document.getElementById('file-name').textContent = fileName;
+}
   function openDatasetPage(id) {
     window.location.href = `/dataset/${id}/`;
 }
@@ -791,7 +799,35 @@ Employees
     $(`#${modalId}`).modal('hide');
     
   }
-  
+  function filterData() {
+    var divisionFilter = document.getElementById('divisionFilter').value;
+    var rows = document.querySelectorAll('#personnelTableBody tr');
+
+    rows.forEach(function(row) {
+        if (divisionFilter === "" || row.getAttribute('data-division') === divisionFilter) {
+            row.style.display = '';
+        } else {
+            row.style.display = 'none';
+        }
+    });
+}
+
+function searchData() {
+    var input = document.getElementById('searchInput').value.toLowerCase();
+    var rows = document.querySelectorAll('#personnelTableBody tr');
+
+    rows.forEach(function(row) {
+        var name = row.cells[0].textContent.toLowerCase();
+        var username = row.cells[1].textContent.toLowerCase();
+        var email = row.cells[2].textContent.toLowerCase();
+        
+        if (name.includes(input) || username.includes(input) || email.includes(input)) {
+            row.style.display = '';
+        } else {
+            row.style.display = 'none';
+        }
+    });
+}
 </script>
 <style>
     /* Tambahkan ini di file CSS Anda */

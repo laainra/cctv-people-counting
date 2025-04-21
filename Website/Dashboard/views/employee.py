@@ -151,3 +151,5 @@ def take_image(request):
     employee = models.Personnels.objects.get(user=request.user)
     name = employee.name
     return render(request, 'employee/take_image.html', {'name':name})
+
+

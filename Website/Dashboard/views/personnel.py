@@ -6,7 +6,8 @@ from datetime import datetime
 from .var import var
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.dateparse import parse_date
-
+import pandas as pd
+from django.contrib import messages
 
 # Backend Library
 
@@ -304,7 +305,82 @@ def move_personnel_image(request):
         except Exception as e:
             return JsonResponse({'status': 'error', 'message': f'Failed to move image: {str(e)}'})
 
+def import_personnel(request):
+    if request.method == 'POST':
+        excel_file = request.FILES['file']
+        
+        # Read the Excel file
+        df = pd.read_excel(excel_file)
 
+        # Get the company associated with the current user
+        company = models.Company.objects.get(user=request.user)
+
+        for index, row in df.iterrows():
+            # Extract data from the row
+            name = row['name']
+            username = row['username']
+            password = row['password']
+            email = row['email']
+            division_name = row['division']  # Assuming you have a column for division name
+
+            # Get or create the division
+            division, created = models.Divisions.objects.get_or_create(company=company, name=division_name)
+
+            # Ensure that the personnel's name is unique for the same company
+            existing_personnel = models.Personnels.objects.filter(name=name, company=company).first()
+            if existing_personnel:
+                return JsonResponse({'status': 'error', 'message': f'Personnel with the name "{name}" already exists in this company.'})
+
+            # Create or update personnel
+            personnel_form = forms.PersonnelForm(data={
+                'name': name,
+                'division': division,
+                'username': username,
+                'password': password,
+                'email': email,
+                'company': company,
+ 
+            })
+
+            if personnel_form.is_valid():
+                # Save personnel and associated user
+                personnel = personnel_form.save(commit=False)
+                personnel.company = company  # Associate the personnel with the company
+                personnel.save()
+
+                # Path for storing personnel images
+                path = os.path.join(var.personnel_path, name)  # Use settings for path
+                if not os.path.exists(path):
+                    try:
+                        os.makedirs(path, exist_ok=True)
+                    except Exception as e:
+                        return JsonResponse({'status': 'error', 'message': f'Failed to create directory: {e}'})
+            else:
+                messages.error(request, f"Error in row {index + 1}: {personnel_form.errors}")
+
+        messages.success(request, "Data imported successfully!")
+        return redirect('employees')  # Ganti dengan URL yang sesuai
+
+    return render(request, 'admin/employees.html')
+
+def download_template(request):
+    """View untuk mengunduh template Excel untuk import data."""
+    # Membuat response untuk file Excel
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = 'attachment; filename="employee_data_template.xlsx"'
+
+    # Membuat workbook dan worksheet
+    workbook = Workbook(response, {'in_memory': True})
+    worksheet = workbook.add_worksheet('Employee Data')
+
+    # Menambahkan header kolom
+    columns = ['name', 'username', 'password', 'email', 'division']
+    worksheet.write_row(0, 0, columns)
+
+    # Menyimpan file
+    workbook.close()
+
+    return response
 # # Function for personnel page
 
 

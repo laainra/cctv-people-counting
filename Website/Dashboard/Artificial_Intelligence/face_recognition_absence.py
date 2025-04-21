@@ -381,4 +381,3 @@ if __name__ == "__main__":
     process_attendance()
     # Then run the monitoring service
     run_face_recognition_service()
-

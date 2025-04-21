@@ -188,35 +188,38 @@ def stop_stream(request):
 
 @login_required
 def delete_camera(request, id):
+    if request.method == 'POST':
 # Delete camera settings and counted instances associated with the camera
-    models.Camera_Settings.objects.get(id=id).delete()
-    try:
-        models.Counted_Instances.objects.filter(camera=id).delete()
-    except:
-        pass
+        models.Camera_Settings.objects.get(id=id).delete()
+        try:
+            models.Counted_Instances.objects.filter(camera=id).delete()
+        except:
+            pass
 
-    # Stop and delete the camera using MC
-    # MC.stop_cam(id)
-    # MC.delete_cam(id)
+        # Stop and delete the camera using MC
+        # MC.stop_cam(id)
+        # MC.delete_cam(id)
 
-    # Get the first camera setting
-    first_cam = models.Camera_Settings.objects.first()
+        # Get the first camera setting
+        first_cam = models.Camera_Settings.objects.first()
 
-    # Check and update session for 'cam_id'
-    if str(id) == str(request.session.get('cam_id')):
-        if first_cam != None:
-            request.session['cam_id'] = int(first_cam.id)
+        # Check and update session for 'cam_id'
+        if str(id) == str(request.session.get('cam_id')):
+            if first_cam != None:
+                request.session['cam_id'] = int(first_cam.id)
 
-    # Check and update session for 'home_cam_num'
-    if str(id) == str(request.session.get('home_cam_num')):
-        if first_cam != None:
-            request.session['home_cam_num'] = int(first_cam.id)
+        # Check and update session for 'home_cam_num'
+        if str(id) == str(request.session.get('home_cam_num')):
+            if first_cam != None:
+                request.session['home_cam_num'] = int(first_cam.id)
 
-    # Set the status session variable to indicate the camera has been deleted
-    request.session['status'] = 'camera_deleted'
+        # Set the status session variable to indicate the camera has been deleted
+        request.session['status'] = 'camera_deleted'
 
     # Redirect to the camera page
-    return redirect('presence_cam')
+        return JsonResponse({'status': 'success'})
+    else:
+        return JsonResponse({'status': 'error', 'message': 'Invalid request method'}, status=405)
 
 @login_required
 def add_camera(request):
@@ -226,6 +229,7 @@ def add_camera(request):
             company_id = models.Company.objects.get(user=request.user)
             camera = form.save(commit=False)  # Jangan langsung simpan
             camera.company = company_id   # Set ID perusahaan
+            camera.cam_is_active = True  
             camera.save() 
 
             cam = models.Camera_Settings.objects.last()
@@ -266,6 +270,7 @@ def edit_camera(request, id):
             active_cam.attendance_time_end = form.cleaned_data['attendance_time_end']
             active_cam.leaving_time_start = form.cleaned_data['leaving_time_start']
             active_cam.leaving_time_end = form.cleaned_data['leaving_time_end']
+            active_cam.cam_is_active = True
             active_cam.save()
 
             try:
@@ -406,6 +411,7 @@ def add_tracking_camera(request):
             company = models.Company.objects.get(user=request.user)
             camera = form.save(commit=False) 
             camera.company = company 
+            camera.cam_is_active = True
             camera.role_camera = "T"
             camera.save() 
 
@@ -479,27 +485,31 @@ def add_presence_camera(request):
         form = forms.AddPresenceCameraForm(request.POST)
         if form.is_valid():
             company = models.Company.objects.get(user=request.user)
-            camera = form.save(commit=False) 
-            camera.company = company 
+            camera = form.save(commit=False)
+            camera.company = company
 
-            # Convert time fields to match '%H:%M:%S' format
             camera.attendance_time_start = format_time(request.POST['attendance_time_start'])
             camera.attendance_time_end = format_time(request.POST['attendance_time_end'])
             camera.leaving_time_start = format_time(request.POST['leaving_time_start'])
             camera.leaving_time_end = format_time(request.POST['leaving_time_end'])
+            camera.cam_is_active = True
+            camera.role_camera = "P"
+            camera.feed_src = 1
 
             camera.save()
-
-            cam = models.Camera_Settings.objects.last()
-            MC.add_camera(cam.id, cam.feed_src)
-
-            request.session['status'] = 'adding_success'
             return JsonResponse({'status': 'success'})
         else:
-            request.session['status'] = 'adding_error'
+            return JsonResponse({
+                'status': 'error',
+                'message': 'Form tidak valid',
+                'errors': form.errors.as_json()
+            }, status=400)
 
-    return render(request, 'add_presence_camera.html', {'Active_Cam': None})
-
+    # jika GET, abaikan di form ajax
+    return JsonResponse({
+        'status': 'error',
+        'message': 'Invalid request method'
+    }, status=405)
 
 @login_required
 def edit_presence_camera(request, id):
@@ -519,8 +529,8 @@ def edit_presence_camera(request, id):
 
         # Update the camera settings
         active_cam.cam_name = cam_name
-        active_cam.role_camera = role_camera
-        active_cam.feed_src = feed_src
+        active_cam.role_camera = 'P'
+        active_cam.feed_src = 1
         active_cam.attendance_time_start = attendance_time_start
         active_cam.attendance_time_end = attendance_time_end
         active_cam.leaving_time_start = leaving_time_start
@@ -530,7 +540,7 @@ def edit_presence_camera(request, id):
         if active_cam.feed_src != feed_src:
             MC.stop_cam(active_cam.id)
             MC.add_camera(active_cam.id, feed_src)
-            active_cam.cam_is_active = False
+            active_cam.cam_is_active =  True
 
         active_cam.save()
         request.session['status'] = 'editing_success'

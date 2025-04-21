@@ -61,10 +61,17 @@ def start_presence_stream(request, cam_id):
     cam = get_object_or_404(models.Camera_Settings, id=cam_id)
     
     # Attempt to open the camera feed
-    camera_feed = cv2.VideoCapture(cam.feed_src) # Assuming feed_src is a valid URL or path
-
+    camera_feed = cv2.VideoCapture(cam.feed_src) 
+    # Assuming feed_src is a valid URL or path
+    if not camera_feed.isOpened():
+            camera_feed = cv2.VideoCapture(cam.feed_src, cv2.CAP_DSHOW) # DirectShow (Windows)
+    if not camera_feed.isOpened():
+            camera_feed = cv2.VideoCapture(cam.feed_src, cv2.CAP_MSMF)  # Media Foundation (Windows)
+    if not camera_feed.isOpened():
+            camera_feed = cv2.VideoCapture(cam.feed_src, cv2.CAP_V4L2)  # Video4Linux (Linux)
+            
     if camera_feed.isOpened():
-        print(f"Start RTSP stream from: {cam.cam_name}")
+        # print(f"Start RTSP stream from: {cam.cam_name}")
         request.session['cams'].append(cam_id)  # Add cam_id to the session list
         request.session.modified = True  # Mark the session as modified
         streaming = True
@@ -123,7 +130,7 @@ def tracking_stream(request):
 def presence_cam_stream(request):
     company = models.Company.objects.get(user=request.user)
     presence_cameras = models.Camera_Settings.objects.filter(
-        Q(role_camera='P_IN') | Q(role_camera='P_OUT'),
+        role_camera='P',
         company=company
     ) # Get presence cameras
     default_camera = presence_cameras.first() if presence_cameras.exists() else None  # Set a default camera if available

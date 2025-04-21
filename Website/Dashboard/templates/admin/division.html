@@ -283,17 +283,9 @@ function addDivision() {
     })
     .then(response => response.json())
     .then(data => {
-        if (data.status === 'success') {
-            $('#modal-tambah').modal('hide');
-            loadDivisions();
-            Swal.fire(
-                'Added!',
-                'Division has been added.',
-                'success'
-            );
+   
             location.reload();
-        
-        }
+
     });
 }
 
