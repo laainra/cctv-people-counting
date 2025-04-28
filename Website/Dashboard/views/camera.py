@@ -478,23 +478,28 @@ def format_time(time_str, default_time=None):
     except ValueError:
         print(f"Invalid time format: {time_str}. Returning default time.")
         return default_time if default_time else datetime.strptime("00:00", "%H:%M").time()  # Return default time on error
-
 @login_required
 def add_presence_camera(request):
     if request.method == 'POST':
         form = forms.AddPresenceCameraForm(request.POST)
         if form.is_valid():
             company = models.Company.objects.get(user=request.user)
-            camera = form.save(commit=False)
-            camera.company = company
+            camera = form.save(commit=False)  # jgn save dulu
 
+            # Set nilai default feed_src
+            if not camera.feed_src:  # kalau belum diisi, set 1
+                camera.feed_src = 1
+
+            # Isi field lainnya
+            camera.company = company
+            camera.cam_is_active = True
+            camera.role_camera = "P"  # kalau role diatur default juga
+
+            # Format jam
             camera.attendance_time_start = format_time(request.POST['attendance_time_start'])
             camera.attendance_time_end = format_time(request.POST['attendance_time_end'])
             camera.leaving_time_start = format_time(request.POST['leaving_time_start'])
             camera.leaving_time_end = format_time(request.POST['leaving_time_end'])
-            camera.cam_is_active = True
-            camera.role_camera = "P"
-            camera.feed_src = 1
 
             camera.save()
             return JsonResponse({'status': 'success'})
@@ -505,11 +510,11 @@ def add_presence_camera(request):
                 'errors': form.errors.as_json()
             }, status=400)
 
-    # jika GET, abaikan di form ajax
     return JsonResponse({
         'status': 'error',
         'message': 'Invalid request method'
     }, status=405)
+
 
 @login_required
 def edit_presence_camera(request, id):

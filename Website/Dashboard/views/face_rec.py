@@ -14,7 +14,9 @@ from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib import messages
 from django.shortcuts import redirect
+
 from .. camera import camera_instance
+
 # Initialize Haar Cascade for face detection
 face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
 dataset_folder = var.personnel_path

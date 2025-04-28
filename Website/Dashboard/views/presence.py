@@ -605,44 +605,44 @@ def get_today_presences(request):
         })
     
     print("Presence data retrieved successfully: ", presence_data)
-    del_img()
+    # del_img()
     return JsonResponse({'data': presence_data})
 
-def del_img():
-    today = date.today()
+# def del_img():
+#     today = date.today()
 
-    # The query to fetch image paths in the database
-    query = '''
-        SELECT 
-            d.image
-        FROM 
-            dashboard_personnel_entries AS d
-        WHERE 
-            DATE(d.timestamp) = %s
-        '''
-    params = [today]
+#     # The query to fetch image paths in the database
+#     query = '''
+#         SELECT 
+#             d.image
+#         FROM 
+#             dashboard_personnel_entries AS d
+#         WHERE 
+#             DATE(d.timestamp) = %s
+#         '''
+#     params = [today]
 
-    with connection.cursor() as cursor:
-        cursor.execute(query, params)
-        # Fetch all image paths from the database
-        db_image_paths = [entry[0] for entry in cursor.fetchall()]
+#     with connection.cursor() as cursor:
+#         cursor.execute(query, params)
+#         # Fetch all image paths from the database
+#         db_image_paths = [entry[0] for entry in cursor.fetchall()]
 
-    # Folder where images are stored
-    # dashboard_dir = os.path.join(DIR, 'Dashboard')
+#     # Folder where images are stored
+#     # dashboard_dir = os.path.join(DIR, 'Dashboard', 'static', 'img', 'extracted_faces',)
     
-    # Get all files in the directory
-    all_files = os.listdir(DIR)
+#     # Get all files in the directory
+#     all_files = os.listdir(DIR)
 
-    # Remove files that are not in the database
-    for file in all_files:
-        file_path = os.path.join(DIR, file)
+#     # Remove files that are not in the database
+#     for file in all_files:
+#         file_path = os.path.join(DIR, file)
         
-        # Check if the file is not in the database list
-        if file not in db_image_paths:
-            try:
-                # os.remove(file_path)  # Delete the file if not in the DB
-                print(f"Deleted file: {file_path}")
-            except Exception as e:
-                print(f"Error deleting file {file_path}: {str(e)}")
+#         # Check if the file is not in the database list
+#         if file not in db_image_paths:
+#             try:
+#                 # os.remove(file_path)  # Delete the file if not in the DB
+#                 print(f"Deleted file: {file_path}")
+#             except Exception as e:
+#                 print(f"Error deleting file {file_path}: {str(e)}")
 
-    print("Deleted images in folder today")
+#     print("Deleted images in folder today")

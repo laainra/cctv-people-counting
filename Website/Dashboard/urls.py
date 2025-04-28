@@ -95,4 +95,9 @@ urlpatterns = [
     path('video_feed_timer/<int:cam_id>/', work_timer.video_feed_timer, name='video_feed_timer'),
     
     path('tracking_report/', tracking.tracking_report, name='tracking_report'),
+    path('import_personnel/', personnel.import_personnel, name='import_personnel'),
+    path('download_template/', personnel.download_template, name='download_template'),
+    path('capture_absence_from_webcam/', face_rec.capture_absence_from_webcam, name='capture_absence_from_webcam'),
+    path('delete_images/', face_rec.delete_images, name='delete_images'),
+    path('get_today_presences/', presence.get_today_presences, name='get_today_presences'),
 ]

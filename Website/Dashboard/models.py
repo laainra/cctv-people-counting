@@ -74,14 +74,13 @@ class Personnel_Images(models.Model):
 
 class Camera_Settings(models.Model):
     ROLE_CAMERA_CHOICES = [
-    ("P_IN", "Presence_In"),
-    ("P_OUT", "Presence_Out"),
+    ("P", "Presence"),
     ("T", "Tracking")
 ]
 
     id = models.AutoField(primary_key=True)
     cam_name = models.CharField(max_length=200)
-    feed_src = models.CharField(max_length=200)
+    feed_src = models.CharField(max_length=200,null=True, default="0")
     x1 = models.IntegerField(default=0)
     y1 = models.IntegerField(default=0)
     x2 = models.IntegerField(default=0)
@@ -98,7 +97,7 @@ class Camera_Settings(models.Model):
     y7 = models.IntegerField(default=0)
     x8 = models.IntegerField(default=0)
     y8 = models.IntegerField(default=0)
-    cam_is_active = models.BooleanField(default=False)
+    cam_is_active = models.BooleanField(default=True)
     gender_detection = models.BooleanField(default=False)
     face_detection = models.BooleanField(default=True)
     face_capture = models.BooleanField(default=True)
